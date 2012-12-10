@@ -1,0 +1,101 @@
+legend
+    h2 Edit Project - {{project.title}}
+form.form-horizontal
+    .control-group
+        label.control-label Name
+        .controls
+            input(type="text",required,ng-model="project.title")
+    .control-group
+       label.control-label Description
+       .controls
+           textarea(type="text",required,ng-model="project.description")
+    .control-group
+           label.control-label Sprint duration
+           .controls
+               select(type="text", required, ng-model="project.sprint_duration",ng-options="n for n in [] | range:1:8")
+               span.add-on  (Weeks)
+    .control-group
+           label.control-label Calculate velocity on
+           .controls
+               label.control-lable Workitem type
+               select(ng-model='velocity_workitem_type',ng-change="velocity_type_changed()", ng-options="m.id as m.title for m in velocity_workitem_details")
+               label.control-lable Workitem state
+               select(ng-model="velocity_workitem_state",ng-options="m.id as m.title for m in velocity_workitem_states",ng-change="state_changed()")
+
+    .control-group
+        .controls
+            button.btn(type="submit",text="Save") Save
+    legend Workitem config
+        span
+            abbr(title="For editing existing item, select respective item from dropdown, edit the value and click save, for adding a new one, select blank enter title and click save.") ?
+    .control-group
+        label.control-label Workitem type
+        .controls
+            select(ng-model="workitem_type",ng-change="type_changed()",ng-options="m.id as m.title for m in workitem_details")
+            span(style="margin-left:5px;")
+            input(type="text", value="{{selected_workitem_type.title}}", ng-model="new_workitem_type")
+            span.add-on(style="margin-left:5px;display:{{visible.save}};", ng-click="update_workitem()")
+                i.i-tick
+                span.hover-bg.hover-hand  Save
+            span.add-on(style="margin-left:5px;display:{{visible.add}};")
+                i.i-add
+                span.hover-bg.hover-hand(ng-click="add_workitem_type()")  Add
+            span.add-on(style="margin-left:5px;display:{{visible.remove}};")
+                i.i-cross
+                span.hover-bg.hover-hand(ng-click="remove_workitem_type()")  Remove
+    .control-group
+        label.control-label Workitem states
+        .controls
+            select(ng-model="workitem_state",ng-options="m.id as m.title for m in workitem_states",ng-change="state_changed()")
+            span(style="margin-left:5px;")
+            input(type="text", value="{{selected_workitem_state.title}}")
+            span.add-on(style="display:{{visible.state_save}};")
+                i.i-tick
+                span.hover-bg.hover-hand  Save
+            span.add-on(style="margin-left:5px;display:{{visible.state_add}}")
+                i.i-add
+                span.hover-bg.hover-hand  Add
+            span.add-on(style="margin-left:5px;display:{{visible.state_remove}}")
+                i.i-cross
+                span.hover-bg.hover-hand  Remove
+
+    legend Modules
+    .control-group.input-append
+       label.control-label Module-name
+       .controls
+           input(type='text', placeholder='',type="text",ng-model="form.module_name")
+           #module-create.ajax-loader.pull-right(style="display:{{module_ajax_loader}}")
+           button.add-on(style="height:28px;", ng-click="add_module()")
+                  i.i-application_form_add
+
+    .control-group
+        label.control-label Modules
+        .controls
+            ul.unstyled
+                li(ng-repeat="m in modules", ui-animate)
+                    span
+                       i.i-application_form_delete.hover-hand(ng-click="remove_module(m.id)")
+                    span  {{m.module_name}}
+
+    legend Users
+    .control-group.input-append
+       label.control-label Email-id
+       .controls
+           input(type='text', placeholder='',type="email",ng-model="form.email_id")
+           #user-create.ajax-loader.pull-right(style="display:{{user_ajax_loader}}")
+           button.add-on(style="height:28px;", ng-click="add_user()")
+              i.i-user_add
+    .control-group
+        label.control-label Users
+        .controls
+            table.table.table-hover
+                thead
+                    tr
+                        th User name
+                        th Email Address
+                        th
+                tr(ng-repeat="m in users", ui-animate)
+                    td {{m.display_name}}
+                    td {{m.user_name}}
+                    td
+                        i.i-user_delete.hover-hand(ng-click="remove_user(m.user_name)",title="remove user")

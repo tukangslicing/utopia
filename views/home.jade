@@ -1,0 +1,15 @@
+extends layout
+
+block content
+    div(ng-view)
+
+block menu
+    li
+     a(href='/home') Home
+    li
+     a(href='/settings') Settings
+    li
+     a(href='/logout') Logout
+
+block scripts
+    script(type='text/javascript', src='javascripts/app-js.js')

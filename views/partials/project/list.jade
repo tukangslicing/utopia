@@ -1,0 +1,14 @@
+legend
+    h2 My projects
+        a.btn.pull-right(href="#/project/new")
+            i.icon-plus-sign
+            |  Project
+
+ul.thumbnails
+    li.span3(ng-repeat="project in projects")
+        div.thumbnail.hover-only-parent.project
+            a.pull-right(href="#/project/{{project.id}}/edit", rel="tooltip", data-title="Edit a project")
+                i.icon-edit.hover-only-child
+            h3.capitalize {{project.title}}
+            p  {{project.description}}
+            a(href="#/project/{{project.id}}/dashboard" ) Dashboard

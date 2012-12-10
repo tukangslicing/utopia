@@ -1,0 +1,69 @@
+legend
+    h2 Create a new Express project
+
+#create-express(ng-controller="CreateExpressProject")
+    .row-fluid
+        .span7
+            form.form-horizontal(name="createproject",ng-submit="create()")
+                .control-group
+                    h3.light 1.Fill up project details.
+                .control-group
+                    label.control-label Project name
+                    .controls
+                            input#inputProjectTitle(type='text', placeholder='Title for your project',type="text",required,ng-model="form.title")
+                .control-group
+                    label.control-label Project description
+                    .controls
+                            textarea#inputProjectDescription(type='text', placeholder='Description of project',type="text",ng-model="form.description")
+                .control-group
+                    .controls
+                        button.btn(type="submit",class="{{disable}}") Save
+                        span.add-on.input-append
+                            #project-create.ajax-loader(style="display:{{create_project_ajax_loader}}")
+            .span5
+                #notification(ng-repeat="nt in notifications")
+                    i(class="{{nt_class}}")
+                    span  {{nt}}
+    .row-fluid
+        .span7
+           form.form-horizontal(name="createmodules",ng-submit="add_module()")
+               .control-group
+                   h3.light 2.Add high level modules.
+               .control-group.input-append
+                   label.control-label Module-name
+                   .controls
+                       input#inputProjectTitle(type='text', placeholder='',type="text",required,ng-model="form.module_name",ui-reset)
+                       #module-create.ajax-loader.pull-right(style="display:{{module_ajax_loader}}")
+                       button.add-on(type="submit",style="height:28px;")
+                          i.i-application_form_add
+
+               .control-group
+                    label.control-label Modules
+                    .controls
+                        ul.unstyled
+                            li(ng-repeat="m in modules", ui-animate)
+                                span
+                                   i.i-application_form_delete.hover-hand(ng-click="remove_module(m.id)")
+                                span  {{m.module_name}}
+
+    .row-fluid
+            .span7
+               form.form-horizontal(name="addusers",ng-submit="add_user()")
+                   .control-group
+                       h3.light 3. Add Users.
+                   .control-group.input-append
+                       label.control-label Email-id
+                       .controls
+                           input#inputProjectTitle(type='text', placeholder='',type="email",required,ng-model="form.email_id",ng-reset)
+                           #module-create.ajax-loader.pull-right(style="display:{{module_ajax_loader}}")
+                           button.add-on(type="submit",style="height:28px;")
+                              i.i-application_form_add
+
+                   .control-group
+                        label.control-label Users
+                        .controls
+                            ul.unstyled
+                                li(ng-repeat="m in users", ui-animate)
+                                    span
+                                       i.i-application_form_delete.hover-hand(ng-click="remove_user(m.user_name)")
+                                    span  {{m.user_name}}

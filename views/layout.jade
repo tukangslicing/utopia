@@ -1,0 +1,58 @@
+doctype 5
+html(lang='en', ng-app="utopia")
+  head
+    meta(name="viewport",content="width=device-width,initial-scale=1.0")
+    meta(charset="utf-8")
+    link(rel='stylesheet', type='text/css', href='stylesheets/bootstrap.css')
+    link(rel='stylesheet', type='text/css', href='stylesheets/bootstrap-responsive.css')
+    link(rel='stylesheet', type='text/css', href='stylesheets/site.css')
+    link(rel='stylesheet', type='text/css', href='stylesheets/icon-style.css')
+    link(rel='stylesheet', type='text/css', href='stylesheets/jgrowl.css')
+    link(rel='stylesheet', type='text/css', href='stylesheets/chosen.css')
+    title Utopia
+  body
+    .navbar.navbar-inverse
+     .navbar-inner
+        .container
+          a.btn.btn-navbar(data-target='.nav-collapse', data-toggle='collapse')
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+          .logo Utopia
+          .nav-collapse.pull-right(style='height: 0px;')
+            ul.nav
+              block menu
+    //if IE 8
+        .alert
+            h2 Oh! You're using IE.
+            span We're sorry but Utopia just doesn't run on IE.
+            #span Yeah, sucks. Get mad at Steve Ballmer or just get Chrome, or Safari, or Android, or Opera, or Firefox, practically any other browser that exists on this planet, for God's sake this isn't 1995.
+
+    #container.data-container.container
+          .alert.alert-error(style='display: none;')
+                a.close(href="#", onclick="$(this).parent().css('display','none');") x
+                strong Oh snap! 
+                span#statusMessage
+     
+          block content
+
+    #notification.jGrowl.bottom-right
+    .navbar.navbar-fixed-bottom(style='text-align:center;padding:10px;')
+        span Chinmay Kulkarni production 2012 &copy;.
+    
+    script(type='text/javascript', src='javascripts/libs/jquery.js')
+    script(type='text/javascript', src='javascripts/libs/bootstrap.min.js')
+    script(type='text/javascript', src='javascripts/libs/socket.io.js')
+    script(type='text/javascript', src='javascripts/libs/angular.min.js')
+    script(type='text/javascript', src='javascripts/libs/jquery-ui-1.9.0.custom.min.js')
+    script(type='text/javascript', src='javascripts/util.js')
+    script(type='text/javascript', src='javascripts/controllers.js')
+    script(type='text/javascript', src='javascripts/libs/jgrowl.min.js')
+    script(type='text/javascript', src='javascripts/libs/chosen.jquery.min.js')
+    block scripts
+    script(type='text/javascript', src='javascripts/services.js')
+
+    // if IE 8
+      script(type='text/javascript', src='http://localhost:3000}/javascripts/libs/respond.min.js')
+      script(type='text/javascript', src='http://localhost:3000/javascripts/libs/modernizr.custom.js')
+    

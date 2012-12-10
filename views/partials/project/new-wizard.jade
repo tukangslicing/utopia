@@ -1,0 +1,77 @@
+legend
+    h2 Select a project type
+
+.row-fluid
+    .span3
+        label.radio
+            input.top-margin(type="radio", name="projectConfig",value="express", ng-model="selected", checked,style="margin-top:10px;")
+            h2 Express
+            span create a project with standard configuration
+
+    .span3
+        label.radio
+            input(type="radio",name="projectConfig",value="custom",ng-model="selected",style="margin-top:10px;")
+            h2 Custom
+            span create a project with customized story types and states
+
+a.btn.pull-right(href="#/project/create/{{selected}}")
+    | Create
+
+legend Express Project
+span Express project is a default template for creating efficient agile projects.
+p  You just have to provide a title and you're good to go!
+ | Creating an Express project will yield you following Workitem types and states
+table.table-bordered.table
+    thead
+        tr
+            th Workitem type
+            th Workitem states
+    tbody
+        tr
+            td(rowspan=8) Story
+        tr
+            td unplanned
+        tr
+            td planned
+        tr
+            td started
+        tr
+            td finished
+        tr
+            td verified
+        tr
+            td resolved
+        tr
+            td reopened
+        tr
+            td(rowspan=8) Bug
+        tr
+            td unplanned
+        tr
+            td planned
+        tr
+            td started
+        tr
+            td finished
+        tr
+            td verified
+        tr
+            td resolved
+        tr
+            td reopened
+        tr
+            td(rowspan=8) Essential
+        tr
+            td unplanned
+        tr
+            td planned
+        tr
+            td started
+        tr
+            td finished
+
+
+legend Custom Project
+span Allows you define you own workitem types and states.
+p  This is for tailoring Utopia to your project needs.
+ |Only recommended if you wish to change default provided workitem types.
