@@ -445,4 +445,29 @@ ProjectController.prototype.remove_workitem_state = function (req, res) {
   });
 };
 
+ProjectController.prototype.set_final_workitem_state = function (req, res) {
+  var db_client;
+
+  function send_response(err, rows) {
+    db.release(db_client);
+    var result = {};
+    if (err) {
+      result.message = "Oops ! something went wrong, please try again";
+      result.success = false;
+      result.data = null;
+    } else {
+      result.message = "State successfully altered";
+      result.success = true;
+      result.data = null;
+    }
+    res.json(result);
+  }
+
+  db.acquire(function (err, client) {
+    db_client = client;
+    var args = [req.params.workitem_state_id, req.params.workitem_id];
+    client.query(sp.get_sp(sp.update_final_workitem_state, args), send_response);
+  });
+};
+
 module.exports = new ProjectController();

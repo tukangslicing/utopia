@@ -23,4 +23,6 @@ exports.init = function (app) {
   app.get('/api/project/:project_id/add_workitem_state/:workitem_id/:workitem_state', project_controller.add_workitem_state);
   app.get('/api/project/:project_id/update_workitem_state/:workitem_id/:workitem_state_id/:workitem_state_title', project_controller.update_workitem_state);
   app.get('/api/project/:project_id/remove_workitem_state/:workitem_id/:workitem_state_id', project_controller.remove_workitem_state);
+
+  app.get('/api/project/:project_id/set_final_workitem_state/:workitem_id/:workitem_state_id', project_controller.set_final_workitem_state);
 };

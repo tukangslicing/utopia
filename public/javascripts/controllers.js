@@ -352,6 +352,9 @@ function ProjectEditController($scope, $http, $routeParams) {
   };
 
   $scope.set_final_workitem_state = function () {
-
+    $http.get("/api/project/" + $routeParams.project_id + "/set_final_workitem_state/" + $scope.workitem_type + "/" + $scope.workitem_state)
+      .success(function (data) {
+        handle_message(data);
+      });
   };
 }
