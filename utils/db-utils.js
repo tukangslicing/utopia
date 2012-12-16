@@ -14,6 +14,11 @@ exports.sp_map = {
   select_workitem_types_project : "sp_tbl_workitem_types_by_project_id",
   select_users_by_project_id : "sp_tbl_project_users_select_by_project_id",
   select_modules_by_project_id : "sp_tbl_project_modules_lst",
+  update_workitem_type : "sp_tbl_workitem_types_upd",
+  delete_workitem_type : "sp_tbl_workitem_types_del",
+  delete_workitem_state : "sp_tbl_workitem_states_del",
+  insert_workitem_state : "sp_tbl_workitem_states_upd",
+  update_final_workitem_state : "sp_set_final_workitem_state",
 
   get_sp : function (name, args) {
     args = args.map(function (d) {

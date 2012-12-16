@@ -19,8 +19,6 @@ form.form-horizontal
            .controls
                label.control-lable Workitem type
                select(ng-model='velocity_workitem_type',ng-change="velocity_type_changed()", ng-options="m.id as m.title for m in velocity_workitem_details")
-               label.control-lable Workitem state
-               select(ng-model="velocity_workitem_state",ng-options="m.id as m.title for m in velocity_workitem_states",ng-change="state_changed()")
 
     .control-group
         .controls
@@ -48,16 +46,19 @@ form.form-horizontal
         .controls
             select(ng-model="workitem_state",ng-options="m.id as m.title for m in workitem_states",ng-change="state_changed()")
             span(style="margin-left:5px;")
-            input(type="text", value="{{selected_workitem_state.title}}")
-            span.add-on(style="display:{{visible.state_save}};")
+            input(type="text", value="{{selected_workitem_state.title}}",ng-model="new_workitem_state")
+            span.add-on(style="margin-left:5px;display:{{visible.state_save}};")
                 i.i-tick
-                span.hover-bg.hover-hand  Save
+                span.hover-bg.hover-hand(ng-click="save_workitem_state()")  Save
             span.add-on(style="margin-left:5px;display:{{visible.state_add}}")
                 i.i-add
-                span.hover-bg.hover-hand  Add
+                span.hover-bg.hover-hand(ng-click="add_workitem_state()")  Add
             span.add-on(style="margin-left:5px;display:{{visible.state_remove}}")
                 i.i-cross
-                span.hover-bg.hover-hand  Remove
+                span.hover-bg.hover-hand(ng-click="remove_workitem_state()")  Remove
+            span.add-on(style="margin-left:5px;display:{{visible.state_remove}}")
+                            i.i-anchor
+                            span.hover-bg.hover-hand(ng-click="set_final_workitem_state()")  Set as final
 
     legend Modules
     .control-group.input-append

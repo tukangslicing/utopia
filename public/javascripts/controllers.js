@@ -125,6 +125,7 @@ function ProjectEditController($scope, $http, $routeParams) {
           b = {};
           b.id = similar_items[j].workitem_state_id;
           b.title = similar_items[j].state_title;
+          b.is_final = similar_items[j].is_final;
           if (b.id !== null) {
             a.states.push(b);
           }
@@ -140,6 +141,7 @@ function ProjectEditController($scope, $http, $routeParams) {
       ];
       res.push(a);
       $scope.workitem_details = res;
+      console.log(res);
     });
     $http.get("/api/project/" + $routeParams.project_id + "/get_modules").success(function (data) {
       $scope.modules = data.data;
@@ -149,12 +151,14 @@ function ProjectEditController($scope, $http, $routeParams) {
 
   init();
 
-  function set_edit_icons_none() {
+  function set_edit_icons_none(no_state) {
     $scope.visible = {};
     $scope.visible.save = 'none';
     $scope.visible.remove = 'none';
     $scope.visible.add = 'none';
-    state_hide_all();
+    if (!no_state) {
+      state_hide_all();
+    }
   }
 
   $scope.add_module = function () {
@@ -190,7 +194,7 @@ function ProjectEditController($scope, $http, $routeParams) {
       return d.id === 0;
     }).length;
     if (l === 0) {
-      $scope.selected_workitem_type.states.push({id : 0, title : "[Add a new workitem state] in " + $scope.selected_workitem_type.title });
+      $scope.selected_workitem_type.states.push({id : 0, title : "[Add a new workitem state]"});
     }
     $scope.workitem_states = $scope.selected_workitem_type.states;
     if ($scope.selected_workitem_type.title === "[Add a new workitem type]") {
@@ -199,19 +203,23 @@ function ProjectEditController($scope, $http, $routeParams) {
       workitem_show_edit();
     }
     state_show_selected();
+    state_hide_all();
   };
 
   $scope.velocity_type_changed = function () {
     var ok = $scope.velocity_workitem_details.filter(function (d) {
       return d.id === $scope.velocity_workitem_type;
     })[0];
-    $scope.velocity_workitem_states = ok.states;
+    $scope.velocity_workitem_states = ok.states.filter(function (d) {
+      return d.id !== 0;
+    });
   };
 
   $scope.state_changed = function () {
     $scope.selected_workitem_state = $scope.selected_workitem_type.states.filter(function (d) {
       return d.id === $scope.workitem_state;
     })[0];
+    set_edit_icons_none(true);
     state_show_selected();
   };
 
@@ -233,17 +241,6 @@ function ProjectEditController($scope, $http, $routeParams) {
             return d.user_name !== user_name;
           });
         }
-      });
-  };
-
-  $scope.add_workitem_type = function () {
-    $http.get('/api/project/' + $routeParams.project_id + '/add_workitem_type/' + $scope.new_workitem_type)
-      .success(function (data) {
-        handle_message(data);
-        var type = data.data;
-        type.states = [];
-        console.log(type);
-        $scope.workitem_details.push(type);
       });
   };
 
@@ -283,15 +280,78 @@ function ProjectEditController($scope, $http, $routeParams) {
     }
   }
 
+  $scope.add_workitem_type = function () {
+    $http.get('/api/project/' + $routeParams.project_id + '/add_workitem_type/' + $scope.new_workitem_type)
+      .success(function (data) {
+        handle_message(data);
+        var type = data.data;
+        type.states = [];
+        console.log(type);
+        $scope.workitem_details.unshift(type);
+      });
+  };
+
   $scope.update_workitem = function () {
     if ($scope.new_workitem_type === "") {
       handle_message({success : false, message : "Workitem name can not be empty"});
       return;
     }
-
     $http.get("/api/project/" + $routeParams.project_id + "/update_workitem_type/" + $scope.workitem_type + "/" + $scope.new_workitem_type)
       .success(function (data) {
         handle_message(data);
+        var item = $scope.workitem_details.filter(function (d) {
+          return d.id === $scope.workitem_type
+        })[0];
+        item.title = $scope.new_workitem_type;
       });
+    set_edit_icons_none();
+  };
+
+  $scope.remove_workitem_type = function () {
+    $http.get("/api/project/" + $routeParams.project_id + "/remove_workitem_type/" + $scope.workitem_type)
+      .success(function (data) {
+        handle_message(data);
+        var item = $scope.workitem_details.filter(function (d) {
+          return d.id === $scope.workitem_type;
+        })[0];
+        var index = $scope.workitem_details.indexOf(item);
+        $scope.workitem_details.splice(index, 1);
+      });
+    set_edit_icons_none();
+  }
+
+  $scope.add_workitem_state = function () {
+    $http.get("/api/project/" + $routeParams.project_id + "/add_workitem_state/" + $scope.workitem_type + "/" + $scope.new_workitem_state)
+      .success(function (data) {
+        handle_message(data);
+        var item = $scope.workitem_details.filter(function (d) {
+          return d.id === $scope.workitem_type;
+        })[0];
+        item.states.unshift(data.data);
+      });
+    state_hide_all();
+  };
+
+  $scope.update_workitem_state = function () {
+
+  };
+
+  $scope.remove_workitem_state = function () {
+    $http.get("/api/project/" + $routeParams.project_id + "/remove_workitem_state/" + $scope.workitem_type + "/" + $scope.workitem_state)
+      .success(function (data) {
+        handle_message(data);
+        var item = $scope.workitem_details.filter(function (d) {
+          return d.id === $scope.workitem_type;
+        })[0];
+        var index = item.states.indexOf(item.states.filter(function (d) {
+          return d.id === $scope.workitem_state;
+        })[0]);
+        item.states.splice(index, 1);
+      });
+    state_hide_all();
+  };
+
+  $scope.set_final_workitem_state = function () {
+
   };
 }

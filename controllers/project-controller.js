@@ -352,6 +352,56 @@ ProjectController.prototype.remove_workitem_type = function (req, res) {
       result.message = "Operation could not be completed, avoid duplicate values";
     } else {
       result.success = true;
+      result.data = rows[0];
+      result.message = "Operation successfully completed";
+    }
+    res.json(result);
+    db.release(db_client);
+  }
+
+  db.acquire(function (err, client) {
+    db_client = client;
+    var args = [req.params.workitem_id, req.params.project_id];
+    client.query(sp.get_sp(sp.delete_workitem_type, args), send_response);
+  });
+};
+
+ProjectController.prototype.update_workitem_type = function (req, res) {
+  var db_client;
+
+  function send_response(err, rows) {
+    db.release(db_client);
+    var result = {};
+    if (err) {
+      result.message = "Can not update workitem type";
+      result.success = false;
+      result.data = null;
+    } else {
+      result.message = "Workitem type successfully updated";
+      result.success = true;
+      result.data = null;
+    }
+    res.json(result);
+  }
+
+  db.acquire(function (err, client) {
+    db_client = client;
+    var args = [req.params.workitem_id, req.params.workitem_title, req.params.project_id];
+    client.query(sp.get_sp(sp.update_workitem_type, args), send_response);
+  });
+};
+
+ProjectController.prototype.add_workitem_state = function (req, res) {
+  var db_client;
+
+  function send_response(err, rows) {
+    var result = new helpers.response();
+    if (err) {
+      result.success = false;
+      result.data = null;
+      result.message = "Operation could not be completed, avoid duplicate values";
+    } else {
+      result.success = true;
       result.data = rows[0][0];
       result.message = "Operation successfully completed";
     }
@@ -361,32 +411,9 @@ ProjectController.prototype.remove_workitem_type = function (req, res) {
 
   db.acquire(function (err, client) {
     db_client = client;
-    var args = [0, req.params.workitem_type, req.params.project_id];
-    send_response(null, null);
+    var args = [0, req.params.workitem_id, req.params.workitem_state];
+    db_client.query(sp.get_sp(sp.insert_workitem_state, args), send_response);
   });
-};
-
-ProjectController.prototype.update_workitem_type = function (req, res) {
-  var db_client;
-
-  function send_response() {
-    db.release(db_client);
-    var result = {};
-    result.message = "Not updated in database but done."
-    result.success = true;
-    result.data = null;
-    res.json(result);
-  }
-
-
-  db.acquire(function (err, client) {
-    db_client = client;
-    send_response();
-  });
-};
-
-ProjectController.prototype.add_workitem_state = function (req, res) {
-
 };
 
 ProjectController.prototype.update_workitem_state = function (req, res) {
@@ -394,7 +421,28 @@ ProjectController.prototype.update_workitem_state = function (req, res) {
 };
 
 ProjectController.prototype.remove_workitem_state = function (req, res) {
+  var db_client;
 
+  function send_response(err, rows) {
+    db.release(db_client);
+    var result = {};
+    if (err) {
+      result.message = "Can not remove workitem state";
+      result.success = false;
+      result.data = null;
+    } else {
+      result.message = "Workitem type successfully updated";
+      result.success = true;
+      result.data = null;
+    }
+    res.json(result);
+  }
+
+  db.acquire(function (err, client) {
+    db_client = client;
+    var args = [req.params.workitem_state_id, req.params.project_id];
+    client.query(sp.get_sp(sp.delete_workitem_state, args), send_response);
+  });
 };
 
 module.exports = new ProjectController();
