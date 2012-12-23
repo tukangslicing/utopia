@@ -84,10 +84,6 @@ function CreateExpressProject($scope, $http, $routeParams) {
   };
 }
 
-function ProjectController($scope, $http, $routeParams) {
-  console.log($routeParams);
-}
-
 function ProjectEditController($scope, $http, $routeParams) {
   function init() {
     $http.get("/api/project/" + $routeParams.project_id + "/get_details").success(function (data) {
@@ -101,6 +97,14 @@ function ProjectEditController($scope, $http, $routeParams) {
       handle_message(data);
       $scope.users = data;
     });
+    update_workitems();
+    $http.get("/api/project/" + $routeParams.project_id + "/get_modules").success(function (data) {
+      $scope.modules = data.data;
+    });
+    set_edit_icons_none();
+  }
+
+  function update_workitems() {
     $http.get("/api/project/" + $routeParams.project_id + "/get_workitem_details").success(function (data) {
       handle_message(data);
       var i = 0,
@@ -143,10 +147,6 @@ function ProjectEditController($scope, $http, $routeParams) {
       $scope.workitem_details = res;
       console.log(res);
     });
-    $http.get("/api/project/" + $routeParams.project_id + "/get_modules").success(function (data) {
-      $scope.modules = data.data;
-    });
-    set_edit_icons_none();
   }
 
   init();
@@ -220,6 +220,13 @@ function ProjectEditController($scope, $http, $routeParams) {
       return d.id === $scope.workitem_state;
     })[0];
     set_edit_icons_none(true);
+    if ($scope.selected_workitem_state.is_final) {
+      $scope.border = "border-left : 1px solid red;";
+      $scope.visible.state_final = "none";
+    } else {
+      $scope.border = "";
+      $scope.visible.state_final = "inline-block";
+    }
     state_show_selected();
   };
 
@@ -260,6 +267,7 @@ function ProjectEditController($scope, $http, $routeParams) {
     $scope.visible.state_save = 'none';
     $scope.visible.state_remove = 'none';
     $scope.visible.state_add = 'none';
+    $scope.visible.state_final = "none";
   }
 
   function state_show_selected() {
@@ -268,6 +276,7 @@ function ProjectEditController($scope, $http, $routeParams) {
         $scope.visible.state_save = 'none';
         $scope.visible.state_remove = 'none';
         $scope.visible.state_add = 'inline-block';
+        $scope.visible.state_final = "none";
       } else {
         $scope.visible.state_save = 'inline-block';
         $scope.visible.state_remove = 'inline-block';
@@ -277,6 +286,7 @@ function ProjectEditController($scope, $http, $routeParams) {
       $scope.visible.state_save = 'none';
       $scope.visible.state_remove = 'none';
       $scope.visible.state_add = 'none';
+      $scope.visible.state_final = "none";
     }
   }
 
@@ -318,7 +328,7 @@ function ProjectEditController($scope, $http, $routeParams) {
         $scope.workitem_details.splice(index, 1);
       });
     set_edit_icons_none();
-  }
+  };
 
   $scope.add_workitem_state = function () {
     $http.get("/api/project/" + $routeParams.project_id + "/add_workitem_state/" + $scope.workitem_type + "/" + $scope.new_workitem_state)
@@ -355,6 +365,11 @@ function ProjectEditController($scope, $http, $routeParams) {
     $http.get("/api/project/" + $routeParams.project_id + "/set_final_workitem_state/" + $scope.workitem_type + "/" + $scope.workitem_state)
       .success(function (data) {
         handle_message(data);
+        update_workitems();
       });
   };
+}
+
+function WhiteBoardController($scope, $http, $routeParams) {
+  $scope.project_id = $routeParams.project_id;
 }

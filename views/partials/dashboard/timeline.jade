@@ -1,11 +1,13 @@
-ul.nav.nav-pills.border-bottom
+ul.nav.nav-pills.border-bottom.padding
    li
-       a(href='#/partials/project/summary') Project Summary
+       a(href='#/project/{{project_id}}/summary') Project Summary
    li
-       a(href='#/partials/project/stories') Whiteboard
+       a(href='#/project/{{project_id}}/whiteboard') Whiteboard
    li.active
-       a(href='#/partials/project/stories') Timeline
+       a(href='#/project/{{project_id}}/timeline') Timeline
    li
-       a(href='#/partials/project/stories') Planning
+       a(href='#/project/{{project_id}}/planning') Planning
+
+   i.icon-cog.pull-right.hover-hand
 
 h1 Hello Timeline
