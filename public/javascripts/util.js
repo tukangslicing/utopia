@@ -21,6 +21,7 @@ $('#submit').click(function () {
 });
 
 var socket = io.connect();
+
 socket.on('notification', function (data) {
 });
 
@@ -29,6 +30,9 @@ socket.on('connect', function (data) {
 
 $(document).ready(function () {
   $("[rel=tooltip]").tooltip();
+  $(document).click(function () {
+    $('.popover').hide();
+  });
   if (ie8) {
     if (!Modernizr.input.placeholder) {
       $("input").each(
@@ -70,4 +74,16 @@ function get_distinct(arr) {
     }
   }
   return result;
+}
+
+function show_preferences(ele, event) {
+  var popover = $('.popover');
+  popover.toggle();
+  popover.css({left : $(ele).offset().left - popover.width() + 35,
+    top : $(ele).offset().top + $(ele).height() + 5});
+  popover.find('.arrow').css({left : popover.width() - $(ele).width() - 6});
+  event.stopPropagation();
+  popover.click(function (event) {
+    event.stopPropagation();
+  });
 }
