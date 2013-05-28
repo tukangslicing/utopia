@@ -21,42 +21,42 @@ require APPPATH.'/libraries/REST_Controller.php';
 	also its ok if we don't append _model for each class, "User" should suffice the use
 */
 
-class Api extends REST_Controller {
+	class Api extends REST_Controller {
 
-	public function __construct()
-	{
-		parent::__construct();
-		$this->load->model('user');
-		$this->load->model('project');
-	}
+		public function __construct()
+		{
+			parent::__construct();
+			$this->load->model('user');
+			$this->load->model('project');
+		}
 
-	public function index_get()
-	{
-		echo "api";
-	}
+		public function index_get()
+		{
+			echo "api";
+		}
 
-	public function auth_post()
-	{
-		
-		$username = $this->post('username');
-		$password = $this->post('password');
-		$result = $this->user->authenticate_user($username,$password);
-
-		if($result)
+		public function auth_post()
 		{
 			
-			$this->session->set_userdata('user_id',$result['user_basic']['id']);
-			$this->session->set_userdata('display_name',$result['user_basic']['display_name']);
-			$this->session->set_userdata('email_verified',$result['user_basic']['email_verified']);
+			$username = $this->post('username');
+			$password = $this->post('password');
+			$result = $this->user->authenticate_user($username,$password);
 
-			$response['action_result'] = TRUE;
-			$response['data'] = $result;
-			$response['message'] = "Login Success";
-			
-			$this->response($response);
-		}
-		else
-		{	$response['action_result'] = FALSE;
+			if($result)
+			{
+				
+				$this->session->set_userdata('user_id',$result['user_basic']['id']);
+				$this->session->set_userdata('display_name',$result['user_basic']['display_name']);
+				$this->session->set_userdata('email_verified',$result['user_basic']['email_verified']);
+
+				$response['action_result'] = TRUE;
+				$response['data'] = $result;
+				$response['message'] = "Login Success";
+				
+				$this->response($response);
+			}
+			else
+				{	$response['action_result'] = FALSE;
 			$response['data'] = NULL;
 			$response['message'] = "Login Failed";
 			$this->response($response);
@@ -194,7 +194,7 @@ class Api extends REST_Controller {
 				'need_review'			=> $this->put('need_review'),
 				'calculate_velocity_on' => $this->put('calculate_velocity_on'),
 				'created_by'			=> $this->put('created_by'),
-			 );
+				);
 			
 			$executed = $this->project->projects_update($data);
 			

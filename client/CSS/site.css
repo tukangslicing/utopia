@@ -1,0 +1,39 @@
+.carousel-inner .item {
+	height: 400px;
+	padding:20px;
+}
+
+.carousel {
+	background-color: gainsboro;
+}
+
+h1 {
+	font-family: "Segoe UI Light"
+}
+
+.footer {
+	text-align: center;
+	padding: 30px 0;
+	border-top: 1px solid #e5e5e5;
+	background-color: #f5f5f5;
+	position: fixed;
+	bottom: 0px;
+	width: 100%;
+}
+
+.login-form {
+	border-bottom: 1px solid green;
+}
+
+.project {
+	float: left;
+	min-width: 200px;
+	padding: 5px;
+	margin: 5px;
+	border: 1px solid #f5f5f5;
+}
+
+.project:hover {
+	background-color: #f5f5f5;
+	cursor: pointer;
+}
