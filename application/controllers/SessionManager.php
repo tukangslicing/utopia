@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Login extends CI_Controller {
+class SessionManager extends CI_Controller {
 
 	public function __construct()
 	{
@@ -45,9 +45,9 @@ class Login extends CI_Controller {
 
 		if($result)
 		{
-			$this->session->set_userdata('user_id',$result['id']);
-			$this->session->set_userdata('display_name',$result['display_name']);
-			$this->session->set_userdata('email_verified',$result['email_verified']);
+			$this->session->set_userdata('user_id',$result['user_basic']['id']);
+			$this->session->set_userdata('display_name',$result['user_basic']['display_name']);
+			$this->session->set_userdata('email_verified',$result['user_basic']['email_verified']);
 			return TRUE;
 		}
 		else
@@ -62,7 +62,7 @@ class Login extends CI_Controller {
 	{
 		//$this->session->unset_userdata('user_id');
 		$this->session->sess_destroy();
-		redirect('login');
+		redirect('SessionManager');
 	}
 
 }

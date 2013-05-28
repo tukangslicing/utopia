@@ -11,7 +11,7 @@ class Home extends CI_Controller {
 	{
 		echo "SESSION => <pre>";
 		print_r($this->session->all_userdata());
-		echo "<pre> <a href='".site_url('logout')."'>logout</a>";
+		echo "<pre> <a href='".site_url('SessionManager/logout')."'>logout</a>";
 	}
 
 }

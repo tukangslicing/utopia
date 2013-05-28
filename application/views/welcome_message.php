@@ -83,7 +83,7 @@
 			<p><b>Lets have an API guide here, parameters should include, URL, GET params, POST params, Return types</b></p>
 			<!-- COPY PASTE THIS DIV EVERYTIME YOU WANNA ADD API DOCUMENTATION -->
 			<div class='api'>
-				<p><span>URL : </span>index.php/api/auth/</p>
+				<p><span>URL : </span><?php echo site_url(); ?>api/auth/</p>
 				<p><span>POST params :</span> username, password</p>
 				<p><span>Returns : </span></p>
 				<code>
@@ -92,6 +92,64 @@
 					<p>message : "Successfully logged in" / "Please check your email or password"</p> 
 				</code>
 			</div>
+
+			<div class='api'>
+				<p><span>URL : </span><?php echo site_url(); ?>api/projects_user/</p>
+				<p><span>GET params :</span> NULL</p>
+				<p><span>Returns : </span></p>
+				<code>
+					<p>action_result : true / false</p>
+					<p>data : If User is Logged In then - user data ; else blank array</p>
+					<p>message : "Success" / "Login Failed"</p> 
+				</code>
+			</div>
+			
+			<div class='api'>
+				<p><span>URL : </span><?php echo site_url(); ?>api/projects/id/[:project_id]</p>
+				<p><span>GET params :</span> Project ID</p>
+				<p><span>Returns : </span></p>
+				<code>
+					<p>action_result : true / false</p>
+					<p>data : Project Details / NULL</p>
+					<p>message : "Success" / "Not Found"</p> 
+				</code>
+			</div>
+
+			<div class='api'>
+				<p><span>URL : </span><?php echo site_url(); ?>api/projects/</p>
+				<p><span>POST params :</span> title, description, sprint_duration, need_review, created_by</p>
+				<p><span>Returns : </span></p>
+				<code>
+					<p>action_result : true / false</p>
+					<p>data :  NULL</p>
+					<p>message : "Insert Success 201" / "Failed To Insert 400"</p> 
+				</code>
+			</div>
+
+			<div class='api'>
+				<p><span>URL : </span><?php echo site_url(); ?>api/projects/</p>
+				<p><span>PUT params :</span>  id , title, description, sprint_duration, need_review, calculate_velocity_on, created_by</p>
+				<p><span>Returns : </span></p>
+				<code>
+					<p>action_result : true / false</p>
+					<p>data :  NULL</p>
+					<p>message : "Update Success 201" / "Failed To Update 400"</p> 
+				</code>
+			</div>
+
+			<div class='api'>
+				<p><span>URL : </span><?php echo site_url(); ?>api/projects/id/[:project_id]</p>
+				<p><span>DELETE params :</span> Project ID</p>
+				<p><span>Returns : </span></p>
+				<code>
+					<p>action_result : true / false</p>
+					<p>data :  NULL</p>
+					<p>message : "Delete Success 201" / "Unable To Delete 400"</p> 
+				</code>
+			</div>
+
+			
+
 		</div>
 		<p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds</p>
 	</div>
