@@ -53,12 +53,12 @@ class Api extends REST_Controller {
 		}
 	}
 
-	/* this is a complex name, api should be at the max 2 words
+	/* projects_by_user_id_get - this is a complex name, api should be at the max 2 words
 		for eg,
-		GET localhost/projects
-		PUT localhost/projects/:project_id
-		DELETE localhost/projects/:project_id
-		POST localhost/projects/
+		GET localhost/projects - retrieves a list of project
+		PUT localhost/projects/:project_id - updates a project
+		DELETE localhost/projects/:project_id - delets a project
+		POST localhost/projects/ - Creates a project
 	*/
 
 	public function projects_by_user_id_get()
