@@ -53,6 +53,14 @@ class Api extends REST_Controller {
 		}
 	}
 
+	/* this is a complex name, api should be at the max 2 words
+		for eg,
+		GET localhost/projects
+		PUT localhost/projects/:project_id
+		DELETE localhost/projects/:project_id
+		POST localhost/projects/
+	*/
+
 	public function projects_by_user_id_get()
 	{
 		$this->load->model('user');

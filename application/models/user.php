@@ -24,12 +24,22 @@ class User extends CI_Model {
 	{
 		$query = "CALL sp_authenticate_user(?,?)";
 		$binds = array($username,$password);
-		//$binds = array('username' => $username, 'pass' => $password);
 		$exec = $this->db->query($query,$binds);
 
 		$result = $exec->row_array();	//single row 
 
+		//instead of directly returning the info  call this get_user_data
+
 		return $result;
+	}
+
+	private function get_user_data() {
+		//TODO
+		/*
+			fetch user related details
+			fetch his projects
+			return both as an array
+		*/	
 	}
 }
 /* End of file  */
