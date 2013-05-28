@@ -18,6 +18,13 @@ var db = (function() {
 				};
 			}
 		}, 
+		resetData : function() {
+			for (var a in dataset) {
+				if(a != 'api-token') {
+					delete dataset[a];
+				}
+			};
+		},
 		print : function() {
 			console.log(dataset);
 		},
@@ -30,9 +37,11 @@ var db = (function() {
 			}, 1500);
 			
 		},
-		sync : function() {
-			get('http://localhost/utopia/api/projects/id/', 42, function(data) {
-				console.log(data);
+		sync : function () {
+			var self = this;
+			get('http://localhost/utopia/api/user_projects', "", function(data) {
+				self.emit('data-updated');
+				self.set('projects',data.data);
 			});
 		}
 	};
@@ -71,5 +80,3 @@ var db = (function() {
 	$.extend(returnObject, jQuery.eventEmitter);
 	return returnObject;
 })();
-
-//db.sync();

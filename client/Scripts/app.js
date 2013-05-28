@@ -52,7 +52,7 @@ ut.setTitle = function (title) {
 }
 
 ut.flashMessage = function (message) {
-  alert(message);
+  console.log('flash-message', message);
 }
 
 ut.redirectTo = function (url) {
@@ -77,3 +77,8 @@ ut.updateNav = function(data) {
 
 ut.loggedInNav = [{text : "About", href: "#/about"}, {text : "Logout", href: "#/logout"}];
 ut.notLoggedInNav = [{text : "Get started", href: "#/get-started"}];
+
+window.onload = function() {
+  db.resetData();
+  db.sync();
+}

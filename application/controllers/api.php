@@ -51,6 +51,7 @@ require APPPATH.'/libraries/REST_Controller.php';
 
 				$response['action_result'] = TRUE;
 				$response['data'] = $result;
+				$response['api_token'] = rand(1111, 99999);
 				$response['message'] = "Login Success";
 				
 				$this->response($response);
@@ -251,6 +252,26 @@ require APPPATH.'/libraries/REST_Controller.php';
 	{
 		$id = $this->get('id');
 		echo "id = ".$id;
+	}
+
+	public function user_projects_get() {
+		$login = $this->user->user_login_grant();
+		if(!$login)
+		{
+			$response['action_result'] = FALSE;
+			$response['data'] = NULL;
+			$response['message'] = "Login Failed";
+			$this->response($response);
+		}
+		else 
+		{
+			//$id = $this->get('id');
+			$user_id = $this->session->userdata('user_id');
+			$exec = $this->user->get_user_projects($user_id);
+			$response['action_result'] = TRUE;
+			$response['data'] = $exec;
+			$this->response($response);
+		}
 	}
 
 }
