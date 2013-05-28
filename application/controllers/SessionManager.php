@@ -31,7 +31,6 @@ class Login extends CI_Controller {
         else
         {
             //delete previous autologin db data
-
             redirect('home');
         }
 	}
@@ -40,27 +39,34 @@ class Login extends CI_Controller {
 	{
 		$username = $this->input->post('username');
 
-		$this->load->model('login_model');
+		$this->load->model('user');
 
-		$result = $this->login_model->authenticate_user($username,$password);
+		$result = $this->user->authenticate_user($username, $password);
 
 		if($result)
 		{
 			$this->session->set_userdata('user_id',$result['id']);
 			$this->session->set_userdata('display_name',$result['display_name']);
 			$this->session->set_userdata('email_verified',$result['email_verified']);
-			
 			return TRUE;
 		}
 		else
 		{
-			 $this->form_validation->set_message('login_check','Incorrect Email Password Combination');
+		 	$this->form_validation->set_message('login_check','Incorrect Email Password Combination');
 			return FALSE;
 		}
 
+	}
+
+	public function logout()
+	{
+		//$this->session->unset_userdata('user_id');
+		$this->session->sess_destroy();
+		redirect('login');
 	}
 
 }
 
 /* End of file  */
 /* Location: ./application/controllers/ */
+?>

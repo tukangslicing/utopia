@@ -13,7 +13,7 @@
 	body {
 		background-color: #fff;
 		margin: 40px;
-		font: 13px/20px normal Helvetica, Arial, sans-serif;
+		font: 13px normal Helvetica, Arial, sans-serif;
 		color: #4F5155;
 	}
 
@@ -42,6 +42,7 @@
 		display: block;
 		margin: 14px 0 14px 0;
 		padding: 12px 10px 12px 10px;
+		padding-top: 0px;
 	}
 
 	#body{
@@ -62,27 +63,38 @@
 		border: 1px solid #D0D0D0;
 		-webkit-box-shadow: 0 0 8px #D0D0D0;
 	}
+
+	.api {
+		border: 1px solid gainsboro;
+		padding-left :5px;
+		padding-right: 5px;
+	}
+
+	.api span {
+		font-weight: bold;
+	}
 	</style>
 </head>
 <body>
 
-<div id="container">
-	<h1>Welcome to CodeIgniter!</h1>
-	<b><a href= "http://localhost/utopia/index.php/api/auth"> http://localhost/utopia/index.php/api/auth</a>
-	<div id="body">
-		<p>The page you are looking at is being generated dynamically by CodeIgniter.</p>
-
-		<p>If you would like to edit this page you'll find it located at:</p>
-		<code>application/views/welcome_message.php</code>
-
-		<p>The corresponding controller for this page is found at:</p>
-		<code>application/controllers/welcome.php</code>
-
-		<p>If you are exploring CodeIgniter for the very first time, you should start by reading the <a href="user_guide/">User Guide</a>.</p>
+	<div id="container">
+		<h1>Welcome to Utopia!</h1>
+		<div id="body">
+			<p><b>Lets have an API guide here, parameters should include, URL, GET params, POST params, Return types</b></p>
+			<!-- COPY PASTE THIS DIV EVERYTIME YOU WANNA ADD API DOCUMENTATION -->
+			<div class='api'>
+				<p><span>URL : </span>index.php/api/auth/</p>
+				<p><span>POST params :</span> username, password</p>
+				<p><span>Returns : </span></p>
+				<code>
+					<p>action_result : true / false</p>
+					<p>data : user data if successful else blank array</p>
+					<p>message : "Successfully logged in" / "Please check your email or password"</p> 
+				</code>
+			</div>
+		</div>
+		<p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds</p>
 	</div>
-
-	<p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds</p>
-</div>
 
 </body>
 </html>
