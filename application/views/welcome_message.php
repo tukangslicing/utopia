@@ -68,6 +68,7 @@
 		border: 1px solid gainsboro;
 		padding-left :5px;
 		padding-right: 5px;
+		margin-bottom: 10px;
 	}
 
 	.api span {
@@ -83,18 +84,14 @@
 			<p><b>Lets have an API guide here, parameters should include, URL, GET params, POST params, Return types</b></p>
 			<!-- COPY PASTE THIS DIV EVERYTIME YOU WANNA ADD API DOCUMENTATION -->
 			<div class='api'>
-				<p><span>URL : </span><?php echo site_url(); ?>api/auth/</p>
-				<p><span>POST params :</span> username, password</p>
-				<p><span>Returns : </span></p>
-				<code>
-					<p>action_result : true / false</p>
-					<p>data : user data if successful else blank array</p>
-					<p>message : "Successfully logged in" / "Please check your email or password"</p> 
-				</code>
+				<p><span>API Access Token : </span> Login With <?php echo site_url('SessionManager'); ?> To Get Access Token</p>
+				<p><span>How To Use :  </span> Just append /api-key/[:api-key] to URL with every request.</p>
+				<p><span>Example : </span>
+					<?php echo site_url(); ?>api/user_projects/api-key/13856 </p>
 			</div>
 
 			<div class='api'>
-				<p><span>URL : </span><?php echo site_url(); ?>api/projects_user/</p>
+				<p><span>URL : </span><?php echo site_url(); ?>api/user_projects/</p>
 				<p><span>GET params :</span> NULL</p>
 				<p><span>Returns : </span></p>
 				<code>
@@ -127,7 +124,7 @@
 			</div>
 
 			<div class='api'>
-				<p><span>URL : </span><?php echo site_url(); ?>api/projects/</p>
+				<p><span>URL : </span><?php echo site_url(); ?>api/projects/id/[:project_id]</p>
 				<p><span>PUT params :</span>  id , title, description, sprint_duration, need_review, calculate_velocity_on, created_by</p>
 				<p><span>Returns : </span></p>
 				<code>

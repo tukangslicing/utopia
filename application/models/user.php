@@ -33,10 +33,37 @@ class User extends CI_Model {
 		{
 			$data = $this->get_user_data($result['id']);
 			$data['user_basic'] = $result;
+			// generate_api_key
+			$this->generate_api_key();
+
 		}
 		
 		//instead of directly returning the info  call this get_user_data
 		return $data;
+	}
+
+	public function generate_api_key()
+	{
+		//generate random key and store it in session user_data
+
+		$api_key = rand(10000,99999);
+		$this->session->set_userdata('api_key',$api_key);
+
+	}
+
+	public function validate_api_key($api_key)
+	{
+		// check if given session have user_data as given
+
+		if($this->session->userdata('api_key') == $api_key)
+		{
+			return TRUE;
+		}
+		else
+		{
+			return FALSE;
+		}
+
 	}
 
 	private function get_user_data($user_id) {
@@ -52,7 +79,7 @@ class User extends CI_Model {
 
 		return $data;
 	}
-
+	/*
 	public function user_login_grant()	//check if user is logged in 
 	{
 		if($this->session->userdata('user_id'))
@@ -64,6 +91,7 @@ class User extends CI_Model {
 			return FALSE;
 		}
 	}
+	*/
 }
 /* End of file  */
 /* Location: ./application/models/ */

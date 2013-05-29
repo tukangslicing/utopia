@@ -9,16 +9,22 @@ class Test extends CI_Controller {
 
 	public function index()
 	{
-		$username = 'a';
-		$password = 'password';
-		$query = "call sp_authenticate_user(?,?)";
-		$binds = array($username, $password);
+		
+		$this->load->model('project');
+		$data = $this->project->project_user_list(59);
+		echo "<pre>";
+		print_r($data);
+		/*
+		$flag = FALSE;
+		foreach ($data as $key => $value) {
+			if($value['id'] == '23')
+			{
+				$flag = TRUE;
+			}
+		}
 
-		$exec = $this->db->query("call sp_authenticate_user('a','b')");
-
-		$result = $exec->result();
-
-		print_r($result);
+		print_r($flag);
+		*/
 	}
 
 }

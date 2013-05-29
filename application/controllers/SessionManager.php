@@ -14,23 +14,15 @@ class SessionManager extends CI_Controller {
         $this->form_validation->set_rules('username','Username','required|xss_clean');        
         $this->form_validation->set_rules('password','Password','required|xss_clean|callback_login_check');
         
-	    //please re-login redirect message  
-       /* $data['re_login'] = NULL; 
-
-        if($this->session->flashdata('user_login')) 
-        {
-            $data['re_login'] = TRUE;
-        }
-*/		
         $data = NULL;	
         if ($this->form_validation->run() == FALSE)
         {
-                //login failure    
-                 $this->load->view('login_view',$data);
+            //login failure    
+            $this->load->view('login_view',$data);
         }
         else
         {
-            //delete previous autologin db data
+           
             redirect('home');
         }
 	}

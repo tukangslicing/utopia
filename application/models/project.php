@@ -52,6 +52,34 @@ class Project extends CI_Model {
 		}
 	}
 
+	//SELECT project users by project ID
+	public function project_user_list($project_id)
+	{		
+		$query = " CALL sp_tbl_project_users_select_by_project_id(?)";
+		$binds = array($project_id);
+		$exec = $this->db->query($query,$binds);
+
+		return $exec->result_array();
+	}
+
+	//Check if User Is Allowed to Access Project 
+	//User ID taken from SESSION
+	public function project_user_grant($project_id)
+	{
+		$data = $this->project_user_list($project_id);
+		$flag = FALSE;
+		$user_id = $this->session->userdata('user_id');
+		foreach ($data as $key => $value) 
+		{
+			if($value['id'] == $user_id)
+			{
+				$flag = TRUE;
+			}
+		}
+
+		return $flag;
+	}
+
 }
 /* End of file  */
 /* Location: ./application/models/ */
