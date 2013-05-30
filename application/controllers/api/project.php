@@ -12,6 +12,8 @@ require APPPATH.'/libraries/REST_Controller.php';
 	
 */
 
+// To access user_id just do $this->user_id
+
 class Project extends REST_Controller {
 
 		public function __construct()
@@ -30,8 +32,7 @@ class Project extends REST_Controller {
 		*/
 		public function index_get($project_id = NULL)
 		{
-			$user_data = parent::_detect_api_key();			
-			$user_id = $user_data->user_id;
+			$user_id = $this->user_id;
 
 			if(!$project_id)
 			{
@@ -83,7 +84,8 @@ class Project extends REST_Controller {
 			$description	= $this->post('description');
 			$sprint_duration= $this->post('sprint_duration');
 			$need_review	= $this->post('need_review');
-			$created_by		= $this->post('created_by');
+			/* created by will always be current user */
+			$created_by		= $this->user_id; //$this->post('created_by');
 
 			$executed = $this->project_model->projects_insert($title,$description,$sprint_duration,$need_review,$created_by);
 
@@ -109,8 +111,8 @@ class Project extends REST_Controller {
 
 		public function index_put($project_id = NULL)
 		{
-			$user_data = parent::_detect_api_key();			
-			$user_id = $user_data->user_id;
+			//$user_data = parent::_detect_api_key();			
+			$user_id = $this->user_id;
 
 			if(!$project_id)
 			{
@@ -166,8 +168,8 @@ class Project extends REST_Controller {
 		
 		public function index_delete($project_id = NULL)
 		{
-			$user_data = parent::_detect_api_key();			
-			$user_id = $user_data->user_id;
+			//$user_data = parent::_detect_api_key();			
+			$user_id = $this->user_id;
 
 			if(!$project_id)
 			{
@@ -211,9 +213,8 @@ class Project extends REST_Controller {
 		//	localhost/utopia/api/project/user_projects
 		public function user_projects_get() {
 			
-			$user_data = parent::_detect_api_key();			
-			$user_id = $user_data->user_id;
-
+			//$user_data = parent::_detect_api_key();			
+			$user_id = $this->user_id;
 			$exec = $this->user_model->get_user_projects($user_id);
 			$response['action_result'] = TRUE;
 			$response['data'] = $exec;
@@ -225,3 +226,4 @@ class Project extends REST_Controller {
 
 /* End of file project.php */
 /* Location: ./application/controllers/api/project.php */
+?>

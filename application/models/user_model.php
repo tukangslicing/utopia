@@ -33,8 +33,8 @@ class User_model extends CI_Model {
 		{
 			$data = $this->get_user_data($result['id']);
 			$data['user_basic'] = $result;
-			// generate_api_key
-			$this->generate_api_key();
+			// generate_api_key handled by REST_Controller now
+			//$this->generate_api_key();
 
 		}
 		
@@ -46,8 +46,8 @@ class User_model extends CI_Model {
 	{
 		//generate random key and store it in session user_data
 
-		$api_key = rand(10000,99999);
-		$this->session->set_userdata('api_key',$api_key);
+		//$api_key = rand(10000,99999);
+		//$this->session->set_userdata('api_key',$api_key);
 
 	}
 
@@ -55,14 +55,14 @@ class User_model extends CI_Model {
 	{
 		// check if given session have user_data as given
 
-		if($this->session->userdata('api_key') == $api_key)
+		/*if($this->session->userdata('api_key') == $api_key)
 		{
 			return TRUE;
 		}
 		else
 		{
 			return FALSE;
-		}
+		}*/
 
 	}
 

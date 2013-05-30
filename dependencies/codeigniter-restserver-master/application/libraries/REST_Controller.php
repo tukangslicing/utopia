@@ -597,7 +597,7 @@ abstract class REST_Controller extends CI_Controller
 		$key_name = 'HTTP_'.strtoupper(str_replace('-', '_', $api_key_variable));
 
 		$this->rest->key = NULL;
-		$this->rest->level = NULL;
+		$this->rest->level = 0;
 		$this->rest->user_id = NULL;
 		$this->rest->ignore_limits = FALSE;
 

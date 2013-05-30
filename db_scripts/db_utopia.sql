@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: May 25, 2013 at 05:42 AM
+-- Generation Time: May 30, 2013 at 09:42 PM
 -- Server version: 5.5.16
 -- PHP Version: 5.3.8
 
@@ -1037,6 +1037,82 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tbl_api_keys`
+--
+
+CREATE TABLE IF NOT EXISTS `tbl_api_keys` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `key` varchar(40) NOT NULL,
+  `level` int(2) NOT NULL,
+  `ignore_limits` tinyint(1) NOT NULL DEFAULT '0',
+  `is_private_key` tinyint(1) NOT NULL DEFAULT '0',
+  `ip_addresses` text,
+  `date_created` int(11) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+
+--
+-- Dumping data for table `tbl_api_keys`
+--
+
+INSERT INTO `tbl_api_keys` (`id`, `key`, `level`, `ignore_limits`, `is_private_key`, `ip_addresses`, `date_created`, `user_id`) VALUES
+(3, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', 0, 0, 0, NULL, 1369941725, 123);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_api_logs`
+--
+
+CREATE TABLE IF NOT EXISTS `tbl_api_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `uri` varchar(255) NOT NULL,
+  `method` varchar(6) NOT NULL,
+  `params` text,
+  `api_key` varchar(40) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `time` int(11) NOT NULL DEFAULT '0',
+  `authorized` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+
+--
+-- Dumping data for table `tbl_api_logs`
+--
+
+INSERT INTO `tbl_api_logs` (`id`, `uri`, `method`, `params`, `api_key`, `ip_address`, `time`, `authorized`) VALUES
+(2, 'api/project/user_projects', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '::1', 0, 1),
+(3, 'api/project/user_projects', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '::1', 1369942417, 1),
+(4, 'api/project/user_projects', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '::1', 1369942851, 1),
+(5, 'api/project/user_projects', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '::1', 1369942857, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_ci_sessions`
+--
+
+CREATE TABLE IF NOT EXISTS `tbl_ci_sessions` (
+  `session_id` varchar(40) NOT NULL DEFAULT '0',
+  `ip_address` varchar(45) NOT NULL DEFAULT '0',
+  `user_agent` varchar(120) NOT NULL,
+  `last_activity` int(10) unsigned NOT NULL DEFAULT '0',
+  `user_data` text NOT NULL,
+  PRIMARY KEY (`session_id`),
+  KEY `last_activity_idx` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `tbl_ci_sessions`
+--
+
+INSERT INTO `tbl_ci_sessions` (`session_id`, `ip_address`, `user_agent`, `last_activity`, `user_data`) VALUES
+('f52ee9a47b11d7711004fe258ae1d7f4', '::1', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.94 Safari/537.36', 1369941246, 'a:1:{s:7:"api_key";i:18835;}');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbl_impediments`
 --
 
@@ -1114,7 +1190,7 @@ CREATE TABLE IF NOT EXISTS `tbl_projects` (
 
 INSERT INTO `tbl_projects` (`id`, `title`, `description`, `sprint_duration`, `need_review`, `calculate_velocity_on`, `created_by`, `velocity_state`) VALUES
 (42, 'Utopia', 'Project management tool', 4, '1', 94, 123, 279),
-(52, 'asdads', 'asdasd', 4, '1', 126, 123, 409);
+(52, 'New title', 'I have no freaking idea', 4, '1', 126, 123, 409);
 
 -- --------------------------------------------------------
 

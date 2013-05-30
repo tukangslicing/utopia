@@ -235,7 +235,7 @@ $config['rest_key_name'] = 'UTOPIA-SERVER-VERSION';
 |	'logs'
 |
 */
-$config['rest_logs_table'] = 'logs';
+$config['rest_logs_table'] = 'tbl_api_logs';
 
 /*
 |--------------------------------------------------------------------------
@@ -261,7 +261,7 @@ $config['rest_logs_table'] = 'logs';
 	) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 |
 */
-$config['rest_enable_logging'] = FALSE;
+$config['rest_enable_logging'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------

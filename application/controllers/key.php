@@ -19,8 +19,9 @@ class Key extends REST_Controller
 {
 	protected $methods = array(
 		'index_put' => array('level' => 10, 'limit' => 10),
-		'index_delete' => array('level' => 10),
+		'index_delete' => array('level' => 0),
 		'level_post' => array('level' => 10),
+		'index_post' => array('key' => FALSE, 'level' => 10),
 		'regenerate_post' => array('level' => 10),
 	);
 
@@ -68,49 +69,15 @@ class Key extends REST_Controller
 		$key = self::_generate_key();
 
 		// If no key level provided, give them a rubbish one
-		$level = 1;
-		$ignore_limits = 1;
+		$level = 0;
+		$ignore_limits = 0;
 
-		/*
-			authenticate user here 
-			by $this->post('username') , $this->post('password') retrieve the user_id
-			and pass it to _insert_key
-		*/
 		$this->load->model('user_model');
 		$username = $this->post('username');
 		$password = $this->post('password');
 
 		$user_data = $this->user_model->authenticate_user($username,$password);
 		$user_id = $user_data['user_basic']['id'];
-		/*
-
-			Create a table like this
-
-			CREATE TABLE `tbl_api_keys` (
-				  `id` int(11) NOT NULL AUTO_INCREMENT,
-				  `key` varchar(40) NOT NULL,
-				  `level` int(2) NOT NULL,
-				  `ignore_limits` tinyint(1) NOT NULL DEFAULT '0',
-				  `is_private_key` tinyint(1)  NOT NULL DEFAULT '0',
-				  `ip_addresses` TEXT NULL DEFAULT NULL,
-				  `date_created` int(11) NOT NULL,
-				  `user_id` bigint(20) NOT NULL
-				  PRIMARY KEY (`id`)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-			while loading back, the request keys are handled in REST_Controller->_detect_api_key method
-			there we can retrieve the user_id and set it as parameter to REST_Controller class, 
-			so all the children classes will automatically have access to user_id,
-
-			set the config table to tbl_api_keys
-			$config['rest_keys_table'] = 'keys';
-
-			at last set enable API keys to TRUE
-			$config['rest_enable_keys'] = FALSE;
-
-			when testing the api, add a header field named 'UTOPIA-SERVER-VERSION' and put your generated key there
-			$config['rest_key_name'] = 'UTOPIA-SERVER-VERSION';
-		*/
 
 		// Insert the new key
 		if (self::_insert_key($key, array('level' => $level, 'ignore_limits' => $ignore_limits,'user_id' => $user_id)))

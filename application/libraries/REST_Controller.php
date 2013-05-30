@@ -1,3 +1,4 @@
+
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
@@ -15,6 +16,10 @@
  */
 abstract class REST_Controller extends CI_Controller
 {
+	/**
+	* User associated with each request
+	*/
+	public $user_id = NULL;
 	/**
 	 * This defines the rest format.
 	 *
@@ -290,7 +295,7 @@ abstract class REST_Controller extends CI_Controller
 				$this->_log_request();
 			}
 
-			$this->response(array('status' => false, 'error' => 'Invalid API Key.'), 403);
+			$this->response(array('status' => false, 'error' => 'Invalid API Key.'), 401);
 		}
 
 		// Sure it exists, but can they do anything with it?
@@ -614,13 +619,21 @@ abstract class REST_Controller extends CI_Controller
 			isset($row->user_id) AND $this->rest->user_id = $row->user_id;
 			isset($row->level) AND $this->rest->level = $row->level;
 			isset($row->ignore_limits) AND $this->rest->ignore_limits = $row->ignore_limits;
-
+			
+			if(!empty($row->user_id)) {
+				//add user id to class
+				$this->user_id = $row->user_id;
+			} else {
+				// can't find user associated with this token
+				return FALSE;
+			}
 			/*
 			 * If "is private key" is enabled, compare the ip address with the list
 			 * of valid ip addresses stored in the database.
 			 */
-			if(!empty($row->is_private_key))
+			if(!empty($row->is_private_key) )
 			{
+				
 				// Check for a list of valid ip addresses
 				if(isset($row->ip_addresses))
 				{
