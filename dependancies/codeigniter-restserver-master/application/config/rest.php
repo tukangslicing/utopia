@@ -22,7 +22,7 @@ $config['force_https'] = FALSE;
 |	Default: xml
 |
 */
-$config['rest_default_format'] = 'json';
+$config['rest_default_format'] = 'xml';
 
 /*
 |--------------------------------------------------------------------------
@@ -223,7 +223,7 @@ $config['rest_key_length'] = 40;
 | Default: X-API-KEY
 |
 */
-$config['rest_key_name'] = 'UTOPIA-SERVER-VERSION';
+$config['rest_key_name'] = 'X-API-KEY';
 
 /*
 |--------------------------------------------------------------------------

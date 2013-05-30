@@ -21,6 +21,7 @@ require APPPATH.'/libraries/REST_Controller.php';
 			$this->load->model('user');
 			$this->load->model('project');
 
+			/* let codeigniter do this authentication */
 			$api_key = $this->get('api-key');
 			if( ! $this->user->validate_api_key($api_key))
 			{
@@ -42,7 +43,7 @@ require APPPATH.'/libraries/REST_Controller.php';
 		*/
 		public function projects_get()
 		{
-				
+
 			$id = $this->get('id');
 			//checking if user have access to this project
 			if ( ! $this->project->project_user_grant($id) )
@@ -74,28 +75,28 @@ require APPPATH.'/libraries/REST_Controller.php';
 		{
 			/* Insert New Project - sp_tbl_projects_insert */
 
-				$title 			= $this->post('title');
-				$description	= $this->post('description');
-				$sprint_duration= $this->post('sprint_duration');
-				$need_review	= $this->post('need_review');
-				$created_by		= $this->post('created_by');
-				
-				$executed = $this->project->projects_insert($title,$description,$sprint_duration,$need_review,$created_by);
-				
-				$response['data'] =NULL;
+			$title 			= $this->post('title');
+			$description	= $this->post('description');
+			$sprint_duration= $this->post('sprint_duration');
+			$need_review	= $this->post('need_review');
+			$created_by		= $this->post('created_by');
 
-				if($executed)
-				{
-					$response['action_result'] = TRUE;
-					$response['message'] = "Insert Success";
-					$this->response($response,201);
-				}
-				else
-				{
-					$response['action_result'] = FALSE;
-					$response['message'] = "Failed To Insert";
-					$this->response($response,400);
-				}
+			$executed = $this->project->projects_insert($title,$description,$sprint_duration,$need_review,$created_by);
+
+			$response['data'] =NULL;
+
+			if($executed)
+			{
+				$response['action_result'] = TRUE;
+				$response['message'] = "Insert Success";
+				$this->response($response,201);
+			}
+			else
+			{
+				$response['action_result'] = FALSE;
+				$response['message'] = "Failed To Insert";
+				$this->response($response,400);
+			}
 			
 		}
 
@@ -112,7 +113,7 @@ require APPPATH.'/libraries/REST_Controller.php';
 			}
 			else
 			{
-			
+
 				$data = array(
 					'id'					=> $id,
 					'title' 				=> $this->put('title'),
@@ -144,24 +145,24 @@ require APPPATH.'/libraries/REST_Controller.php';
 		
 		public function projects_delete()
 		{
-		
-				$id = $this->get('id');
-				$exec = $this->project->projects_delete($id);
 
-				$response['action_result'] = TRUE;
-				$response['data'] = $exec;
+			$id = $this->get('id');
+			$exec = $this->project->projects_delete($id);
 
-				if($exec)
-				{
-					$response['message'] = "Deleted";
-					$this->response($response,201);
-				}
-				else
-				{
-					$response['message'] = "Unable To Delete";
-					$this->response($response,400);
-				}
-				
+			$response['action_result'] = TRUE;
+			$response['data'] = $exec;
+
+			if($exec)
+			{
+				$response['message'] = "Deleted";
+				$this->response($response,201);
+			}
+			else
+			{
+				$response['message'] = "Unable To Delete";
+				$this->response($response,400);
+			}
+
 		}
 
 		public function test_delete()
@@ -171,15 +172,16 @@ require APPPATH.'/libraries/REST_Controller.php';
 
 		public function user_projects_get() {
 				//$id = $this->get('id');
-				$user_id = $this->session->userdata('user_id');
-				$exec = $this->user->get_user_projects($user_id);
-				$response['action_result'] = TRUE;
-				$response['data'] = $exec;
-				$this->response($response);
+			$user_id = $this->session->userdata('user_id');
+			$exec = $this->user->get_user_projects($user_id);
+			$response['action_result'] = TRUE;
+			$response['data'] = $exec;
+			$this->response($response);
 			
 		}
 
-}
+	}
 
-/* End of file  */
-/* Location: ./application/controllers/ */
+	/* End of file  */
+	/* Location: ./application/controllers/ */
+	?>
