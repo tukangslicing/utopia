@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Project extends CI_Model {
+class Project_model extends CI_Model {
 
 	//GET
 	public function projects_sel($project_id)
@@ -64,11 +64,10 @@ class Project extends CI_Model {
 
 	//Check if User Is Allowed to Access Project 
 	//User ID taken from SESSION
-	public function project_user_grant($project_id)
+	public function project_user_grant($project_id,$user_id)
 	{
 		$data = $this->project_user_list($project_id);
 		$flag = FALSE;
-		$user_id = $this->session->userdata('user_id');
 		foreach ($data as $key => $value) 
 		{
 			if($value['id'] == $user_id)

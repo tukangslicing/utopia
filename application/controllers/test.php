@@ -14,6 +14,11 @@ class Test extends CI_Controller {
 		$data = $this->project->project_user_list(59);
 		echo "<pre>";
 		print_r($data);
+		$this->load->model('user');
+
+		$result = $this->user->authenticate_user('c@k.com', 'password');
+		$user_id = $result['user_basic']['id'];
+		print_r($result);
 		/*
 		$flag = FALSE;
 		foreach ($data as $key => $value) {

@@ -75,6 +75,14 @@ class Key extends REST_Controller
 			authenticate user here 
 			by $this->post('username') , $this->post('password') retrieve the user_id
 			and pass it to _insert_key
+		*/
+		$this->load->model('user_model');
+		$username = $this->post('username');
+		$password = $this->post('password');
+
+		$user_data = $this->user_model->authenticate_user($username,$password);
+		$user_id = $user_data['user_basic']['id'];
+		/*
 
 			Create a table like this
 
@@ -105,7 +113,7 @@ class Key extends REST_Controller
 		*/
 
 		// Insert the new key
-		if (self::_insert_key($key, array('level' => $level, 'ignore_limits' => $ignore_limits)))
+		if (self::_insert_key($key, array('level' => $level, 'ignore_limits' => $ignore_limits,'user_id' => $user_id)))
 		{
 			$this->response(array('status' => 1, 'key' => $key), 201); // 201 = Created
 		}
@@ -257,7 +265,7 @@ class Key extends REST_Controller
 	
 	private function _generate_key()
 	{
-		//$this->load->helper('security');
+		$this->load->helper('security');
 		
 		do
 		{

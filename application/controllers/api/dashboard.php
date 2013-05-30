@@ -2,7 +2,7 @@
 
 require APPPATH.'/libraries/REST_Controller.php';
 
-class Settings extends REST_Controller {
+class Dashboard extends REST_Controller {
 
 	public function __construct()
 	{
@@ -16,5 +16,5 @@ class Settings extends REST_Controller {
 
 }
 
-/* End of file settings.php */
-/* Location: ./application/controllers/api/settings.php */
+/* End of file dashboard.php */
+/* Location: ./application/controllers/api/dashboard.php */
