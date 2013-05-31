@@ -11,6 +11,14 @@ class Project_model extends CI_Model {
 		return $exec->result_array();
 	}
 
+	public function project_modules($project_id)
+	{
+		$query = "CALL sp_tbl_project_modules_lst(?)";
+		$binds = array($project_id);
+		$exec = $this->db->query($query,$binds);
+		return $exec->result_array();
+	}
+	
 	//POST
 	public function projects_insert($title,$description,$sprint_duration,$need_review,$created_by)
 	{
@@ -63,7 +71,6 @@ class Project_model extends CI_Model {
 	}
 
 	//Check if User Is Allowed to Access Project 
-	//User ID taken from SESSION
 	public function project_user_grant($project_id,$user_id)
 	{
 		$data = $this->project_user_list($project_id);
@@ -82,4 +89,3 @@ class Project_model extends CI_Model {
 }
 /* End of file  */
 /* Location: ./application/models/ */
-?>

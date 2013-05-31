@@ -287,3 +287,6 @@ class Key extends REST_Controller
 		return $this->db->where('key', $key)->delete(config_item('rest_keys_table'));
 	}
 }
+
+/* End of file  */
+/* Location: ./application/controllers/ */
