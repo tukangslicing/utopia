@@ -14,6 +14,16 @@ class Whiteboard extends REST_Controller {
 		
 	}
 
+	public function index_get()
+	{
+		/*
+		 	this controller will only be based for listing out data, edit, delete won't be handled by it
+		 	the data we typically need to start with is 
+		 	1. All the workitems assigned to current user
+
+		*/
+	}
+
 }
 
 /* End of file whiteboard.php */

@@ -24,14 +24,24 @@ class Project extends REST_Controller {
 		}
 
 		/*
-		Get Projects by Project ID
-		original call : localhost/utopia/api/project/index/42
-		new call 	  : localhost/utopia/api/project/42
-
-			   index  removed  with config/routes
+			Get Projects by Project ID
+			original call : localhost/utopia/api/project/index/42
+			new call 	  : localhost/utopia/api/project/42
+		    index  removed  with config/routes
 		*/
 		public function index_get($project_id = NULL)
 		{
+
+			/*
+				Need some additional information from this method
+				1. List of modules in current project
+				2. List of impediments which are not resolved
+				3. List of workitem types and their states
+				4. List of users in this project (only user_id and Display Name should suffice)
+
+			*/
+
+
 			$user_id = $this->user_id;
 
 			if(!$project_id)
