@@ -14,6 +14,10 @@ ut.config(function($routeProvider, $locationProvider) {
     templateUrl : 'logout',
     controller : LogoutController
   });
+  $routeProvider.when('/white-board', {
+    templateUrl : 'white-board',
+    controller : LogoutController
+  });
   $routeProvider.otherwise({
     templateUrl : 'under-construction',
     controller : function() {}
@@ -46,39 +50,10 @@ ut.config(function($routeProvider, $locationProvider) {
 }(jQuery));
 
 
-/* utility methods */
-ut.setTitle = function (title) {
-	$('title').html(title);
-}
-
-ut.flashMessage = function (message) {
-  console.log('flash-message', message);
-}
-
-ut.redirectTo = function (url) {
-  window.location = "#/" + url;
-}
-
-ut.handleMessage = function(data) {
-  if(!data.action_result) {
-    ut.flashMessage(data.message);
-  }
-}
-
-ut.updateNav = function(data) {
-  var menu = $('.menu-bar ul');
-  var html = "";
-  for (var i = 0; i < data.length; i++) {
-    var current = data[i];
-    html += "<li><a href='"+ current.href +"'>" + current.text + "</li>";
-  };
-  menu.html(html);
-};
-
-ut.loggedInNav = [{text : "About", href: "#/about"}, {text : "Logout", href: "#/logout"}];
-ut.notLoggedInNav = [{text : "Get started", href: "#/get-started"}];
 
 window.onload = function() {
   db.resetData();
   db.sync();
 }
+
+

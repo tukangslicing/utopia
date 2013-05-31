@@ -1,11 +1,8 @@
 
 function LoginController($scope) {
-	ut.checkUserData();	
 	$scope.submit = function() {
-		db.get_user({username : $scope.username, password : $scope.password}, function(data) {
-			db.set('user', data.data.user_basic);
-			db.set('projects', data.data.user_projects);
-			db.set('api-token', data.api_token);
+		db.getUser({username : $scope.username, password : $scope.password}, function(data) {
+			db.set('api-key', key);
 			ut.redirectTo('');
 			db.listen();
 		});
@@ -13,13 +10,26 @@ function LoginController($scope) {
 }
 
 function LandingPageController($scope) {
-	ut.checkUserData();	
-	var projects = db.get('projects');
-	$scope.projects = projects;
+	$scope.projects = [];
+	var projects = db.getProjects(function(data) {
+		db.set('projects', data)
+		$scope.projects = db.get('projects');
+		$scope.$apply();
+	});
 	db.on('data-updated', function(data) {
 		console.log(data, 'from controller');
 		$scope.projects = db.get('projects');
-	})
+		$scope.$apply();
+	});
+	$scope.load_project = function() {
+		var project = db.getProjectById(this.project.id)
+		ut.setTitle(project.title);
+		db.loadProject(project.id, function(data) {
+			console.log(data);
+			db.set('currentProject', data);
+			ut.redirectTo('white-board');
+		});
+	}
 }
 
 
@@ -28,14 +38,6 @@ function LogoutController($scope) {
 	ut.updateNav(ut.notLoggedInNav);
 }
 
-ut.checkUserData = function() {
-	var user = db.get('api-token');
-	if(!user) {
-		ut.redirectTo('login')
-		ut.updateNav(ut.notLoggedInNav);
-		return;
-	} 
-	ut.redirectTo('')
-	ut.updateNav(ut.loggedInNav);
-};
+function WhiteboardController($scope) {
 
+}
