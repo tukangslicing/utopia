@@ -21,7 +21,7 @@ class Key extends REST_Controller
 		'index_put' => array('level' => 10, 'limit' => 10),
 		'index_delete' => array('level' => 0),
 		'level_post' => array('level' => 10),
-		'index_post' => array('key' => FALSE, 'level' => 10),
+		'index_post' => array('key' => FALSE, 'level' => 0),
 		'regenerate_post' => array('level' => 10),
 	);
 

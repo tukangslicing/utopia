@@ -16,7 +16,7 @@ ut.config(function($routeProvider, $locationProvider) {
   });
   $routeProvider.when('/white-board', {
     templateUrl : 'white-board',
-    controller : LogoutController
+    controller : WhiteboardController()
   });
   $routeProvider.otherwise({
     templateUrl : 'under-construction',
@@ -52,8 +52,8 @@ ut.config(function($routeProvider, $locationProvider) {
 
 
 window.onload = function() {
-  db.resetData();
-  db.sync();
+  /*db.resetData();
+  db.sync();*/
 }
 
 

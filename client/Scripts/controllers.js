@@ -2,7 +2,7 @@
 function LoginController($scope) {
 	$scope.submit = function() {
 		db.getUser({username : $scope.username, password : $scope.password}, function(data) {
-			db.set('api-key', key);
+			db.set('api-key', data.key);
 			ut.redirectTo('');
 			db.listen();
 		});
@@ -17,7 +17,6 @@ function LandingPageController($scope) {
 		$scope.$apply();
 	});
 	db.on('data-updated', function(data) {
-		console.log(data, 'from controller');
 		$scope.projects = db.get('projects');
 		$scope.$apply();
 	});

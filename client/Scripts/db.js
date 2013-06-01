@@ -48,28 +48,29 @@ var db = (function() {
 	};
 
 	function Request(url, data, callback, method) {
-		if(!dataset['api-key']) {
+		/*if(!dataset['api-key']) {
 			ut.redirectTo('login');
 			db.clear();
 			return;
-		}
+		}*/
 		$("html").css("cursor", "busy");
 		$.ajax({
 			url : url,
 			method : method,
-			data : data,
-			contentType: "application/json; charset=utf-8",
+			data : $.param(data),
 			beforeSend: function (request) {
 				var key = dataset['api-key'] || "";
 				request.setRequestHeader("utopia-server-version", key.slice(1,41));
 			},
 			statusCode: {
 				200: function(data) {
-					callback(data.data);
+					var returnData = data.data || data;
+					callback(returnData);
 					$("html").css("cursor", "");
 				},
 				201: function(data) {
-					callback(data.data);
+					var returnData = data.data || data;
+					callback(returnData);
 					$("html").css("cursor", "");
 				},
 				401:function(){
