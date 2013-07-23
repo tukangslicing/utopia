@@ -29,10 +29,11 @@ class Impediments_model extends CI_Model {
 
 	public function impediments_unresolved($project_id)
 	{
-		$query = " CALL sp_tbl_impediments_unresolved_lst(?)";
+		/*$query = " CALL sp_tbl_impediments_unresolved_lst(?)";
 		$binds = array($project_id);
-		$exec = $this->db->query($query,$binds);
-		return $exec->result_array();
+		$exec = $this->db->query($query,$binds);*/
+		$query = $this->db->get_where('tbl_impediments', array("project_id" => $project_id, "is_resolved" => 1));
+		return $query->result();
 	}
 
 }

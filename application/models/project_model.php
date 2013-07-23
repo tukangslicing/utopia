@@ -86,6 +86,42 @@ class Project_model extends CI_Model {
 		return $flag;
 	}
 
+	public function get_details($project_id) {
+		$types = $this->db->get_where('tbl_workitem_types', array('project_id' => $project_id));
+		$types = $types->result_array();
+		
+		for ($index=0; $index < 5; $index++) { 
+			$current = $types[$index];
+			$this->db->select('*');
+			$this->db->from('tbl_workitem_states');
+			$this->db->where('workitem_type_id', $current['id']);
+			$states = $this->db->get();
+			$types[$index]['states'] = $states->result_array();
+		}	
+
+		$this->db->select('*');
+		$this->db->from('tbl_milestones');
+		$this->db->where('project_id', $project_id);
+		$this->db->order_by('start_date', 'desc');
+		$this->db->limit(3);
+		$sprints = $this->db->get()->result_array();
+
+		$this->db->select('*');
+		$this->db->from('tbl_users');
+		$this->db->join('tbl_project_users', 'user_id = tbl_users.id');
+		$this->db->where('project_id', $project_id);
+		$users = $this->db->get()->result_array(); 
+
+		$project = $this->db->get_where('tbl_projects', array('id' => $project_id))->result();
+
+		$data['project'] = $project;
+		$data['users'] = $users;
+		$data['workitem_types'] = $types;
+		$data['sprints'] = $sprints;
+
+		return $data;
+	}
+
 }
 /* End of file  */
 /* Location: ./application/models/ */

@@ -51,18 +51,11 @@ class Project extends REST_Controller {
 
 		public function index_get($project_id = NULL)
 		{
-
-			/*
-				Need some additional information from this method
-				ok 1. List of modules in current project
-				ok 2. List of impediments which are not resolved
-		 Not sure  3. List of workitem types and their states
-				ok 4. List of users in this project (only user_id and Display Name should suffice)
-
-			*/
-
+			if($project_id == NULL) {
+				$this->user_projects_get();
+				return;
+			}
 			$user_id = $this->user_id;
-
 			$this->_project_validation($project_id,$user_id);
 	
 			$data['project'] = $this->project_model->projects_sel($project_id);
@@ -122,9 +115,7 @@ class Project extends REST_Controller {
 			
 		}
 
-
 		//	localhost/utopia/api/project/58
-
 		public function index_put($project_id = NULL)
 		{
 			
@@ -161,7 +152,6 @@ class Project extends REST_Controller {
 		}
 		
 		//	localhost/utopia/api/project/58
-		
 		public function index_delete($project_id = NULL)
 		{
 			
@@ -189,16 +179,25 @@ class Project extends REST_Controller {
 
 		//	localhost/utopia/api/project/user_projects
 		public function user_projects_get() {
-					
 			$user_id = $this->user_id;
 			$exec = $this->user_model->get_user_projects($user_id);
 			$response['action_result'] = TRUE;
 			$response['data'] = $exec;
 			$this->response($response);
-			
 		}
 
-	}
+		public function details_get() {
+			$project_id = $this->get('project_id');
+			$user_id = $this->user_id;
+			$this->_project_validation($project_id, $user_id);
+			$exec = $this->project_model->get_details($project_id);
+
+			$response['action_result'] = TRUE;
+			$response['data'] = $exec;
+			$this->response($response, 200);
+		}
+
+}
 
 /* End of file project.php */
 /* Location: ./application/controllers/api/project.php */

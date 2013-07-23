@@ -1,3 +1,27 @@
+(function(jQuery) {
+  jQuery.eventEmitter = {
+    _JQInit: function() {
+      this._JQ = jQuery(this);
+    },
+    emit: function(evt, data) {
+      !this._JQ && this._JQInit();
+      this._JQ.trigger(evt, data);
+    },
+    once: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.one(evt, handler);
+    },
+    on: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.bind(evt, handler);
+    },
+    off: function(evt, handler) {
+      !this._JQ && this._JQInit();
+      this._JQ.unbind(evt, handler);
+    }
+  };
+}(jQuery));
+
 var db = (function() {
 	var dataset = localStorage || {};
 	var returnObject = {
@@ -27,7 +51,7 @@ var db = (function() {
 			console.log(dataset);
 		},
 		getUser : function(data, callback) {
-			post('http://localhost/utopia/key', data, callback);
+			post('http://localhost/utopia/index.php/key', data, callback);
 		},
 		listen : function() {
 			setInterval(function() {
@@ -35,7 +59,7 @@ var db = (function() {
 			}, 1500);
 		},
 		getProjects : function(callback) {
-			get('http://localhost/utopia/api/project/user_projects', "	", callback);
+			get('http://localhost/utopia/index.php/api/project/user_projects', "	", callback);
 		},
 		getProjectById : function(id) {
 			return this.get('projects').filter(function(d) { return d.id == id })[0];
@@ -43,16 +67,11 @@ var db = (function() {
 		sync : function () {
 		},
 		loadProject : function(id, callback) {
-			get('http://localhost/utopia/api/project/', id, callback);	
+			get('http://localhost/utopia/index.php/api/project/', id, callback);	
 		}
 	};
 
 	function Request(url, data, callback, method) {
-		/*if(!dataset['api-key']) {
-			ut.redirectTo('login');
-			db.clear();
-			return;
-		}*/
 		$("html").css("cursor", "busy");
 		$.ajax({
 			url : url,
@@ -109,3 +128,4 @@ var db = (function() {
 	$.extend(returnObject, jQuery.eventEmitter);
 	return returnObject;
 })();
+

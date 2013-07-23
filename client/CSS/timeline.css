@@ -1,0 +1,117 @@
+.posts, .work-timeline, .timeline {
+    margin: 0 auto;
+    max-width: 700px;
+    overflow: hidden;
+    height: auto;
+    position: relative;
+    padding: 0px;
+    list-style-type: none;
+    background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEElEQVQIW2NMTEz8z8gABAAPKwIlXWq1kgAAAABJRU5ErkJggg==);
+    background-repeat: repeat-y;
+    background-position: 50% 0;
+  /* 
+    elements 1,(2),3,(4), etc.
+    elements in brackets inherit these properties, some are overridden below (2n)
+    beginning at 0
+*/;
+}
+
+.posts .year, .work-timeline .year, .timeline .year {
+    background: steelBlue;
+    font-size: 1.5em;
+    line-height: 1.5em;
+    clear: both;
+    margin: 0.5em auto;
+    color: white;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.posts .year:first-of-type, .work-timeline .year:first-of-type, .timeline .year:first-of-type {
+    margin-top: 0 !important;
+}
+
+.posts .entry, .posts .event, .work-timeline .entry, .work-timeline .event, .timeline .entry, .timeline .event {
+    position: relative;
+    display: block;
+    text-align: left;
+    float: right;
+    clear: right;
+    width: 45%;
+    margin: 5px 0.5%;
+    /*border-radius: 5px;*/
+    list-style-type: none;
+    display: block;
+    padding: .4em;
+    color: #4d4d4d;
+    /*border: 1px solid #9d9d9d;*/
+    text-decoration: none;
+    /*background: white;*/
+    -webkit-box-shadow: 1px 1px 1px 1px silver;
+    -webkit-transition: all .2s;
+    -moz-transition: all .2s;
+    -ms-transition: all .2s;
+    -o-transition: all .2s;
+    transition: all .2s;
+    @media all and (max-width: 600px) {
+			width: 85%;
+}
+		}
+
+.posts .entry.offset-first, .posts .event.offset-first, .work-timeline .entry.offset-first, .work-timeline .event.offset-first, .timeline .entry.offset-first, .timeline .event.offset-first {
+    margin-top: 0px !important;
+}
+
+.posts .entry.featured, .posts .event.featured, .work-timeline .entry.featured, .work-timeline .event.featured, .timeline .entry.featured, .timeline .event.featured {
+    width: 90%;
+    background: #e6e6e6;
+}
+
+.posts .entry.featured:after, .posts .event.featured:after, .work-timeline .entry.featured:after, .work-timeline .event.featured:after, .timeline .entry.featured:after, .timeline .event.featured:after {
+    top: -1em;
+    left: 46.5%;
+}
+
+.posts .entry.featured:nth-child(2n):after, .posts .event.featured:nth-child(2n):after, .work-timeline .entry.featured:nth-child(2n):after, .work-timeline .event.featured:nth-child(2n):after, .timeline .entry.featured:nth-child(2n):after, .timeline .event.featured:nth-child(2n):after {
+    right: 46.5%;
+}
+
+.posts .entry img, .posts .event img, .work-timeline .entry img, .work-timeline .event img, .timeline .entry img, .timeline .event img {
+    margin: .7em auto;
+    max-width: 100%;
+}
+
+.posts .entry:hover, .posts .event:hover, .work-timeline .entry:hover, .work-timeline .event:hover, .timeline .entry:hover, .timeline .event:hover {
+    border-radius: 5px;
+    background: #f7f7f7;
+}
+
+.posts .entry:hover:after, .posts .event:hover:after, .work-timeline .entry:hover:after, .work-timeline .event:hover:after, .timeline .entry:hover:after, .timeline .event:hover:after {
+    background: #505050;
+}
+
+.posts .entry:nth-child(2n), .posts .event:nth-child(2n), .work-timeline .entry:nth-child(2n), .work-timeline .event:nth-child(2n), .timeline .entry:nth-child(2n), .timeline .event:nth-child(2n) {
+    float: left;
+    clear: left;
+}
+
+.posts .entry:after, .posts .event:after, .work-timeline .entry:after, .work-timeline .event:after, .timeline .entry:after, .timeline .event:after {
+    @media all and (min-width: 650px) {
+												display: block;
+    content: ' ';
+    height: 9px;
+    width: 9px;
+    background: #9d9d9d;
+    border-radius: 50%;
+    position: absolute;
+    left: -5%;
+    top: 1.5em;
+    border: 2px solid white;
+}
+											}
+
+.posts .entry:nth-child(2n):after, .posts .event:nth-child(2n):after, .work-timeline .entry:nth-child(2n):after, .work-timeline .event:nth-child(2n):after, .timeline .entry:nth-child(2n):after, .timeline .event:nth-child(2n):after {
+    right: -5%;
+												/* reset the standard declaration I defined before */
+    left: auto;
+}
