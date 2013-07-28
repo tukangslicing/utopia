@@ -56,6 +56,11 @@ html, body {
 	background-color: white;
 }
 
+.container.ng-view {
+	width: 97%;
+	margin: 20px;
+}
+
 .workitems {
 	overflow-y:scroll;
 	/*max-height: 500px;*/
