@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 3.3.9
+-- version 4.0.4
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Jul 24, 2013 at 12:19 AM
--- Server version: 5.5.8
--- PHP Version: 5.3.5
+-- Generation Time: Aug 02, 2013 at 01:34 PM
+-- Server version: 5.6.12-log
+-- PHP Version: 5.4.12
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,6 +19,1022 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 --
 -- Database: `db_utopia`
 --
+CREATE DATABASE IF NOT EXISTS `db_utopia` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+USE `db_utopia`;
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_authenticate_user`(username varchar(200), pass varchar(200))
+BEGIN
+	SELECT id,display_name,email_verified FROM tbl_users WHERE user_name = username AND password = pass;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_select_projects_by_user_id`(userid BIGINT)
+BEGIN
+	SELECT tbl_projects.id,tbl_projects.title, tbl_projects.description
+  FROM    db_utopia.tbl_project_users tbl_project_users
+       INNER JOIN
+          db_utopia.tbl_projects tbl_projects
+       ON (tbl_project_users.project_id = tbl_projects.id)
+ WHERE tbl_project_users.user_id = userid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_set_final_workitem_state`(kid BIGINT, kworkitem_type_id BIGINT)
+BEGIN
+	UPDATE tbl_workitem_states SET
+     is_final = 0
+  WHERE workitem_type_id = kworkitem_type_id;
+  
+  UPDATE tbl_workitem_states SET
+     is_final = 1
+  WHERE id = kid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_impediments_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_impediments
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_impediments_lst`()
+BEGIN
+	SELECT id,
+	       issue_title,
+	       project_id,
+	       workitem_id,
+	       created_by,
+	       created_at,
+	       is_resolved
+	  FROM tbl_impediments;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_impediments_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       issue_title,
+	       project_id,
+	       workitem_id,
+	       created_by,
+	       created_at,
+	       is_resolved
+	  FROM tbl_impediments
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_impediments_upd`(kvid bigint(20),
+	kvissue_title varchar(80),
+	kvproject_id bigint(20),
+	kvworkitem_id bigint(20),
+	kvcreated_by bigint(20),
+	kvcreated_at timestamp,
+	kvis_resolved bit(1))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_impediments
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_impediments(id,
+				issue_title,
+				project_id,
+				workitem_id,
+				created_by,
+				created_at,
+				is_resolved)
+		VALUES (kvid,
+				kvissue_title,
+				kvproject_id,
+				kvworkitem_id,
+				kvcreated_by,
+				kvcreated_at,
+				kvis_resolved);
+	ELSE
+		UPDATE tbl_impediments
+		SET id = kvid,
+			issue_title = kvissue_title,
+			project_id = kvproject_id,
+			workitem_id = kvworkitem_id,
+			created_by = kvcreated_by,
+			created_at = kvcreated_at,
+			is_resolved = kvis_resolved
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_impediment_comments_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_impediment_comments
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_impediment_comments_lst`()
+BEGIN
+	SELECT id,
+	       created_by,
+	       created_at,
+	       comment_body,
+	       impediment_id
+	  FROM tbl_impediment_comments;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_impediment_comments_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       created_by,
+	       created_at,
+	       comment_body,
+	       impediment_id
+	  FROM tbl_impediment_comments
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_impediment_comments_upd`(kvid bigint(20),
+	kvcreated_by bigint(20),
+	kvcreated_at timestamp,
+	kvcomment_body text,
+	kvimpediment_id bigint(20))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_impediment_comments
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_impediment_comments(id,
+				created_by,
+				created_at,
+				comment_body,
+				impediment_id)
+		VALUES (kvid,
+				kvcreated_by,
+				kvcreated_at,
+				kvcomment_body,
+				kvimpediment_id);
+	ELSE
+		UPDATE tbl_impediment_comments
+		SET id = kvid,
+			created_by = kvcreated_by,
+			created_at = kvcreated_at,
+			comment_body = kvcomment_body,
+			impediment_id = kvimpediment_id
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_milestones_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_milestones
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_milestones_lst`()
+BEGIN
+	SELECT id,
+	       title,
+	       start_date,
+	       end_date,
+	       project_id,
+	       created_by
+	  FROM tbl_milestones;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_milestones_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       title,
+	       start_date,
+	       end_date,
+	       project_id,
+	       created_by
+	  FROM tbl_milestones
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_milestones_upd`(kvid bigint(20),
+	kvtitle varchar(200),
+	kvstart_date timestamp,
+	kvend_date timestamp,
+	kvproject_id bigint(20),
+	kvcreated_by bigint(20))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_milestones
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_milestones(id,
+				title,
+				start_date,
+				end_date,
+				project_id,
+				created_by)
+		VALUES (kvid,
+				kvtitle,
+				kvstart_date,
+				kvend_date,
+				kvproject_id,
+				kvcreated_by);
+	ELSE
+		UPDATE tbl_milestones
+		SET id = kvid,
+			title = kvtitle,
+			start_date = kvstart_date,
+			end_date = kvend_date,
+			project_id = kvproject_id,
+			created_by = kvcreated_by
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_projects_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_projects
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_projects_insert`(
+	kvtitle varchar(200),
+	kvdescription text,
+	kvsprint_duration int(11),
+	kvneed_review bit(1),
+	kvcreated_by bigint(20))
+BEGIN
+		INSERT INTO tbl_projects(title,description,
+    sprint_duration,
+    need_review,
+    created_by)
+    
+		VALUES (
+			kvtitle,
+			kvdescription,
+			kvsprint_duration,
+			kvneed_review,
+			kvcreated_by);
+    SELECT LAST_INSERT_ID() as project_id;
+    CALL sp_tbl_project_users_upd(0,kvcreated_by,LAST_INSERT_ID(),1);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_projects_lst`()
+BEGIN
+	SELECT id,
+	       title,
+	       description,
+	       sprint_duration,
+	       need_review,
+	       calculate_velocity_on,
+	       created_by
+	  FROM tbl_projects;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_projects_sel`(pkid bigint(20))
+BEGIN
+	SELECT tbl_projects.id,
+       tbl_projects.title,
+       tbl_projects.description,
+       tbl_projects.sprint_duration,
+       tbl_projects.need_review,
+       tbl_projects.velocity_state,
+       tbl_users.display_name,
+       tbl_workitem_types.title AS `velocity_workitem`,
+       tbl_projects.calculate_velocity_on
+  FROM    (   db_utopia.tbl_workitem_types tbl_workitem_types
+           INNER JOIN
+              db_utopia.tbl_projects tbl_projects
+           ON     (tbl_workitem_types.project_id = tbl_projects.id)
+              AND (tbl_projects.calculate_velocity_on = tbl_workitem_types.id))
+       INNER JOIN
+          db_utopia.tbl_users tbl_users
+       ON (tbl_projects.created_by = tbl_users.id)
+	 WHERE db_utopia.tbl_projects.id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_projects_upd`(kvid bigint(20),
+	kvtitle varchar(200),
+	kvdescription text,
+	kvsprint_duration int(11),
+	kvneed_review bit(1),
+	kvcalculate_velocity_on bigint(20),
+	kvcreated_by bigint(20))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_projects
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_projects(id,
+				title,
+				description,
+				sprint_duration,
+				need_review,
+				calculate_velocity_on,
+				created_by)
+		VALUES (kvid,
+				kvtitle,
+				kvdescription,
+				kvsprint_duration,
+				kvneed_review,
+				kvcalculate_velocity_on,
+				kvcreated_by);
+	ELSE
+		UPDATE tbl_projects
+		SET id = kvid,
+			title = kvtitle,
+			description = kvdescription,
+			sprint_duration = kvsprint_duration,
+			need_review = kvneed_review,
+			calculate_velocity_on = kvcalculate_velocity_on,
+			created_by = kvcreated_by
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_modules_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_project_modules
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_modules_lst`(kproject_id BIGINT)
+BEGIN
+	SELECT id,
+	       project_id,
+	       module_name
+	  FROM tbl_project_modules
+    WHERE project_id = kproject_id; 
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_modules_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       project_id,
+	       module_name
+	  FROM tbl_project_modules
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_modules_upd`(kvid BIGINT,
+	kvproject_id bigint(20),
+	kvmodule_name varchar(200))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_project_modules
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_project_modules(
+				project_id,
+				module_name)
+		VALUES (
+				kvproject_id,
+				kvmodule_name);
+        SELECT id,module_name FROM tbl_project_modules WHERE id = LAST_INSERT_ID();
+	ELSE
+		UPDATE tbl_project_modules
+		SET 
+			project_id = kvproject_id,
+			module_name = kvmodule_name
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_users_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_project_users
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_users_delete_by_email`(kemail_id varchar(200), kproject_id BIGINT(20))
+BEGIN
+	DECLARE kuser_id BIGINT(20);
+  SELECT id INTO kuser_id FROM tbl_users WHERE tbl_users.user_name = kemail_id;
+  DELETE FROM tbl_project_users WHERE user_id = kuser_id AND project_id = kproject_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_users_lst`()
+BEGIN
+	SELECT id,
+	       user_id,
+	       project_id,
+	       has_joined
+	  FROM tbl_project_users;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_users_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       user_id,
+	       project_id,
+	       has_joined
+	  FROM tbl_project_users
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_users_select_by_project_id`(kproject_id BIGINT(20))
+BEGIN
+	SELECT tbl_users.user_name, tbl_users.display_name, tbl_users.id
+  FROM    db_utopia.tbl_project_users tbl_project_users
+       INNER JOIN
+          db_utopia.tbl_users tbl_users
+       ON (tbl_project_users.user_id = tbl_users.id)
+       WHERE tbl_project_users.project_id = kproject_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_project_users_upd`(kvid bigint(20),
+	kvuser_id bigint(20),
+	kvproject_id bigint(20),
+	kvhas_joined tinyint(4))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_project_users
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_project_users(id,
+				user_id,
+				project_id,
+				has_joined)
+		VALUES (kvid,
+				kvuser_id,
+				kvproject_id,
+				kvhas_joined);
+	ELSE
+		UPDATE tbl_project_users
+		SET id = kvid,
+			user_id = kvuser_id,
+			project_id = kvproject_id,
+			has_joined = kvhas_joined
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_users_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_users
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_users_lst`()
+BEGIN
+	SELECT id,
+	       display_name,
+	       user_name,
+	       password,
+	       last_logged_in,
+	       email_verified,
+	       send_email_only_me,
+	       send_daily_report,
+	       whiteboard_workitems_length,
+	       intelligent_sorting
+	  FROM tbl_users;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_users_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       display_name,
+	       user_name,
+	       password,
+	       last_logged_in,
+	       email_verified,
+	       send_email_only_me,
+	       send_daily_report,
+	       whiteboard_workitems_length,
+	       intelligent_sorting
+	  FROM tbl_users
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_users_select_by_email`(kuser_name varchar(200))
+BEGIN
+	SELECT id,
+	       display_name,
+	       user_name,
+	       password,
+	       last_logged_in,
+	       email_verified,
+	       send_email_only_me,
+	       send_daily_report,
+	       whiteboard_workitems_length,
+	       intelligent_sorting
+	  FROM tbl_users
+	 WHERE user_name = kuser_name;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_users_upd`(kvid bigint(20),
+	kvdisplay_name varchar(200),
+	kvuser_name varchar(200),
+	kvpassword varchar(200),
+	kvlast_logged_in timestamp,
+	kvemail_verified tinyint(1),
+	kvsend_email_only_me tinyint(1),
+	kvsend_daily_report tinyint(1),
+	kvwhiteboard_workitems_length int(11),
+	kvintelligent_sorting tinyint(1))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_users
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_users(id,
+				display_name,
+				user_name,
+				password,
+				last_logged_in,
+				email_verified,
+				send_email_only_me,
+				send_daily_report,
+				whiteboard_workitems_length,
+				intelligent_sorting)
+		VALUES (kvid,
+				kvdisplay_name,
+				kvuser_name,
+				kvpassword,
+				kvlast_logged_in,
+				kvemail_verified,
+				kvsend_email_only_me,
+				kvsend_daily_report,
+				kvwhiteboard_workitems_length,
+				kvintelligent_sorting);
+	ELSE
+		UPDATE tbl_users
+		SET id = kvid,
+			display_name = kvdisplay_name,
+			user_name = kvuser_name,
+			password = kvpassword,
+			last_logged_in = kvlast_logged_in,
+			email_verified = kvemail_verified,
+			send_email_only_me = kvsend_email_only_me,
+			send_daily_report = kvsend_daily_report,
+			whiteboard_workitems_length = kvwhiteboard_workitems_length,
+			intelligent_sorting = kvintelligent_sorting
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_user_modules_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_user_modules
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_user_modules_lst`()
+BEGIN
+	SELECT id,
+	       user_id,
+	       module_id
+	  FROM tbl_user_modules;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_user_modules_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       user_id,
+	       module_id
+	  FROM tbl_user_modules
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_user_modules_upd`(kvid bigint(20),
+	kvuser_id bigint(20),
+	kvmodule_id bigint(20))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_user_modules
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_user_modules(id,
+				user_id,
+				module_id)
+		VALUES (kvid,
+				kvuser_id,
+				kvmodule_id);
+	ELSE
+		UPDATE tbl_user_modules
+		SET id = kvid,
+			user_id = kvuser_id,
+			module_id = kvmodule_id
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_user_preferences_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_user_preferences
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_user_preferences_lst`()
+BEGIN
+	SELECT id,
+	       user_id,
+	       workitem_type,
+	       workitem_state,
+	       priority
+	  FROM tbl_user_preferences;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_user_preferences_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       user_id,
+	       workitem_type,
+	       workitem_state,
+	       priority
+	  FROM tbl_user_preferences
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_user_preferences_upd`(kvid bigint(20),
+	kvuser_id bigint(20),
+	kvworkitem_type bigint(20),
+	kvworkitem_state bigint(20),
+	kvpriority int(11))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_user_preferences
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_user_preferences(id,
+				user_id,
+				workitem_type,
+				workitem_state,
+				priority)
+		VALUES (kvid,
+				kvuser_id,
+				kvworkitem_type,
+				kvworkitem_state,
+				kvpriority);
+	ELSE
+		UPDATE tbl_user_preferences
+		SET id = kvid,
+			user_id = kvuser_id,
+			workitem_type = kvworkitem_type,
+			workitem_state = kvworkitem_state,
+			priority = kvpriority
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitems_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_workitems
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitems_lst`()
+BEGIN
+	SELECT id,
+	       title,
+	       description,
+	       created_by,
+	       assigned_to,
+	       project_id,
+	       importance,
+	       type,
+	       created_date,
+	       planned_for
+	  FROM tbl_workitems;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitems_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       title,
+	       description,
+	       created_by,
+	       assigned_to,
+	       project_id,
+	       importance,
+	       type,
+	       created_date,
+	       planned_for
+	  FROM tbl_workitems
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitems_upd`(kvid bigint(20),
+	kvtitle varchar(200),
+	kvdescription text,
+	kvcreated_by bigint(20),
+	kvassigned_to bigint(20),
+	kvproject_id bigint(20),
+	kvimportance varchar(20),
+	kvtype bigint(20),
+	kvcreated_date timestamp,
+	kvplanned_for bigint(20))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_workitems
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_workitems(id,
+				title,
+				description,
+				created_by,
+				assigned_to,
+				project_id,
+				importance,
+				type,
+				created_date,
+				planned_for)
+		VALUES (kvid,
+				kvtitle,
+				kvdescription,
+				kvcreated_by,
+				kvassigned_to,
+				kvproject_id,
+				kvimportance,
+				kvtype,
+				kvcreated_date,
+				kvplanned_for);
+	ELSE
+		UPDATE tbl_workitems
+		SET id = kvid,
+			title = kvtitle,
+			description = kvdescription,
+			created_by = kvcreated_by,
+			assigned_to = kvassigned_to,
+			project_id = kvproject_id,
+			importance = kvimportance,
+			type = kvtype,
+			created_date = kvcreated_date,
+			planned_for = kvplanned_for
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_comments_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_workitem_comments
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_comments_lst`()
+BEGIN
+	SELECT id,
+	       workitem_id,
+	       comment_body,
+	       created_at,
+	       created_by
+	  FROM tbl_workitem_comments;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_comments_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       workitem_id,
+	       comment_body,
+	       created_at,
+	       created_by
+	  FROM tbl_workitem_comments
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_comments_upd`(kvid bigint(20),
+	kvworkitem_id bigint(20),
+	kvcomment_body text,
+	kvcreated_at timestamp,
+	kvcreated_by bigint(20))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_workitem_comments
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_workitem_comments(id,
+				workitem_id,
+				comment_body,
+				created_at,
+				created_by)
+		VALUES (kvid,
+				kvworkitem_id,
+				kvcomment_body,
+				kvcreated_at,
+				kvcreated_by);
+	ELSE
+		UPDATE tbl_workitem_comments
+		SET id = kvid,
+			workitem_id = kvworkitem_id,
+			comment_body = kvcomment_body,
+			created_at = kvcreated_at,
+			created_by = kvcreated_by
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_log_del`(pkid bigint(20))
+BEGIN
+	DELETE FROM tbl_workitem_log
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_log_lst`()
+BEGIN
+	SELECT id,
+	       workitem_id,
+	       action,
+	       user_id,
+	       old_value,
+	       new_value
+	  FROM tbl_workitem_log;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_log_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       workitem_id,
+	       action,
+	       user_id,
+	       old_value,
+	       new_value
+	  FROM tbl_workitem_log
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_log_upd`(kvid bigint(20),
+	kvworkitem_id bigint(20),
+	kvaction varchar(40),
+	kvuser_id bigint(20),
+	kvold_value varchar(200),
+	kvnew_value varchar(200))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_workitem_log
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_workitem_log(id,
+				workitem_id,
+				action,
+				user_id,
+				old_value,
+				new_value)
+		VALUES (kvid,
+				kvworkitem_id,
+				kvaction,
+				kvuser_id,
+				kvold_value,
+				kvnew_value);
+	ELSE
+		UPDATE tbl_workitem_log
+		SET id = kvid,
+			workitem_id = kvworkitem_id,
+			action = kvaction,
+			user_id = kvuser_id,
+			old_value = kvold_value,
+			new_value = kvnew_value
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_states_del`(pkid bigint(20),kproject_id BIGINT)
+BEGIN
+  DECLARE vproject_id BIGINT;
+  
+  SELECT tbl_workitem_types.project_id INTO vproject_id
+  FROM    db_utopia.tbl_workitem_states tbl_workitem_states
+       INNER JOIN
+          db_utopia.tbl_workitem_types tbl_workitem_types
+       ON (tbl_workitem_states.workitem_type_id = tbl_workitem_types.id)
+  WHERE tbl_workitem_states.id = pkid;
+    
+  IF kproject_id = vproject_id THEN  
+  	DELETE FROM tbl_workitem_states
+  	 WHERE id = pkid;
+  END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_states_insert`(kproject_id BIGINT ,kworkitem_title varchar(40),
+kworkitem_state varchar(200))
+BEGIN
+  DECLARE workitem_id BIGINT;
+	SELECT id INTO workitem_id FROM tbl_workitem_types WHERE title = kworkitem_title AND project_id = kproject_id;
+  INSERT INTO tbl_workitem_states(workitem_type_id,state_title) VALUES (workitem_id,kworkitem_state);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_states_lst`()
+BEGIN
+	SELECT id,
+	       workitem_type_id,
+	       state_title
+	  FROM tbl_workitem_states;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_states_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       workitem_type_id,
+	       state_title
+	  FROM tbl_workitem_states
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_states_upd`(kvid bigint(20),
+	kvworkitem_type_id bigint(20),
+	kvstate_title varchar(200))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_workitem_states
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_workitem_states(id,
+				workitem_type_id,
+				state_title)
+		VALUES (kvid,
+				kvworkitem_type_id,
+				kvstate_title);
+    SELECT id,state_title as `title` FROM tbl_workitem_states WHERE id = LAST_INSERT_ID();
+	ELSE
+		UPDATE tbl_workitem_states
+		SET id = kvid,
+			workitem_type_id = kvworkitem_type_id,
+			state_title = kvstate_title
+		WHERE id = kvid;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_types_by_project_id`(kproject_id BIGINT(20))
+BEGIN
+	SELECT tbl_workitem_states.id AS `workitem_state_id`,
+       tbl_workitem_states.workitem_type_id,
+       tbl_workitem_states.state_title,
+       tbl_workitem_types.title,
+       tbl_workitem_types.project_id,
+       tbl_workitem_types.id,
+       tbl_workitem_states.is_final
+  FROM    db_utopia.tbl_workitem_states tbl_workitem_states
+       RIGHT OUTER JOIN
+          db_utopia.tbl_workitem_types tbl_workitem_types
+       ON (tbl_workitem_states.workitem_type_id = tbl_workitem_types.id)
+  WHERE tbl_workitem_types.project_id = kproject_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_types_del`(pkid bigint(20),kvproject_id BIGINT)
+BEGIN
+	DELETE FROM tbl_workitem_types
+	 WHERE id = pkid and project_id = kvproject_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_types_lst`()
+BEGIN
+	SELECT id,
+	       title,
+	       project_id
+	  FROM tbl_workitem_types;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_types_sel`(pkid bigint(20))
+BEGIN
+	SELECT id,
+	       title,
+	       project_id
+	  FROM tbl_workitem_types
+	 WHERE id = pkid;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_tbl_workitem_types_upd`(kvid BIGINT,
+	kvtitle varchar(40),
+	kvproject_id bigint(20))
+BEGIN
+	DECLARE lcount INT;
+	SELECT count(1) INTO lcount
+	  FROM tbl_workitem_types
+	 WHERE id = kvid;
+	IF lcount = 0 THEN
+		INSERT INTO tbl_workitem_types(id,
+				title,
+				project_id)
+		VALUES (
+        kvid,
+				kvtitle,
+				kvproject_id);
+    SELECT id,title FROM tbl_workitem_types WHERE id = LAST_INSERT_ID();
+	ELSE
+		UPDATE tbl_workitem_types
+		SET title = kvtitle
+		WHERE id = kvid AND project_id = kvproject_id;
+	END IF;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_update_velocity_feature`(kvproject_id BIGINT)
+BEGIN
+  DECLARE workitem_id BIGINT;
+	SELECT id INTO workitem_id FROM tbl_workitem_types WHERE project_id = kvproject_id AND title = "feature";
+  UPDATE tbl_projects SET calculate_velocity_on = workitem_id WHERE id = kvproject_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_workitem_by_user_id`(kuser_id BIGINT, kproject_id BIGINT)
+BEGIN
+	SELECT * FROM tbl_workitems WHERE assigned_to = kuser_id AND project_id = kproject_id ORDER BY importance DESC;
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -35,7 +1052,7 @@ CREATE TABLE IF NOT EXISTS `tbl_api_keys` (
   `date_created` int(11) NOT NULL,
   `user_id` bigint(20) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=22 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=26 ;
 
 --
 -- Dumping data for table `tbl_api_keys`
@@ -60,7 +1077,11 @@ INSERT INTO `tbl_api_keys` (`id`, `key`, `level`, `ignore_limits`, `is_private_k
 (18, '0cd8a639da6bb94570ce1bc7c8d859ff9797129c', 0, 0, 0, NULL, 1373548692, 123),
 (19, 'b9918623a57abe5393b2e3c67df29b239c936113', 0, 0, 0, NULL, 1373562196, 111),
 (20, '177e8d4708183df3451594d3f97980e6c0d33b03', 0, 0, 0, NULL, 1373629546, 123),
-(21, 'd780fc95d92c5aaa30a2395354beb240fdf39d34', 0, 0, 0, NULL, 1373889162, 123);
+(21, 'd780fc95d92c5aaa30a2395354beb240fdf39d34', 0, 0, 0, NULL, 1373889162, 123),
+(22, 'fe83d574ae7b471e8939318204bb7a989e5790fe', 0, 0, 0, NULL, 1374682202, 1),
+(23, '5844981ceda219df237a17f69f6bec3fb7a7f7ce', 0, 0, 0, NULL, 1374682212, 123),
+(24, '8abb73fc3c7d5b796a264c6abd696421a407e81b', 0, 0, 0, NULL, 1375377307, 123),
+(25, '0c842f0c113e40dbe55871622949008ec45f048d', 0, 0, 0, NULL, 1375431192, 123);
 
 -- --------------------------------------------------------
 
@@ -78,7 +1099,7 @@ CREATE TABLE IF NOT EXISTS `tbl_api_logs` (
   `time` int(11) NOT NULL DEFAULT '0',
   `authorized` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4051 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4255 ;
 
 --
 -- Dumping data for table `tbl_api_logs`
@@ -4150,7 +5171,212 @@ INSERT INTO `tbl_api_logs` (`id`, `uri`, `method`, `params`, `api_key`, `ip_addr
 (4047, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', 'd780fc95d92c5aaa30a2395354beb240fdf39d34', '127.0.0.1', 1374241594, 1),
 (4048, 'api/workitem/comments/workitem_id/18/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"18";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', 'd780fc95d92c5aaa30a2395354beb240fdf39d34', '127.0.0.1', 1374241596, 1),
 (4049, 'api/workitem/tasks/workitem_id/18/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"18";s:7:"task_id";b:0;}', 'd780fc95d92c5aaa30a2395354beb240fdf39d34', '127.0.0.1', 1374241596, 1),
-(4050, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', 'd780fc95d92c5aaa30a2395354beb240fdf39d34', '127.0.0.1', 1374241748, 1);
+(4050, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', 'd780fc95d92c5aaa30a2395354beb240fdf39d34', '127.0.0.1', 1374241748, 1),
+(4051, 'api/timeline', 'get', NULL, '', '127.0.0.1', 1374677086, 0),
+(4052, 'api/timeline', 'get', NULL, '59e58cac1768482f30d817c471ed22032e3630d2', '127.0.0.1', 1374677110, 1),
+(4053, 'api/timeline', 'get', NULL, 'fbfe04e1a607f9cd4ba617a6716ef663fd3ed638', '127.0.0.1', 1374677125, 1),
+(4054, 'api/project', 'get', NULL, '', '127.0.0.1', 1374682039, 0),
+(4055, 'key', 'post', 'a:2:{s:8:"username";s:7:"c@k.com";s:8:"password";s:8:"password";}', '', '127.0.0.1', 1374682054, 1),
+(4056, 'key', 'post', 'a:2:{s:8:"username";s:7:"c@k.com";s:8:"password";s:1:"p";}', '', '127.0.0.1', 1374682058, 1),
+(4057, 'key', 'post', 'a:2:{s:8:"username";s:7:"c@k.com";s:8:"password";s:8:"password";}', '', '127.0.0.1', 1374682063, 1),
+(4058, 'api/timeline', 'get', NULL, 'fbfe04e1a607f9cd4ba617a6716ef663fd3ed638', '127.0.0.1', 1374682093, 1),
+(4059, 'api/timeline', 'get', NULL, '', '127.0.0.1', 1374682101, 0),
+(4060, 'api/timeline', 'get', NULL, 'fbfe04e1a607f9cd4ba617a6716ef663fd3ed638', '127.0.0.1', 1374682106, 1),
+(4061, 'key', 'post', 'a:2:{s:8:"username";s:19:"mac300390@gmail.com";s:8:"password";s:8:"password";}', '', '127.0.0.1', 1374682119, 1),
+(4062, 'api/timeline', 'get', NULL, 'fbfe04e1a607f9cd4ba617a6716ef663fd3ed638', '127.0.0.1', 1374682191, 1),
+(4063, 'key', 'post', 'a:2:{s:8:"username";s:19:"mac300390@gmail.com";s:8:"password";s:8:"password";}', '', '127.0.0.1', 1374682201, 1),
+(4064, 'api/project', 'get', NULL, 'fe83d574ae7b471e8939318204bb7a989e5790fe', '127.0.0.1', 1374682202, 1),
+(4065, 'key', 'post', 'a:2:{s:8:"username";s:7:"c@k.com";s:8:"password";s:1:"p";}', 'fe83d574ae7b471e8939318204bb7a989e5790fe', '127.0.0.1', 1374682209, 1),
+(4066, 'key', 'post', 'a:2:{s:8:"username";s:7:"c@k.com";s:8:"password";s:8:"password";}', 'fe83d574ae7b471e8939318204bb7a989e5790fe', '127.0.0.1', 1374682212, 1),
+(4067, 'api/project', 'get', NULL, '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682212, 1),
+(4068, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682214, 1),
+(4069, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682214, 1),
+(4070, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682234, 1),
+(4071, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682234, 1),
+(4072, 'api/workitem/index/project_id/42/workitem_id/1', 'post', 'a:3:{s:10:"project_id";s:2:"42";s:11:"workitem_id";s:1:"1";s:4:"data";a:13:{s:2:"id";s:1:"1";s:5:"title";s:16:"New Title I have";s:11:"description";s:22:"Lets change this again";s:10:"created_by";s:3:"123";s:11:"assigned_to";s:3:"123";s:10:"project_id";s:2:"42";s:10:"importance";s:1:"1";s:4:"type";s:2:"96";s:12:"created_date";s:19:"2013-02-09 18:49:42";s:11:"planned_for";s:1:"1";s:12:"story_points";s:1:"2";s:12:"last_updated";s:29:"Wed, 24 Jul 2013 16:10:47 GMT";s:5:"state";s:3:"287";}}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682247, 1),
+(4073, 'api/workitem/tasks/workitem_id/1/task_id', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;s:4:"task";s:8:"lol task";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682287, 1),
+(4074, 'api/workitem/index/project_id/42/workitem_id/1', 'post', 'a:3:{s:10:"project_id";s:2:"42";s:11:"workitem_id";s:1:"1";s:4:"data";a:13:{s:2:"id";s:1:"1";s:5:"title";s:16:"New Title I have";s:11:"description";s:22:"Lets change this again";s:10:"created_by";s:3:"123";s:11:"assigned_to";s:3:"123";s:10:"project_id";s:2:"42";s:10:"importance";s:1:"1";s:4:"type";s:2:"96";s:12:"created_date";s:19:"2013-02-09 18:49:42";s:11:"planned_for";s:1:"1";s:12:"story_points";s:1:"2";s:12:"last_updated";s:29:"Wed, 24 Jul 2013 16:11:30 GMT";s:5:"state";s:3:"287";}}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682290, 1),
+(4075, 'api/workitem/tasks/workitem_id/2/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"2";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682294, 1),
+(4076, 'api/workitem/comments/workitem_id/2/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"2";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682294, 1),
+(4077, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682295, 1),
+(4078, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682295, 1),
+(4079, 'api/workitem/tasks/workitem_id/1/task_id/21', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";s:2:"21";s:4:"data";a:6:{s:2:"id";s:2:"21";s:4:"task";s:8:"lol task";s:4:"done";b:1;s:9:"done_date";s:19:"2013-07-24 21:41:27";s:11:"workitem_id";s:1:"1";s:7:"user_id";s:3:"123";}}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682297, 1),
+(4080, 'api/workitem/tasks/workitem_id/1/task_id/21', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";s:2:"21";s:4:"data";a:6:{s:2:"id";s:2:"21";s:4:"task";s:8:"lol task";s:4:"done";b:0;s:9:"done_date";s:19:"2013-07-24 21:41:27";s:11:"workitem_id";s:1:"1";s:7:"user_id";s:3:"123";}}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682298, 1),
+(4081, 'api/workitem/comments/workitem_id/2/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"2";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682345, 1),
+(4082, 'api/workitem/tasks/workitem_id/2/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"2";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682345, 1),
+(4083, 'api/workitem/comments/workitem_id/4/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"4";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682346, 1),
+(4084, 'api/workitem/tasks/workitem_id/4/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"4";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682346, 1),
+(4085, 'api/workitem/comments/workitem_id/4/workitem_comment_id', 'post', 'a:3:{s:11:"workitem_id";s:1:"4";s:19:"workitem_comment_id";b:0;s:12:"comment_body";s:13:"it just works";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682378, 1),
+(4086, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682383, 1),
+(4087, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:4:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;s:5:"users";s:3:"111";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682401, 1),
+(4088, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682404, 1),
+(4089, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682408, 1),
+(4090, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682412, 1),
+(4091, 'api/project', 'get', NULL, '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682416, 1),
+(4092, 'api/project/details/project_id/52', 'get', 'a:1:{s:10:"project_id";s:2:"52";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682419, 1),
+(4093, 'api/workitem/index/project_id/52/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"52";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682419, 1),
+(4094, 'api/timeline/index/project_id/52/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"52";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682421, 1),
+(4095, 'api/workitem/index/project_id/52/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"52";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682422, 1),
+(4096, 'api/project', 'get', NULL, '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682425, 1),
+(4097, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682426, 1),
+(4098, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682426, 1),
+(4099, 'api/workitem/comments/workitem_id/57/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"57";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682431, 1),
+(4100, 'api/workitem/tasks/workitem_id/57/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"57";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682431, 1),
+(4101, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682435, 1),
+(4102, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682435, 1),
+(4103, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:12:"comment_body";s:25:"i dont freakin believe it";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682460, 1),
+(4104, 'api/workitem/comments/workitem_id/45/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"45";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682506, 1),
+(4105, 'api/workitem/tasks/workitem_id/45/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"45";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682506, 1),
+(4106, 'api/workitem/comments/workitem_id/79/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"79";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682535, 1),
+(4107, 'api/workitem/tasks/workitem_id/79/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"79";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682535, 1),
+(4108, 'api/workitem/tasks/workitem_id/99/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"99";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682537, 1),
+(4109, 'api/workitem/comments/workitem_id/99/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"99";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682537, 1),
+(4110, 'api/workitem/comments/workitem_id/25/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"25";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682538, 1),
+(4111, 'api/workitem/tasks/workitem_id/25/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"25";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682538, 1),
+(4112, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682556, 1),
+(4113, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682558, 1),
+(4114, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682580, 1),
+(4115, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682580, 1),
+(4116, 'api/project', 'get', NULL, '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682589, 1),
+(4117, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682590, 1),
+(4118, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682591, 1),
+(4119, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682597, 1),
+(4120, 'api/project', 'get', NULL, '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682637, 1),
+(4121, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682638, 1),
+(4122, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682638, 1),
+(4123, 'api/workitem/comments/workitem_id/4/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"4";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682640, 1),
+(4124, 'api/workitem/tasks/workitem_id/4/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"4";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682640, 1),
+(4125, 'api/workitem/comments/workitem_id/18/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"18";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682662, 1),
+(4126, 'api/workitem/tasks/workitem_id/18/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"18";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682662, 1),
+(4127, 'api/workitem/comments/workitem_id/19/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"19";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682667, 1),
+(4128, 'api/workitem/tasks/workitem_id/19/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"19";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682667, 1),
+(4129, 'api/workitem/comments/workitem_id/20/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"20";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682670, 1),
+(4130, 'api/workitem/tasks/workitem_id/20/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"20";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682670, 1),
+(4131, 'api/workitem/comments/workitem_id/19/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"19";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682673, 1),
+(4132, 'api/workitem/tasks/workitem_id/19/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"19";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682673, 1),
+(4133, 'api/workitem/comments/workitem_id/21/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"21";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682675, 1),
+(4134, 'api/workitem/tasks/workitem_id/21/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"21";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682675, 1),
+(4135, 'api/workitem/comments/workitem_id/22/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"22";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682676, 1),
+(4136, 'api/workitem/tasks/workitem_id/22/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"22";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682676, 1),
+(4137, 'api/workitem/comments/workitem_id/23/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"23";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682677, 1),
+(4138, 'api/workitem/tasks/workitem_id/23/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"23";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682677, 1),
+(4139, 'api/workitem/comments/workitem_id/29/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"29";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682678, 1),
+(4140, 'api/workitem/tasks/workitem_id/29/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"29";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682678, 1),
+(4141, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682684, 1),
+(4142, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682684, 1),
+(4143, 'api/workitem/tasks/workitem_id/1/task_id/20', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";s:2:"20";s:4:"data";a:6:{s:2:"id";s:2:"20";s:4:"task";s:8:"New task";s:4:"done";b:0;s:9:"done_date";s:19:"2013-07-19 19:16:29";s:11:"workitem_id";s:1:"1";s:7:"user_id";s:3:"123";}}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682690, 1),
+(4144, 'api/workitem/tasks/workitem_id/1/task_id/20', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";s:2:"20";s:4:"data";a:6:{s:2:"id";s:2:"20";s:4:"task";s:8:"New task";s:4:"done";b:1;s:9:"done_date";s:19:"2013-07-19 19:16:29";s:11:"workitem_id";s:1:"1";s:7:"user_id";s:3:"123";}}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682692, 1),
+(4145, 'api/workitem/tasks/workitem_id/1/task_id/20', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";s:2:"20";s:4:"data";a:6:{s:2:"id";s:2:"20";s:4:"task";s:8:"New task";s:4:"done";b:0;s:9:"done_date";s:19:"2013-07-19 19:16:29";s:11:"workitem_id";s:1:"1";s:7:"user_id";s:3:"123";}}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682710, 1),
+(4146, 'api/workitem/tasks/workitem_id/1/task_id/20', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";s:2:"20";s:4:"data";a:6:{s:2:"id";s:2:"20";s:4:"task";s:8:"New task";s:4:"done";b:1;s:9:"done_date";s:19:"2013-07-19 19:16:29";s:11:"workitem_id";s:1:"1";s:7:"user_id";s:3:"123";}}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682773, 1),
+(4147, 'api/workitem/tasks/workitem_id/1/task_id', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;s:4:"task";s:3:"wow";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374682786, 1),
+(4148, 'api/workitem/comments/workitem_id/2/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"2";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683141, 1),
+(4149, 'api/workitem/tasks/workitem_id/2/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"2";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683142, 1),
+(4150, 'api/workitem/tasks/workitem_id/4/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"4";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683143, 1),
+(4151, 'api/workitem/comments/workitem_id/4/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"4";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683143, 1),
+(4152, 'api/workitem/comments/workitem_id/4/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"4";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683145, 1),
+(4153, 'api/workitem/tasks/workitem_id/4/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"4";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683145, 1),
+(4154, 'api/workitem/tasks/workitem_id/18/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"18";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683146, 1),
+(4155, 'api/workitem/comments/workitem_id/18/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"18";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683146, 1),
+(4156, 'api/workitem/comments/workitem_id/19/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"19";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683147, 1),
+(4157, 'api/workitem/tasks/workitem_id/19/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"19";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683147, 1),
+(4158, 'api/workitem/comments/workitem_id/20/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:2:"20";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683149, 1),
+(4159, 'api/workitem/tasks/workitem_id/20/task_id', 'get', 'a:2:{s:11:"workitem_id";s:2:"20";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683149, 1),
+(4160, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683150, 1),
+(4161, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683150, 1),
+(4162, 'api/timeline', 'get', NULL, 'fbfe04e1a607f9cd4ba617a6716ef663fd3ed638', '127.0.0.1', 1374683163, 1),
+(4163, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683169, 1),
+(4164, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683189, 1),
+(4165, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '5844981ceda219df237a17f69f6bec3fb7a7f7ce', '127.0.0.1', 1374683196, 1),
+(4166, 'api/project', 'get', NULL, '', '127.0.0.1', 1375377273, 0),
+(4167, 'key', 'post', NULL, '', '127.0.0.1', 1375377276, 1),
+(4168, 'key', 'post', 'a:2:{s:8:"username";s:7:"c@k.com";s:8:"password";s:8:"password";}', '', '127.0.0.1', 1375377307, 1),
+(4169, 'api/project', 'get', NULL, '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377307, 1),
+(4170, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377309, 1),
+(4171, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377310, 1),
+(4172, 'api/project', 'get', NULL, '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377819, 1),
+(4173, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377820, 1),
+(4174, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377821, 1),
+(4175, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377822, 1),
+(4176, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377822, 1),
+(4177, 'api/project', 'get', NULL, '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377837, 1),
+(4178, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377838, 1),
+(4179, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377838, 1),
+(4180, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '8abb73fc3c7d5b796a264c6abd696421a407e81b', '127.0.0.1', 1375377840, 1),
+(4181, 'api/project', 'get', NULL, '', '127.0.0.1', 1375431175, 0),
+(4182, 'api/project', 'get', NULL, '', '127.0.0.1', 1375431181, 0),
+(4183, 'key', 'post', 'a:2:{s:8:"username";s:7:"c@k.com";s:8:"password";s:8:"password";}', '', '127.0.0.1', 1375431192, 1),
+(4184, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431192, 1),
+(4185, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431194, 1),
+(4186, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431194, 1),
+(4187, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431197, 1),
+(4188, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431199, 1),
+(4189, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431203, 1),
+(4190, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431204, 1),
+(4191, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431204, 1),
+(4192, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431206, 1),
+(4193, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431206, 1),
+(4194, 'api/workitem/index/project_id/42/workitem_id/1', 'post', 'a:3:{s:10:"project_id";s:2:"42";s:11:"workitem_id";s:1:"1";s:4:"data";a:13:{s:2:"id";s:1:"1";s:5:"title";s:16:"New Title I have";s:11:"description";s:22:"Lets change this again";s:10:"created_by";s:3:"123";s:11:"assigned_to";s:3:"123";s:10:"project_id";s:2:"42";s:10:"importance";s:1:"1";s:4:"type";s:2:"96";s:12:"created_date";s:19:"2013-02-09 18:49:42";s:11:"planned_for";s:1:"1";s:12:"story_points";s:1:"2";s:12:"last_updated";s:29:"Fri, 02 Aug 2013 08:13:51 GMT";s:5:"state";s:3:"287";}}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431231, 1),
+(4195, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431234, 1),
+(4196, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375431238, 1),
+(4197, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375432425, 1),
+(4198, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375432426, 1),
+(4199, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375432427, 1),
+(4200, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375432896, 1),
+(4201, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375444820, 1),
+(4202, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375444822, 1),
+(4203, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375444822, 1),
+(4204, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375444827, 1),
+(4205, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375444827, 1),
+(4206, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375444841, 1),
+(4207, 'api/project', 'get', NULL, '', '127.0.0.1', 1375444857, 0),
+(4208, 'api/project', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375444950, 1),
+(4209, 'api/project', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375444978, 1),
+(4210, 'api/project', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375444980, 1),
+(4211, 'api/project', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375444981, 1),
+(4212, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445010, 1),
+(4213, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445010, 1),
+(4214, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445013, 1),
+(4215, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445016, 1),
+(4216, 'api/timeline/index/project_id/42/start_date/2013-08-01/end_date/2013-08-15/workitem_id', 'get', 'a:4:{s:10:"project_id";s:2:"42";s:10:"start_date";s:10:"2013-08-01";s:8:"end_date";s:10:"2013-08-15";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445026, 1),
+(4217, 'api/timeline/index/project_id/42/start_date/2013-08-01/end_date/2013-08-15/workitem_id', 'get', 'a:4:{s:10:"project_id";s:2:"42";s:10:"start_date";s:10:"2013-08-01";s:8:"end_date";s:10:"2013-08-15";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445028, 1),
+(4218, 'api/timeline/index/project_id/42/start_date/2013-08-01/end_date/2013-08-15/workitem_id', 'get', 'a:5:{s:10:"project_id";s:2:"42";s:10:"start_date";s:10:"2013-08-01";s:8:"end_date";s:10:"2013-08-15";s:11:"workitem_id";b:0;s:5:"users";s:3:"111";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445034, 1),
+(4219, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445041, 1),
+(4220, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445052, 1),
+(4221, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445053, 1);
+INSERT INTO `tbl_api_logs` (`id`, `uri`, `method`, `params`, `api_key`, `ip_address`, `time`, `authorized`) VALUES
+(4222, 'api/workitem/comments/workitem_id/2/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"2";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445065, 1),
+(4223, 'api/workitem/tasks/workitem_id/2/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"2";s:7:"task_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375445065, 1),
+(4224, 'test', 'get', NULL, '', '127.0.0.1', 1375448843, 0),
+(4225, 'test', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375448879, 1),
+(4226, 'test/project_log', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375448895, 1),
+(4227, 'test/project_log', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375448987, 1),
+(4228, 'test/project_log', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375449022, 1),
+(4229, 'test/project_log', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375449062, 1),
+(4230, 'test/project_log', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375449082, 1),
+(4231, 'test/project_log', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375449152, 1),
+(4232, 'test/project_log', 'get', NULL, '5371088c9b72b5e873f284be81ab237f8bfe0a6c', '127.0.0.1', 1375449256, 1),
+(4233, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449898, 1),
+(4234, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449900, 1),
+(4235, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449900, 1),
+(4236, 'api/workitem/tasks/workitem_id/1/task_id', 'get', 'a:2:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449905, 1),
+(4237, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'get', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449905, 1),
+(4238, 'api/workitem/tasks/workitem_id/1/task_id/21', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";s:2:"21";s:4:"data";a:6:{s:2:"id";s:2:"21";s:4:"task";s:8:"lol task";s:4:"done";b:1;s:9:"done_date";s:19:"2013-07-24 16:11:38";s:11:"workitem_id";s:1:"1";s:7:"user_id";s:3:"123";}}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449917, 1),
+(4239, 'api/workitem/tasks/workitem_id/1/task_id/21', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";s:2:"21";s:4:"data";a:6:{s:2:"id";s:2:"21";s:4:"task";s:8:"lol task";s:4:"done";b:0;s:9:"done_date";s:19:"2013-07-24 16:11:38";s:11:"workitem_id";s:1:"1";s:7:"user_id";s:3:"123";}}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449927, 1),
+(4240, 'api/workitem/tasks/workitem_id/1/task_id', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:7:"task_id";b:0;s:4:"task";s:12:"new task duh";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449944, 1),
+(4241, 'api/workitem/comments/workitem_id/1/workitem_comment_id/16', 'delete', 'a:2:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";s:2:"16";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375449977, 1),
+(4242, 'api/workitem/comments/workitem_id/1/workitem_comment_id', 'post', 'a:3:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";b:0;s:12:"comment_body";s:13:"new comment ?";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450004, 1),
+(4243, 'api/workitem/comments/workitem_id/1/workitem_comment_id/32', 'delete', 'a:2:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";s:2:"32";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450013, 1),
+(4244, 'api/workitem/comments/workitem_id/1/workitem_comment_id/31', 'delete', 'a:2:{s:11:"workitem_id";s:1:"1";s:19:"workitem_comment_id";s:2:"31";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450117, 1),
+(4245, 'api/workitem/index/project_id/42/workitem_id/1', 'post', 'a:3:{s:10:"project_id";s:2:"42";s:11:"workitem_id";s:1:"1";s:4:"data";a:13:{s:2:"id";s:1:"1";s:5:"title";s:16:"New Title I have";s:11:"description";s:22:"Lets change this again";s:10:"created_by";s:3:"123";s:11:"assigned_to";s:3:"123";s:10:"project_id";s:2:"42";s:10:"importance";s:1:"1";s:4:"type";s:2:"96";s:12:"created_date";s:19:"2013-02-09 18:49:42";s:11:"planned_for";s:1:"1";s:12:"story_points";s:1:"2";s:12:"last_updated";s:29:"Fri, 02 Aug 2013 13:28:41 GMT";s:5:"state";s:3:"287";}}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450121, 1),
+(4246, 'api/workitem/index/project_id/42/workitem_id/1', 'post', 'a:3:{s:10:"project_id";s:2:"42";s:11:"workitem_id";s:1:"1";s:4:"data";a:13:{s:2:"id";s:1:"1";s:5:"title";s:17:"New Title I have2";s:11:"description";s:22:"Lets change this again";s:10:"created_by";s:3:"123";s:11:"assigned_to";s:3:"123";s:10:"project_id";s:2:"42";s:10:"importance";s:1:"1";s:4:"type";s:2:"96";s:12:"created_date";s:19:"2013-02-09 18:49:42";s:11:"planned_for";s:1:"1";s:12:"story_points";s:1:"2";s:12:"last_updated";s:29:"Fri, 02 Aug 2013 13:33:01 GMT";s:5:"state";s:3:"287";}}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450381, 1),
+(4247, 'api/timeline/index/project_id/42/start_date/end_date/workitem_id', 'get', 'a:3:{s:10:"project_id";s:2:"42";s:10:"start_date";s:8:"end_date";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450396, 1),
+(4248, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450405, 1),
+(4249, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450408, 1),
+(4250, 'api/project/details/project_id/52', 'get', 'a:1:{s:10:"project_id";s:2:"52";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450409, 1),
+(4251, 'api/workitem/index/project_id/52/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"52";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450409, 1),
+(4252, 'api/project', 'get', NULL, '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450412, 1),
+(4253, 'api/project/details/project_id/42', 'get', 'a:1:{s:10:"project_id";s:2:"42";}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450415, 1),
+(4254, 'api/workitem/index/project_id/42/workitem_id', 'get', 'a:2:{s:10:"project_id";s:2:"42";s:11:"workitem_id";b:0;}', '0c842f0c113e40dbe55871622949008ec45f048d', '127.0.0.1', 1375450415, 1);
 
 -- --------------------------------------------------------
 
@@ -4194,11 +5420,6 @@ CREATE TABLE IF NOT EXISTS `tbl_impediments` (
   KEY `FK_tbl_impediments_user_id` (`created_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
--- Dumping data for table `tbl_impediments`
---
-
-
 -- --------------------------------------------------------
 
 --
@@ -4215,11 +5436,6 @@ CREATE TABLE IF NOT EXISTS `tbl_impediment_comments` (
   KEY `FK_tbl_impediment_comments_user_id` (`created_by`),
   KEY `FK_tbl_impediment_comments_impediment_id` (`impediment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `tbl_impediment_comments`
---
-
 
 -- --------------------------------------------------------
 
@@ -4243,7 +5459,7 @@ CREATE TABLE IF NOT EXISTS `tbl_milestones` (
 --
 
 INSERT INTO `tbl_milestones` (`id`, `title`, `start_date`, `end_date`, `project_id`, `created_by`) VALUES
-(1, 'Default sprint', '2013-07-08 14:27:50', '2013-07-08 00:00:00', 42, 123);
+(1, 'Default sprint', '2013-07-08 08:57:50', '2013-07-07 18:30:00', 42, 123);
 
 -- --------------------------------------------------------
 
@@ -4273,6 +5489,41 @@ CREATE TABLE IF NOT EXISTS `tbl_projects` (
 INSERT INTO `tbl_projects` (`id`, `title`, `description`, `sprint_duration`, `need_review`, `calculate_velocity_on`, `created_by`, `velocity_state`) VALUES
 (42, 'Utopia', 'Project management tool', 4, b'1', 94, 123, 279),
 (52, 'New title', 'I have no freaking idea', 4, b'1', 126, 123, 409);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_project_log`
+--
+
+CREATE TABLE IF NOT EXISTS `tbl_project_log` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `event` varchar(200) NOT NULL,
+  `project_id` bigint(20) NOT NULL,
+  `user_id` bigint(20) NOT NULL,
+  `target_id` bigint(20) DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `FK_tbl_project_log_projects` (`project_id`),
+  KEY `FK_tbl_project_log_users` (`user_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+
+--
+-- Dumping data for table `tbl_project_log`
+--
+
+INSERT INTO `tbl_project_log` (`id`, `event`, `project_id`, `user_id`, `target_id`, `timestamp`) VALUES
+(1, 'task-add', 42, 123, NULL, '2013-08-02 13:12:32'),
+(3, 'task-add', 42, 123, NULL, '2013-08-02 13:14:16'),
+(4, 'project-update', 52, 123, NULL, '2013-08-02 13:14:16'),
+(5, 'task-update', 42, 123, NULL, '2013-08-02 13:25:17'),
+(6, 'task-update', 42, 123, NULL, '2013-08-02 13:25:28'),
+(7, 'task-add', 42, 123, NULL, '2013-08-02 13:25:44'),
+(8, 'comment-add', 42, 123, NULL, '2013-08-02 13:26:44'),
+(9, 'comment-remove', 42, 123, NULL, '2013-08-02 13:26:53'),
+(10, 'comment-remove', 42, 123, NULL, '2013-08-02 13:28:37'),
+(11, 'workitem-update', 42, 123, NULL, '2013-08-02 13:28:41'),
+(12, 'workitem-update', 42, 123, NULL, '2013-08-02 13:33:01');
 
 -- --------------------------------------------------------
 
@@ -4350,28 +5601,28 @@ CREATE TABLE IF NOT EXISTS `tbl_users` (
 --
 
 INSERT INTO `tbl_users` (`id`, `display_name`, `user_name`, `password`, `last_logged_in`, `email_verified`, `send_email_only_me`, `send_daily_report`, `whiteboard_workitems_length`, `intelligent_sorting`) VALUES
-(1, 'Chinmay Kulkarni', 'mac300390@gmail.com', 'password', '2012-10-27 11:51:45', 1, NULL, NULL, 30, NULL),
-(103, 'Hayden Jenkins', 'Ut.tincidunt.vehicula@tristique.org', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(104, 'Gannon Dawson', 'pellentesque@magnisdis.org', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(105, 'Lester Dejesus', 'erat@Nunclaoreetlectus.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(106, 'Maxwell Rice', 'enim.consequat@nisi.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(107, 'Nehru Whitley', 'dui.nec@semperpretium.com', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(108, 'Calvin Hickman', 'pretium.neque.Morbi@enim.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(109, 'Guy Velez', 'molestie.dapibus@enimcondimentum.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(110, 'Nehru Peck', 'nec.quam.Curabitur@Donecat.edu', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(111, 'Solomon Caldwell', 'vulputate.eu.odio@id.edu', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(112, 'Burke Acosta', 'sollicitudin.commodo@ligulaAliquam.com', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(113, 'Raymond Mckenzie', 'penatibus.et.magnis@lorem.edu', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(114, 'Reed Cannon', 'Phasellus.nulla@nec.org', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(115, 'Xanthus Daugherty', 'faucibus.Morbi.vehicula@ipsumdolor.org', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(116, 'Berk Rush', 'Nam@Quisqueimperdiet.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(117, 'Edan Atkinson', 'elit@ametdiameu.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(118, 'Hamish Hodge', 'ut.lacus@Praesenteu.com', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(119, 'Fuller Hatfield', 'placerat@Donecfringilla.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(120, 'Quinlan Hodges', 'Curabitur.consequat.lectus@Nullaeuneque.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(121, 'Cooper Patton', 'orci@pede.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(122, 'Joseph Vaughn', 'Proin.sed.turpis@non.ca', 'password', '2012-10-28 10:40:12', 1, NULL, NULL, 30, NULL),
-(123, 'Chinmay K', 'c@k.com', 'password', '2012-10-28 11:32:08', 1, NULL, NULL, 30, NULL);
+(1, 'Chinmay Kulkarni', 'mac300390@gmail.com', 'password', '2012-10-27 06:21:45', 1, NULL, NULL, 30, NULL),
+(103, 'Hayden Jenkins', 'Ut.tincidunt.vehicula@tristique.org', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(104, 'Gannon Dawson', 'pellentesque@magnisdis.org', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(105, 'Lester Dejesus', 'erat@Nunclaoreetlectus.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(106, 'Maxwell Rice', 'enim.consequat@nisi.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(107, 'Nehru Whitley', 'dui.nec@semperpretium.com', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(108, 'Calvin Hickman', 'pretium.neque.Morbi@enim.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(109, 'Guy Velez', 'molestie.dapibus@enimcondimentum.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(110, 'Nehru Peck', 'nec.quam.Curabitur@Donecat.edu', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(111, 'Solomon Caldwell', 'vulputate.eu.odio@id.edu', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(112, 'Burke Acosta', 'sollicitudin.commodo@ligulaAliquam.com', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(113, 'Raymond Mckenzie', 'penatibus.et.magnis@lorem.edu', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(114, 'Reed Cannon', 'Phasellus.nulla@nec.org', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(115, 'Xanthus Daugherty', 'faucibus.Morbi.vehicula@ipsumdolor.org', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(116, 'Berk Rush', 'Nam@Quisqueimperdiet.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(117, 'Edan Atkinson', 'elit@ametdiameu.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(118, 'Hamish Hodge', 'ut.lacus@Praesenteu.com', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(119, 'Fuller Hatfield', 'placerat@Donecfringilla.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(120, 'Quinlan Hodges', 'Curabitur.consequat.lectus@Nullaeuneque.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(121, 'Cooper Patton', 'orci@pede.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(122, 'Joseph Vaughn', 'Proin.sed.turpis@non.ca', 'password', '2012-10-28 05:10:12', 1, NULL, NULL, 30, NULL),
+(123, 'Chinmay K', 'c@k.com', 'password', '2012-10-28 06:02:08', 1, NULL, NULL, 30, NULL);
 
 -- --------------------------------------------------------
 
@@ -4387,11 +5638,6 @@ CREATE TABLE IF NOT EXISTS `tbl_user_modules` (
   KEY `FK_user_id` (`user_id`),
   KEY `FK_module_id` (`module_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `tbl_user_modules`
---
-
 
 -- --------------------------------------------------------
 
@@ -4412,11 +5658,6 @@ CREATE TABLE IF NOT EXISTS `tbl_user_preferences` (
   KEY `FK_tbl_user_preferences_user_id` (`user_id`),
   KEY `FK_tbl_user_preferences_project_id` (`project_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
---
--- Dumping data for table `tbl_user_preferences`
---
-
 
 -- --------------------------------------------------------
 
@@ -4452,94 +5693,94 @@ CREATE TABLE IF NOT EXISTS `tbl_workitems` (
 --
 
 INSERT INTO `tbl_workitems` (`id`, `title`, `description`, `created_by`, `assigned_to`, `project_id`, `importance`, `type`, `created_date`, `planned_for`, `story_points`, `last_updated`, `state`) VALUES
-(1, 'New Title I have', 'Lets change this', 123, 123, 42, '1', 96, '2013-02-09 18:49:42', 1, 2, '2013-07-19 19:16:29', 287),
-(2, 'Change the title', 'This should appear in timeline', 123, 123, 42, '2', 94, '2013-02-09 18:49:42', 1, 1, '2013-07-11 20:31:51', 279),
-(3, 'This should not appear now', 'Lets change the description', 123, 111, 42, '1', 94, '2013-02-09 18:49:42', 1, 1, '2013-07-12 15:47:58', 277),
-(4, 'Add impediments view', 'This should be new.w', 123, 123, 42, '1', 94, '2013-02-09 18:49:42', 1, 0, '2013-07-15 23:16:14', 278),
-(14, 'lets change its title', 'metus. Ina', 123, 111, 42, '2', 96, '2013-02-09 18:49:43', 1, 0, '2013-07-11 22:39:33', 286),
-(18, 'Implement planning view', 'mauris erat eget ipsum. Suspendisse sagittis.', 123, 123, 42, '1', 94, '2013-02-09 18:49:43', 1, 3, '2013-07-13 10:31:14', 278),
-(19, 'Finish timeline filters', 'User should be able to set filters in task', 123, 123, 42, '2', 94, '2013-02-09 18:49:43', 1, 0, '2013-07-13 19:16:38', 276),
-(20, 'egestas hendrerit neque. In ornare', 'This has a new description', 123, 123, 42, '1', 94, '2013-02-09 18:49:43', 1, 0, '2013-07-19 18:27:07', 277),
-(21, 'nisl elementum purus, accumsan interdum', 'molestie arcu. Sed eu nibh', 123, 123, 42, '0', 94, '2013-02-09 18:49:43', 1, 0, '2013-07-11 14:44:31', 277),
-(22, 'enim. Suspendisse aliquet, sem ut', 'nec orci. Donec', 123, 123, 42, '1', 94, '2013-02-09 18:49:43', 1, 1, '2013-07-11 14:42:30', 277),
-(23, 'Nullam vitae diam. Proin dolor.', 'vel,', 123, 123, 42, '1', 94, '2013-02-09 18:49:43', 1, 0, '2013-07-06 11:18:49', 286),
-(24, 'Nunc lectus pede, ultrices a,', 'ut cursus luctus,', 123, 123, 42, '1', 96, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(25, 'eleifend nec, malesuada ut, sem.', 'posuere cubilia Curae; Donec tincidunt. Donec vitae erat vel', 123, 123, 42, '2', 96, '2013-02-09 18:49:43', 1, 2, '2013-07-06 11:18:49', 286),
-(26, 'vitae, aliquet nec, imperdiet nec,', 'pede blandit congue. In scelerisque scelerisque dui. Suspendisse', 123, 123, 42, '2', 96, '2013-02-09 18:49:43', 1, 0, '2013-07-06 11:18:49', 286),
-(27, 'convallis in, cursus et, eros.', 'et, magna.', 123, 123, 42, '2', 96, '2013-02-09 18:49:43', 1, 0, '2013-07-06 11:18:49', 286),
-(28, 'cubilia Curae; Donec tincidunt. Donec', 'in, tempus', 123, 123, 42, '0', 94, '2013-02-09 18:49:43', 1, 0, '2013-07-06 11:18:49', 286),
-(29, 'commodo tincidunt nibh. Phasellus nulla.', 'ullamcorper magna. Sed eu eros. Nam consequat dolor vitae dolor.', 123, 123, 42, '2', 96, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(30, 'Integer vulputate, risus a ultricies', 'amet, consectetuer adipiscing elit. Etiam laoreet, libero', 123, 123, 42, '2', 94, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(31, 'gravida sit amet, dapibus id,', 'Nullam enim. Sed nulla ante, iaculis', 123, 123, 42, '2', 94, '2013-02-09 18:49:43', 1, 3, '2013-07-06 11:18:49', 286),
-(32, 'non quam. Pellentesque habitant morbi', 'mauris blandit mattis. Cras', 123, 123, 42, '1', 96, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(33, 'auctor vitae, aliquet nec, imperdiet', 'Quisque fringilla euismod enim. Etiam gravida molestie arcu.', 123, 123, 42, '0', 96, '2013-02-09 18:49:43', 1, 2, '2013-07-06 11:18:49', 286),
-(34, 'sagittis. Duis gravida. Praesent eu', 'sem, vitae aliquam eros turpis', 123, 123, 42, '2', 96, '2013-02-09 18:49:43', 1, 0, '2013-07-06 11:18:49', 286),
-(35, 'purus. Nullam scelerisque neque sed', 'cursus vestibulum. Mauris magna.', 123, 123, 42, '2', 96, '2013-02-09 18:49:43', 1, 0, '2013-07-06 11:18:49', 286),
-(36, 'egestas blandit. Nam nulla magna,', 'erat volutpat. Nulla', 123, 123, 42, '2', 94, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(37, 'in consectetuer ipsum nunc id', 'ut cursus luctus, ipsum leo elementum sem, vitae', 123, 123, 42, '1', 94, '2013-02-09 18:49:43', 1, 2, '2013-07-06 11:18:49', 286),
-(38, 'nibh sit amet orci. Ut', 'risus. In mi pede, nonummy ut, molestie in,', 123, 123, 42, '1', 96, '2013-02-09 18:49:43', 1, 2, '2013-07-06 11:18:49', 286),
-(39, 'tristique senectus et netus et', 'tristique aliquet. Phasellus fermentum convallis ligula. Donec luctus aliquet', 123, 123, 42, '2', 96, '2013-02-09 18:49:43', 1, 0, '2013-07-06 11:18:49', 286),
-(40, 'ac mi eleifend egestas. Sed', 'nunc nulla vulputate dui, nec tempus mauris', 123, 123, 42, '1', 96, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(41, 'a, arcu. Sed et libero.', 'auctor vitae, aliquet nec, imperdiet nec, leo. Morbi neque', 123, 123, 42, '2', 94, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(42, 'natoque penatibus et magnis dis', 'aliquet', 123, 123, 42, '1', 94, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(43, 'Donec vitae erat vel pede', 'Proin nisl sem, consequat nec, mollis', 123, 123, 42, '2', 94, '2013-02-09 18:49:43', 1, 1, '2013-07-06 11:18:49', 286),
-(44, 'libero est, congue a, aliquet', 'non justo. Proin non massa non ante bibendum ullamcorper.', 123, 123, 42, '1', 94, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(45, 'ornare, libero at auctor ullamcorper,', 'Suspendisse sagittis. Nullam', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(46, 'lacus. Ut nec urna et', 'Phasellus ornare. Fusce', 123, 123, 42, '2', 94, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(47, 'lorem ipsum sodales purus, in', 'orci quis lectus. Nullam suscipit, est ac', 123, 123, 42, '1', 94, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(48, 'egestas a, scelerisque sed, sapien.', 'nascetur ridiculus mus. Aenean eget magna. Suspendisse tristique neque venenatis', 123, 123, 42, '2', 94, '2013-02-09 18:49:44', 1, 1, '2013-07-06 11:18:49', 286),
-(49, 'quis massa. Mauris vestibulum, neque', 'et arcu imperdiet', 123, 123, 42, '0', 94, '2013-02-09 18:49:44', 1, 1, '2013-07-06 11:18:49', 286),
-(50, 'Donec egestas. Duis ac arcu.', 'sapien molestie', 123, 123, 42, '2', 94, '2013-02-09 18:49:44', 1, 2, '2013-07-06 11:18:49', 286),
-(51, 'est. Mauris eu turpis. Nulla', 'vehicula risus.', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(52, 'vulputate eu, odio. Phasellus at', 'convallis convallis dolor. Quisque tincidunt pede ac', 123, 123, 42, '0', 94, '2013-02-09 18:49:44', 1, 1, '2013-07-06 11:18:49', 286),
-(53, 'Fusce diam nunc, ullamcorper eu,', 'tristique senectus et netus et malesuada fames ac turpis egestas.', 123, 123, 42, '0', 94, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(54, 'magna sed dui. Fusce aliquam,', 'Maecenas ornare egestas ligula. Nullam feugiat', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 2, '2013-07-06 11:18:49', 286),
-(55, 'lorem vitae odio sagittis semper.', 'tempus, lorem fringilla ornare placerat, orci lacus vestibulum lorem,', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 1, '2013-07-06 11:18:49', 286),
-(56, 'Ut tincidunt orci quis lectus.', 'convallis in, cursus', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(57, 'ullamcorper viverra. Maecenas iaculis aliquet', 'magna. Ut', 123, 123, 42, '0', 94, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(58, 'mauris, aliquam eu, accumsan sed,', 'at pretium aliquet, metus urna convallis erat, eget tincidunt', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 1, '2013-07-06 11:18:49', 286),
-(59, 'velit in aliquet lobortis, nisi', 'a, dui. Cras pellentesque. Sed dictum. Proin', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 2, '2013-07-06 11:18:49', 286),
-(60, 'Sed pharetra, felis eget varius', 'felis. Nulla tempor augue ac ipsum.', 123, 123, 42, '0', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(61, 'Duis dignissim tempor arcu. Vestibulum', 'non massa non ante bibendum ullamcorper. Duis', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 2, '2013-07-06 11:18:49', 286),
-(62, 'nisi nibh lacinia orci, consectetuer', 'elementum, lorem ut aliquam iaculis, lacus pede sagittis', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(63, 'Cum sociis natoque penatibus et', 'fringilla. Donec feugiat metus sit amet', 123, 123, 42, '1', 94, '2013-02-09 18:49:44', 1, 1, '2013-07-06 11:18:49', 286),
-(64, 'Sed pharetra, felis eget varius', 'luctus. Curabitur egestas nunc sed libero. Proin', 123, 123, 42, '0', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(65, 'ipsum porta elit, a feugiat', 'turpis. Aliquam', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 1, '2013-07-06 11:18:49', 286),
-(66, 'a tortor. Nunc commodo auctor', 'et, euismod et,', 123, 123, 42, '1', 94, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(67, 'ligula. Aenean euismod mauris eu', 'Maecenas libero est, congue a, aliquet vel, vulputate eu,', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(68, 'elit, pellentesque a, facilisis non,', 'erat. Etiam vestibulum massa rutrum magna. Cras', 123, 123, 42, '0', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(69, 'Integer urna. Vivamus molestie dapibus', 'sapien,', 123, 123, 42, '0', 94, '2013-02-09 18:49:44', 1, 1, '2013-07-06 11:18:49', 286),
-(70, 'cursus. Integer mollis. Integer tincidunt', 'blandit mattis. Cras eget nisi dictum augue malesuada', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(71, 'id, erat. Etiam vestibulum massa', 'velit dui, semper et, lacinia vitae, sodales at, velit. Pellentesque', 123, 123, 42, '0', 96, '2013-02-09 18:49:44', 1, 2, '2013-07-06 11:18:49', 286),
-(72, 'ridiculus mus. Proin vel arcu', 'malesuada', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(73, 'venenatis lacus. Etiam bibendum fermentum', 'eget, ipsum. Donec sollicitudin adipiscing ligula. Aenean gravida', 123, 123, 42, '0', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(74, 'lacus pede sagittis augue, eu', 'Nunc quis arcu vel quam dignissim pharetra. Nam ac nulla.', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(75, 'risus. In mi pede, nonummy', 'quis lectus. Nullam', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(76, 'blandit mattis. Cras eget nisi', 'Sed id risus quis', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(77, 'orci. Donec nibh. Quisque nonummy', 'et, magna. Praesent interdum', 123, 123, 42, '1', 94, '2013-02-09 18:49:44', 1, 2, '2013-07-06 11:18:49', 286),
-(78, 'ac mattis semper, dui lectus', 'metus urna convallis', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 2, '2013-07-06 11:18:49', 286),
-(79, 'metus vitae velit egestas lacinia.', 'Ut sagittis lobortis', 123, 123, 42, '2', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(80, 'nec enim. Nunc ut erat.', 'Praesent eu dui. Cum sociis natoque', 123, 123, 42, '0', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(81, 'sollicitudin a, malesuada id, erat.', 'quis diam luctus lobortis. Class aptent taciti', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(82, 'pulvinar arcu et pede. Nunc', 'quis diam. Pellentesque habitant morbi tristique senectus', 123, 123, 42, '1', 96, '2013-02-09 18:49:44', 1, 0, '2013-07-06 11:18:49', 286),
-(83, 'Donec elementum, lorem ut aliquam', 'elit sed consequat auctor, nunc', 123, 123, 42, '0', 96, '2013-02-09 18:49:44', 1, 3, '2013-07-06 11:18:49', 286),
-(84, 'mollis vitae, posuere at, velit.', 'Suspendisse ac metus vitae velit egestas lacinia. Sed congue,', 123, 123, 42, '1', 94, '2013-02-09 18:49:44', 1, 2, '2013-07-06 11:18:49', 286),
-(85, 'sit amet lorem semper auctor.', 'dolor. Donec fringilla. Donec feugiat metus', 123, 123, 42, '2', 96, '2013-02-09 18:49:45', 1, 0, '2013-07-06 11:18:49', 286),
-(86, 'risus. Donec nibh enim, gravida', 'gravida molestie arcu.', 123, 123, 42, '2', 96, '2013-02-09 18:49:45', 1, 1, '2013-07-06 11:18:49', 286),
-(87, 'aliquet. Phasellus fermentum convallis ligula.', 'feugiat tellus lorem eu metus. In lorem. Donec elementum,', 123, 123, 42, '2', 96, '2013-02-09 18:49:45', 1, 2, '2013-07-06 11:18:49', 286),
-(88, 'Nullam scelerisque neque sed sem', 'elementum at, egestas a,', 123, 123, 42, '1', 96, '2013-02-09 18:49:45', 1, 0, '2013-07-06 11:18:49', 286),
-(89, 'Morbi sit amet massa. Quisque', 'Nullam feugiat placerat velit. Quisque varius. Nam porttitor', 123, 123, 42, '1', 96, '2013-02-09 18:49:45', 1, 2, '2013-07-06 11:18:49', 286),
-(90, 'amet, consectetuer adipiscing elit. Curabitur', 'sollicitudin adipiscing ligula. Aenean gravida', 123, 123, 42, '0', 96, '2013-02-09 18:49:45', 1, 1, '2013-07-06 11:18:49', 286),
-(91, 'ipsum dolor sit amet, consectetuer', 'justo nec ante. Maecenas mi', 123, 123, 42, '0', 94, '2013-02-09 18:49:45', 1, 3, '2013-07-06 11:18:49', 286),
-(92, 'Cras lorem lorem, luctus ut,', 'urna. Nullam', 123, 123, 42, '0', 94, '2013-02-09 18:49:45', 1, 1, '2013-07-06 11:18:49', 286),
-(93, 'luctus sit amet, faucibus ut,', 'a', 123, 123, 42, '2', 96, '2013-02-09 18:49:45', 1, 0, '2013-07-06 11:18:49', 286),
-(94, 'eu dui. Cum sociis natoque', 'pede. Suspendisse dui. Fusce diam nunc, ullamcorper eu,', 123, 123, 42, '1', 94, '2013-02-09 18:49:45', 1, 2, '2013-07-06 11:18:49', 286),
-(95, 'Duis gravida. Praesent eu nulla', 'sit', 123, 123, 42, '1', 96, '2013-02-09 18:49:45', 1, 3, '2013-07-06 11:18:49', 286),
-(96, 'ligula. Nullam feugiat placerat velit.', 'fames ac turpis egestas. Aliquam fringilla', 123, 123, 42, '2', 96, '2013-02-09 18:49:45', 1, 3, '2013-07-06 11:18:49', 286),
-(97, 'Nunc ac sem ut dolor', 'est tempor bibendum. Donec felis orci,', 123, 123, 42, '0', 94, '2013-02-09 18:49:45', 1, 3, '2013-07-06 11:18:49', 286),
-(98, 'luctus lobortis. Class aptent taciti', 'pede,', 123, 123, 42, '0', 96, '2013-02-09 18:49:45', 1, 2, '2013-07-06 11:18:49', 286),
-(99, 'tempus non, lacinia at, iaculis', 'conubia nostra, per inceptos hymenaeos.', 123, 123, 42, '2', 96, '2013-02-09 18:49:45', 1, 3, '2013-07-06 11:18:49', 286),
-(100, 'hymenaeos. Mauris ut quam vel', 'massa. Vestibulum accumsan neque et nunc. Quisque', 123, 123, 42, '1', 94, '2013-02-09 18:49:45', 1, 2, '2013-07-06 11:18:49', 286);
+(1, 'New Title I have2', 'Lets change this again', 123, 123, 42, '1', 96, '2013-02-09 13:19:42', 1, 2, '2013-08-02 13:33:01', 287),
+(2, 'Change the title', 'This should appear in timeline', 123, 123, 42, '2', 94, '2013-02-09 13:19:42', 1, 1, '2013-07-11 20:31:51', 279),
+(3, 'This should not appear now', 'Lets change the description', 123, 111, 42, '1', 94, '2013-02-09 13:19:42', 1, 1, '2013-07-12 15:47:58', 277),
+(4, 'Add impediments view', 'This should be new.w', 123, 123, 42, '1', 94, '2013-02-09 13:19:42', 1, 0, '2013-07-24 16:12:58', 278),
+(14, 'lets change its title', 'metus. Ina', 123, 111, 42, '2', 96, '2013-02-09 13:19:43', 1, 0, '2013-07-11 22:39:33', 286),
+(18, 'Implement planning view', 'mauris erat eget ipsum. Suspendisse sagittis.', 123, 123, 42, '1', 94, '2013-02-09 13:19:43', 1, 3, '2013-07-13 10:31:14', 278),
+(19, 'Finish timeline filters', 'User should be able to set filters in task', 123, 123, 42, '2', 94, '2013-02-09 13:19:43', 1, 0, '2013-07-13 19:16:38', 276),
+(20, 'egestas hendrerit neque. In ornare', 'This has a new description', 123, 123, 42, '1', 94, '2013-02-09 13:19:43', 1, 0, '2013-07-19 18:27:07', 277),
+(21, 'nisl elementum purus, accumsan interdum', 'molestie arcu. Sed eu nibh', 123, 123, 42, '0', 94, '2013-02-09 13:19:43', 1, 0, '2013-07-11 14:44:31', 277),
+(22, 'enim. Suspendisse aliquet, sem ut', 'nec orci. Donec', 123, 123, 42, '1', 94, '2013-02-09 13:19:43', 1, 1, '2013-07-11 14:42:30', 277),
+(23, 'Nullam vitae diam. Proin dolor.', 'vel,', 123, 123, 42, '1', 94, '2013-02-09 13:19:43', 1, 0, '2013-07-06 11:18:49', 286),
+(24, 'Nunc lectus pede, ultrices a,', 'ut cursus luctus,', 123, 123, 42, '1', 96, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(25, 'eleifend nec, malesuada ut, sem.', 'posuere cubilia Curae; Donec tincidunt. Donec vitae erat vel', 123, 123, 42, '2', 96, '2013-02-09 13:19:43', 1, 2, '2013-07-06 11:18:49', 286),
+(26, 'vitae, aliquet nec, imperdiet nec,', 'pede blandit congue. In scelerisque scelerisque dui. Suspendisse', 123, 123, 42, '2', 96, '2013-02-09 13:19:43', 1, 0, '2013-07-06 11:18:49', 286),
+(27, 'convallis in, cursus et, eros.', 'et, magna.', 123, 123, 42, '2', 96, '2013-02-09 13:19:43', 1, 0, '2013-07-06 11:18:49', 286),
+(28, 'cubilia Curae; Donec tincidunt. Donec', 'in, tempus', 123, 123, 42, '0', 94, '2013-02-09 13:19:43', 1, 0, '2013-07-06 11:18:49', 286),
+(29, 'commodo tincidunt nibh. Phasellus nulla.', 'ullamcorper magna. Sed eu eros. Nam consequat dolor vitae dolor.', 123, 123, 42, '2', 96, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(30, 'Integer vulputate, risus a ultricies', 'amet, consectetuer adipiscing elit. Etiam laoreet, libero', 123, 123, 42, '2', 94, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(31, 'gravida sit amet, dapibus id,', 'Nullam enim. Sed nulla ante, iaculis', 123, 123, 42, '2', 94, '2013-02-09 13:19:43', 1, 3, '2013-07-06 11:18:49', 286),
+(32, 'non quam. Pellentesque habitant morbi', 'mauris blandit mattis. Cras', 123, 123, 42, '1', 96, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(33, 'auctor vitae, aliquet nec, imperdiet', 'Quisque fringilla euismod enim. Etiam gravida molestie arcu.', 123, 123, 42, '0', 96, '2013-02-09 13:19:43', 1, 2, '2013-07-06 11:18:49', 286),
+(34, 'sagittis. Duis gravida. Praesent eu', 'sem, vitae aliquam eros turpis', 123, 123, 42, '2', 96, '2013-02-09 13:19:43', 1, 0, '2013-07-06 11:18:49', 286),
+(35, 'purus. Nullam scelerisque neque sed', 'cursus vestibulum. Mauris magna.', 123, 123, 42, '2', 96, '2013-02-09 13:19:43', 1, 0, '2013-07-06 11:18:49', 286),
+(36, 'egestas blandit. Nam nulla magna,', 'erat volutpat. Nulla', 123, 123, 42, '2', 94, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(37, 'in consectetuer ipsum nunc id', 'ut cursus luctus, ipsum leo elementum sem, vitae', 123, 123, 42, '1', 94, '2013-02-09 13:19:43', 1, 2, '2013-07-06 11:18:49', 286),
+(38, 'nibh sit amet orci. Ut', 'risus. In mi pede, nonummy ut, molestie in,', 123, 123, 42, '1', 96, '2013-02-09 13:19:43', 1, 2, '2013-07-06 11:18:49', 286),
+(39, 'tristique senectus et netus et', 'tristique aliquet. Phasellus fermentum convallis ligula. Donec luctus aliquet', 123, 123, 42, '2', 96, '2013-02-09 13:19:43', 1, 0, '2013-07-06 11:18:49', 286),
+(40, 'ac mi eleifend egestas. Sed', 'nunc nulla vulputate dui, nec tempus mauris', 123, 123, 42, '1', 96, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(41, 'a, arcu. Sed et libero.', 'auctor vitae, aliquet nec, imperdiet nec, leo. Morbi neque', 123, 123, 42, '2', 94, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(42, 'natoque penatibus et magnis dis', 'aliquet', 123, 123, 42, '1', 94, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(43, 'Donec vitae erat vel pede', 'Proin nisl sem, consequat nec, mollis', 123, 123, 42, '2', 94, '2013-02-09 13:19:43', 1, 1, '2013-07-06 11:18:49', 286),
+(44, 'libero est, congue a, aliquet', 'non justo. Proin non massa non ante bibendum ullamcorper.', 123, 123, 42, '1', 94, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(45, 'ornare, libero at auctor ullamcorper,', 'Suspendisse sagittis. Nullam', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(46, 'lacus. Ut nec urna et', 'Phasellus ornare. Fusce', 123, 123, 42, '2', 94, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(47, 'lorem ipsum sodales purus, in', 'orci quis lectus. Nullam suscipit, est ac', 123, 123, 42, '1', 94, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(48, 'egestas a, scelerisque sed, sapien.', 'nascetur ridiculus mus. Aenean eget magna. Suspendisse tristique neque venenatis', 123, 123, 42, '2', 94, '2013-02-09 13:19:44', 1, 1, '2013-07-06 11:18:49', 286),
+(49, 'quis massa. Mauris vestibulum, neque', 'et arcu imperdiet', 123, 123, 42, '0', 94, '2013-02-09 13:19:44', 1, 1, '2013-07-06 11:18:49', 286),
+(50, 'Donec egestas. Duis ac arcu.', 'sapien molestie', 123, 123, 42, '2', 94, '2013-02-09 13:19:44', 1, 2, '2013-07-06 11:18:49', 286),
+(51, 'est. Mauris eu turpis. Nulla', 'vehicula risus.', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(52, 'vulputate eu, odio. Phasellus at', 'convallis convallis dolor. Quisque tincidunt pede ac', 123, 123, 42, '0', 94, '2013-02-09 13:19:44', 1, 1, '2013-07-06 11:18:49', 286),
+(53, 'Fusce diam nunc, ullamcorper eu,', 'tristique senectus et netus et malesuada fames ac turpis egestas.', 123, 123, 42, '0', 94, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(54, 'magna sed dui. Fusce aliquam,', 'Maecenas ornare egestas ligula. Nullam feugiat', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 2, '2013-07-06 11:18:49', 286),
+(55, 'lorem vitae odio sagittis semper.', 'tempus, lorem fringilla ornare placerat, orci lacus vestibulum lorem,', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 1, '2013-07-06 11:18:49', 286),
+(56, 'Ut tincidunt orci quis lectus.', 'convallis in, cursus', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(57, 'ullamcorper viverra. Maecenas iaculis aliquet', 'magna. Ut', 123, 123, 42, '0', 94, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(58, 'mauris, aliquam eu, accumsan sed,', 'at pretium aliquet, metus urna convallis erat, eget tincidunt', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 1, '2013-07-06 11:18:49', 286),
+(59, 'velit in aliquet lobortis, nisi', 'a, dui. Cras pellentesque. Sed dictum. Proin', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 2, '2013-07-06 11:18:49', 286),
+(60, 'Sed pharetra, felis eget varius', 'felis. Nulla tempor augue ac ipsum.', 123, 123, 42, '0', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(61, 'Duis dignissim tempor arcu. Vestibulum', 'non massa non ante bibendum ullamcorper. Duis', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 2, '2013-07-06 11:18:49', 286),
+(62, 'nisi nibh lacinia orci, consectetuer', 'elementum, lorem ut aliquam iaculis, lacus pede sagittis', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(63, 'Cum sociis natoque penatibus et', 'fringilla. Donec feugiat metus sit amet', 123, 123, 42, '1', 94, '2013-02-09 13:19:44', 1, 1, '2013-07-06 11:18:49', 286),
+(64, 'Sed pharetra, felis eget varius', 'luctus. Curabitur egestas nunc sed libero. Proin', 123, 123, 42, '0', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(65, 'ipsum porta elit, a feugiat', 'turpis. Aliquam', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 1, '2013-07-06 11:18:49', 286),
+(66, 'a tortor. Nunc commodo auctor', 'et, euismod et,', 123, 123, 42, '1', 94, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(67, 'ligula. Aenean euismod mauris eu', 'Maecenas libero est, congue a, aliquet vel, vulputate eu,', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(68, 'elit, pellentesque a, facilisis non,', 'erat. Etiam vestibulum massa rutrum magna. Cras', 123, 123, 42, '0', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(69, 'Integer urna. Vivamus molestie dapibus', 'sapien,', 123, 123, 42, '0', 94, '2013-02-09 13:19:44', 1, 1, '2013-07-06 11:18:49', 286),
+(70, 'cursus. Integer mollis. Integer tincidunt', 'blandit mattis. Cras eget nisi dictum augue malesuada', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(71, 'id, erat. Etiam vestibulum massa', 'velit dui, semper et, lacinia vitae, sodales at, velit. Pellentesque', 123, 123, 42, '0', 96, '2013-02-09 13:19:44', 1, 2, '2013-07-06 11:18:49', 286),
+(72, 'ridiculus mus. Proin vel arcu', 'malesuada', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(73, 'venenatis lacus. Etiam bibendum fermentum', 'eget, ipsum. Donec sollicitudin adipiscing ligula. Aenean gravida', 123, 123, 42, '0', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(74, 'lacus pede sagittis augue, eu', 'Nunc quis arcu vel quam dignissim pharetra. Nam ac nulla.', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(75, 'risus. In mi pede, nonummy', 'quis lectus. Nullam', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(76, 'blandit mattis. Cras eget nisi', 'Sed id risus quis', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(77, 'orci. Donec nibh. Quisque nonummy', 'et, magna. Praesent interdum', 123, 123, 42, '1', 94, '2013-02-09 13:19:44', 1, 2, '2013-07-06 11:18:49', 286),
+(78, 'ac mattis semper, dui lectus', 'metus urna convallis', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 2, '2013-07-06 11:18:49', 286),
+(79, 'metus vitae velit egestas lacinia.', 'Ut sagittis lobortis', 123, 123, 42, '2', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(80, 'nec enim. Nunc ut erat.', 'Praesent eu dui. Cum sociis natoque', 123, 123, 42, '0', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(81, 'sollicitudin a, malesuada id, erat.', 'quis diam luctus lobortis. Class aptent taciti', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(82, 'pulvinar arcu et pede. Nunc', 'quis diam. Pellentesque habitant morbi tristique senectus', 123, 123, 42, '1', 96, '2013-02-09 13:19:44', 1, 0, '2013-07-06 11:18:49', 286),
+(83, 'Donec elementum, lorem ut aliquam', 'elit sed consequat auctor, nunc', 123, 123, 42, '0', 96, '2013-02-09 13:19:44', 1, 3, '2013-07-06 11:18:49', 286),
+(84, 'mollis vitae, posuere at, velit.', 'Suspendisse ac metus vitae velit egestas lacinia. Sed congue,', 123, 123, 42, '1', 94, '2013-02-09 13:19:44', 1, 2, '2013-07-06 11:18:49', 286),
+(85, 'sit amet lorem semper auctor.', 'dolor. Donec fringilla. Donec feugiat metus', 123, 123, 42, '2', 96, '2013-02-09 13:19:45', 1, 0, '2013-07-06 11:18:49', 286),
+(86, 'risus. Donec nibh enim, gravida', 'gravida molestie arcu.', 123, 123, 42, '2', 96, '2013-02-09 13:19:45', 1, 1, '2013-07-06 11:18:49', 286),
+(87, 'aliquet. Phasellus fermentum convallis ligula.', 'feugiat tellus lorem eu metus. In lorem. Donec elementum,', 123, 123, 42, '2', 96, '2013-02-09 13:19:45', 1, 2, '2013-07-06 11:18:49', 286),
+(88, 'Nullam scelerisque neque sed sem', 'elementum at, egestas a,', 123, 123, 42, '1', 96, '2013-02-09 13:19:45', 1, 0, '2013-07-06 11:18:49', 286),
+(89, 'Morbi sit amet massa. Quisque', 'Nullam feugiat placerat velit. Quisque varius. Nam porttitor', 123, 123, 42, '1', 96, '2013-02-09 13:19:45', 1, 2, '2013-07-06 11:18:49', 286),
+(90, 'amet, consectetuer adipiscing elit. Curabitur', 'sollicitudin adipiscing ligula. Aenean gravida', 123, 123, 42, '0', 96, '2013-02-09 13:19:45', 1, 1, '2013-07-06 11:18:49', 286),
+(91, 'ipsum dolor sit amet, consectetuer', 'justo nec ante. Maecenas mi', 123, 123, 42, '0', 94, '2013-02-09 13:19:45', 1, 3, '2013-07-06 11:18:49', 286),
+(92, 'Cras lorem lorem, luctus ut,', 'urna. Nullam', 123, 123, 42, '0', 94, '2013-02-09 13:19:45', 1, 1, '2013-07-06 11:18:49', 286),
+(93, 'luctus sit amet, faucibus ut,', 'a', 123, 123, 42, '2', 96, '2013-02-09 13:19:45', 1, 0, '2013-07-06 11:18:49', 286),
+(94, 'eu dui. Cum sociis natoque', 'pede. Suspendisse dui. Fusce diam nunc, ullamcorper eu,', 123, 123, 42, '1', 94, '2013-02-09 13:19:45', 1, 2, '2013-07-06 11:18:49', 286),
+(95, 'Duis gravida. Praesent eu nulla', 'sit', 123, 123, 42, '1', 96, '2013-02-09 13:19:45', 1, 3, '2013-07-06 11:18:49', 286),
+(96, 'ligula. Nullam feugiat placerat velit.', 'fames ac turpis egestas. Aliquam fringilla', 123, 123, 42, '2', 96, '2013-02-09 13:19:45', 1, 3, '2013-07-06 11:18:49', 286),
+(97, 'Nunc ac sem ut dolor', 'est tempor bibendum. Donec felis orci,', 123, 123, 42, '0', 94, '2013-02-09 13:19:45', 1, 3, '2013-07-06 11:18:49', 286),
+(98, 'luctus lobortis. Class aptent taciti', 'pede,', 123, 123, 42, '0', 96, '2013-02-09 13:19:45', 1, 2, '2013-07-06 11:18:49', 286),
+(99, 'tempus non, lacinia at, iaculis', 'conubia nostra, per inceptos hymenaeos.', 123, 123, 42, '2', 96, '2013-02-09 13:19:45', 1, 3, '2013-07-06 11:18:49', 286),
+(100, 'hymenaeos. Mauris ut quam vel', 'massa. Vestibulum accumsan neque et nunc. Quisque', 123, 123, 42, '1', 94, '2013-02-09 13:19:45', 1, 2, '2013-07-06 11:18:49', 286);
 
 -- --------------------------------------------------------
 
@@ -4556,7 +5797,7 @@ CREATE TABLE IF NOT EXISTS `tbl_workitem_comments` (
   PRIMARY KEY (`id`),
   KEY `FK_workitem_comments_workitem_id` (`workitem_id`),
   KEY `FK_workitem_comments_user_id` (`created_by`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=30 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=33 ;
 
 --
 -- Dumping data for table `tbl_workitem_comments`
@@ -4564,17 +5805,17 @@ CREATE TABLE IF NOT EXISTS `tbl_workitem_comments` (
 
 INSERT INTO `tbl_workitem_comments` (`id`, `workitem_id`, `comment_body`, `created_at`, `created_by`) VALUES
 (7, 2, 'Why its not working ?', '0000-00-00 00:00:00', 123),
-(16, 1, 'Oh wow !', '2013-07-09 20:35:32', 123),
-(17, 2, 'This is a \nmultiline\nComment\nSee w\nhat happens to this', '2013-07-09 23:05:56', 123),
-(20, 1, 'Lets have something similar', '2013-07-10 15:30:36', 123),
-(21, 3, 'This is new comment', '2013-07-10 15:31:42', 123),
-(22, 4, 'Ok does enter work ?', '2013-07-10 16:54:53', 123),
-(24, 1, 'New item', '2013-07-10 17:00:48', 123),
-(25, 3, 'This is from solomon''s account', '2013-07-11 22:33:46', 111),
-(26, 3, 'This is weird', '2013-07-11 22:34:09', 111),
-(27, 14, 'Let me add a comment', '2013-07-11 22:37:12', 111),
-(28, 14, 'Let me add another', '2013-07-11 22:39:22', 111),
-(29, 18, 'This depends on timeline view', '2013-07-13 10:31:13', 123);
+(17, 2, 'This is a \nmultiline\nComment\nSee w\nhat happens to this', '2013-07-09 17:35:56', 123),
+(20, 1, 'Lets have something similar', '2013-07-10 10:00:36', 123),
+(21, 3, 'This is new comment', '2013-07-10 10:01:42', 123),
+(22, 4, 'Ok does enter work ?', '2013-07-10 11:24:53', 123),
+(24, 1, 'New item', '2013-07-10 11:30:48', 123),
+(25, 3, 'This is from solomon''s account', '2013-07-11 17:03:46', 111),
+(26, 3, 'This is weird', '2013-07-11 17:04:09', 111),
+(27, 14, 'Let me add a comment', '2013-07-11 17:07:12', 111),
+(28, 14, 'Let me add another', '2013-07-11 17:09:22', 111),
+(29, 18, 'This depends on timeline view', '2013-07-13 05:01:13', 123),
+(30, 4, 'it just works', '2013-07-24 16:12:58', 123);
 
 -- --------------------------------------------------------
 
@@ -4593,78 +5834,80 @@ CREATE TABLE IF NOT EXISTS `tbl_workitem_log` (
   PRIMARY KEY (`id`),
   KEY `FK_workitem_log` (`user_id`),
   KEY `FK_workitem_log_workitem_id` (`workitem_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=67 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=69 ;
 
 --
 -- Dumping data for table `tbl_workitem_log`
 --
 
 INSERT INTO `tbl_workitem_log` (`id`, `workitem_id`, `action`, `user_id`, `old_value`, `new_value`, `timestamp`) VALUES
-(1, 4, 'description', 123, 'cursus luctus, ipsum leo elementum sem, vitae', 'Some thing new now !', '2013-07-11 06:01:58'),
-(2, 4, 'description', 123, 'Some thing new now !', 'And new description', '2013-07-11 06:01:58'),
-(3, 4, 'title', 123, 'New name', 'New name !', '2013-07-11 06:01:58'),
-(4, 4, 'description', 123, 'And new description', 'Ok ok ok !', '2013-07-11 06:01:58'),
-(5, 4, 'description', 123, 'Ok ok ok !', 'This should be new', '2013-07-11 06:01:58'),
-(6, 4, 'importance', 123, '2', '1', '2013-07-11 06:01:58'),
-(7, 4, 'story_points', 123, '2', '0', '2013-07-11 06:01:58'),
-(8, 4, 'state', 123, '286', '276', '2013-07-11 06:01:58'),
-(9, 1, 'description', 123, 'lobortis augue \nscelerisque mollis. Phasellus \n\n\nlibero mauris,', 'ok this is weird\n\n\nlibero mauris,', '2013-07-11 06:01:58'),
-(10, 1, 'description', 123, 'ok this is weird\n\n\nlibero mauris,', 'ok this is weird1\n\n\nlibero mauris,', '2013-07-11 06:01:58'),
-(11, 1, 'description', 123, 'ok this is weird1\n\n\nlibero mauris,', 'ok this is weird1t\n\n\nlibero mauris,', '2013-07-11 06:01:58'),
-(12, 1, 'description', 123, 'ok this is weird1t\n\n\nlibero mauris,', 'Is it ?\n\n\nlibero mauris,', '2013-07-11 06:01:58'),
-(13, 1, 'description', 123, 'Is it ?\n\n\nlibero mauris,', 'Ok seriously\n\n\nlibero mauris,', '2013-07-11 06:01:58'),
-(14, 1, 'description', 123, 'Ok seriously\n\n\nlibero mauris,', 'Ok seriously', '2013-07-11 06:01:58'),
-(15, 1, 'description', 123, 'Ok seriously', 'Ok seriouslyarggggggggg', '2013-07-11 06:01:58'),
-(16, 2, 'description', 123, 'Is this new ?', 'Is this new ?g', '2013-07-11 06:01:58'),
-(17, 1, 'description', 123, 'Ok seriouslyarggggggggg', 'This has to update now', '2013-07-11 06:01:58'),
-(18, 1, 'description', 123, 'This has to update now', 'This has to update nowqqweq', '2013-07-11 06:01:58'),
-(19, 2, 'description', 123, 'Is this new ?g', 'No this one is old', '2013-07-11 06:01:58'),
-(20, 1, 'description', 123, 'This has to update nowqqweq', 'asdasd', '2013-07-11 06:01:58'),
-(21, 1, 'description', 123, 'asdasd', 'asdasdasdasd', '2013-07-11 06:01:58'),
-(22, 1, 'description', 123, 'asdasdasdasd', 'asdasdasdasdvv', '2013-07-11 06:01:58'),
-(23, 2, 'description', 123, 'No this one is old', 'This should be UTC', '2013-07-11 06:01:58'),
-(24, 2, 'description', 123, 'This should be UTC', 'This should be UTCf', '2013-07-11 06:01:58'),
-(25, 2, 'description', 123, 'This should be UTCf', 'This should be UTC', '2013-07-11 06:01:58'),
-(26, 2, 'title', 123, 'Change the title!', 'Change the title', '2013-07-11 06:01:58'),
-(27, 2, 'description', 123, 'This should be UTC', 'This should be UTCg', '2013-07-11 06:01:58'),
-(28, 2, 'description', 123, 'This should be UTCg', 'This should be UTC', '2013-07-11 06:01:58'),
-(29, 2, 'description', 123, 'This should be UTC', 'This should be UTCa', '2013-07-11 06:01:58'),
-(30, 4, 'description', 123, 'This should be new', 'This should be newas', '2013-07-11 06:01:58'),
-(31, 2, 'description', 123, 'This should be UTCa', 'This should be UTCab', '2013-07-11 06:01:58'),
-(33, 2, 'description', 123, 'This should be UTCa', 'This should be UTC', '2013-07-11 06:01:58'),
-(34, 4, 'description', 123, 'This should be newas', 'This should be new.', '2013-07-11 06:01:58'),
-(35, 1, 'description', 123, 'asdasdasdasdvv', 'ok', '2013-07-11 06:01:58'),
-(36, 14, 'description', 123, 'metus. In', 'metus. Ina', '2013-07-11 06:01:58'),
-(37, 4, 'description', 123, 'This should be new.', 'This should be new.w', '2013-07-11 11:49:31'),
-(38, 2, 'description', 123, 'This should be UTC', 'This should be UTC1', '2013-07-11 11:53:15'),
-(39, 1, 'state', 123, '286', '287', '2013-07-11 13:49:41'),
-(40, 14, 'assigned_to', 123, '123', '111', '2013-07-11 14:03:57'),
-(41, 18, 'state', 123, '286', '276', '2013-07-11 14:29:14'),
-(42, 4, 'state', 123, '276', '277', '2013-07-11 14:36:00'),
-(43, 4, 'state', 123, '277', '278', '2013-07-11 14:36:51'),
-(44, 4, 'state', 123, '278', '279', '2013-07-11 14:37:35'),
-(45, 2, 'state', 123, '276', '277', '2013-07-11 14:38:38'),
-(46, 2, 'state', 123, '277', '279', '2013-07-11 14:39:05'),
-(47, 18, 'state', 123, '276', '279', '2013-07-11 14:39:26'),
-(48, 19, 'state', 123, '286', '277', '2013-07-11 14:39:49'),
-(49, 20, 'state', 123, '286', '277', '2013-07-11 14:41:56'),
-(50, 22, 'state', 123, '286', '277', '2013-07-11 14:42:29'),
-(51, 21, 'state', 123, '286', '277', '2013-07-11 14:44:30'),
-(52, 19, 'state', 123, '277', '278', '2013-07-11 14:44:38'),
-(53, 18, 'state', 123, '279', '278', '2013-07-11 14:45:25'),
-(54, 4, 'state', 123, '279', '278', '2013-07-11 14:45:51'),
-(55, 2, 'description', 123, 'This should be UTC1', 'This should appear in timeline', '2013-07-11 20:31:51'),
-(56, 3, 'state', 111, '286', '277', '2013-07-11 22:33:54'),
-(57, 14, 'title', 111, 'ut, pellentesque eget, dictum placerat,', 'lets change its title', '2013-07-11 22:34:42'),
-(58, 3, 'description', 111, 'urna. Ut tincidunt vehicula risus. Nulla eget metus eu erat', 'Lets change the description', '2013-07-12 15:42:19'),
-(59, 3, 'importance', 111, '0', '1', '2013-07-12 15:47:58'),
-(60, 18, 'title', 123, 'Nullam velit dui, semper et,', 'Implement planning view', '2013-07-12 17:16:33'),
-(61, 19, 'title', 123, 'pharetra nibh. Aliquam ornare, libero', 'Finish timeline filters', '2013-07-13 19:10:41'),
-(62, 19, 'description', 123, 'ultrices, mauris ipsum porta elit, a', 'User should be able to set filters in task', '2013-07-13 19:10:41'),
-(63, 19, 'state', 123, '278', '276', '2013-07-13 19:10:41'),
-(64, 4, 'title', 123, 'New name !', 'Add impediments view', '2013-07-15 23:16:13'),
-(65, 1, 'description', 123, 'ok', 'Lets change this', '2013-07-16 20:36:47'),
-(66, 20, 'description', 123, 'aliquet nec, imperdiet', 'This has a new description', '2013-07-19 18:27:06');
+(1, 4, 'description', 123, 'cursus luctus, ipsum leo elementum sem, vitae', 'Some thing new now !', '2013-07-11 00:31:58'),
+(2, 4, 'description', 123, 'Some thing new now !', 'And new description', '2013-07-11 00:31:58'),
+(3, 4, 'title', 123, 'New name', 'New name !', '2013-07-11 00:31:58'),
+(4, 4, 'description', 123, 'And new description', 'Ok ok ok !', '2013-07-11 00:31:58'),
+(5, 4, 'description', 123, 'Ok ok ok !', 'This should be new', '2013-07-11 00:31:58'),
+(6, 4, 'importance', 123, '2', '1', '2013-07-11 00:31:58'),
+(7, 4, 'story_points', 123, '2', '0', '2013-07-11 00:31:58'),
+(8, 4, 'state', 123, '286', '276', '2013-07-11 00:31:58'),
+(9, 1, 'description', 123, 'lobortis augue \nscelerisque mollis. Phasellus \n\n\nlibero mauris,', 'ok this is weird\n\n\nlibero mauris,', '2013-07-11 00:31:58'),
+(10, 1, 'description', 123, 'ok this is weird\n\n\nlibero mauris,', 'ok this is weird1\n\n\nlibero mauris,', '2013-07-11 00:31:58'),
+(11, 1, 'description', 123, 'ok this is weird1\n\n\nlibero mauris,', 'ok this is weird1t\n\n\nlibero mauris,', '2013-07-11 00:31:58'),
+(12, 1, 'description', 123, 'ok this is weird1t\n\n\nlibero mauris,', 'Is it ?\n\n\nlibero mauris,', '2013-07-11 00:31:58'),
+(13, 1, 'description', 123, 'Is it ?\n\n\nlibero mauris,', 'Ok seriously\n\n\nlibero mauris,', '2013-07-11 00:31:58'),
+(14, 1, 'description', 123, 'Ok seriously\n\n\nlibero mauris,', 'Ok seriously', '2013-07-11 00:31:58'),
+(15, 1, 'description', 123, 'Ok seriously', 'Ok seriouslyarggggggggg', '2013-07-11 00:31:58'),
+(16, 2, 'description', 123, 'Is this new ?', 'Is this new ?g', '2013-07-11 00:31:58'),
+(17, 1, 'description', 123, 'Ok seriouslyarggggggggg', 'This has to update now', '2013-07-11 00:31:58'),
+(18, 1, 'description', 123, 'This has to update now', 'This has to update nowqqweq', '2013-07-11 00:31:58'),
+(19, 2, 'description', 123, 'Is this new ?g', 'No this one is old', '2013-07-11 00:31:58'),
+(20, 1, 'description', 123, 'This has to update nowqqweq', 'asdasd', '2013-07-11 00:31:58'),
+(21, 1, 'description', 123, 'asdasd', 'asdasdasdasd', '2013-07-11 00:31:58'),
+(22, 1, 'description', 123, 'asdasdasdasd', 'asdasdasdasdvv', '2013-07-11 00:31:58'),
+(23, 2, 'description', 123, 'No this one is old', 'This should be UTC', '2013-07-11 00:31:58'),
+(24, 2, 'description', 123, 'This should be UTC', 'This should be UTCf', '2013-07-11 00:31:58'),
+(25, 2, 'description', 123, 'This should be UTCf', 'This should be UTC', '2013-07-11 00:31:58'),
+(26, 2, 'title', 123, 'Change the title!', 'Change the title', '2013-07-11 00:31:58'),
+(27, 2, 'description', 123, 'This should be UTC', 'This should be UTCg', '2013-07-11 00:31:58'),
+(28, 2, 'description', 123, 'This should be UTCg', 'This should be UTC', '2013-07-11 00:31:58'),
+(29, 2, 'description', 123, 'This should be UTC', 'This should be UTCa', '2013-07-11 00:31:58'),
+(30, 4, 'description', 123, 'This should be new', 'This should be newas', '2013-07-11 00:31:58'),
+(31, 2, 'description', 123, 'This should be UTCa', 'This should be UTCab', '2013-07-11 00:31:58'),
+(33, 2, 'description', 123, 'This should be UTCa', 'This should be UTC', '2013-07-11 00:31:58'),
+(34, 4, 'description', 123, 'This should be newas', 'This should be new.', '2013-07-11 00:31:58'),
+(35, 1, 'description', 123, 'asdasdasdasdvv', 'ok', '2013-07-11 00:31:58'),
+(36, 14, 'description', 123, 'metus. In', 'metus. Ina', '2013-07-11 00:31:58'),
+(37, 4, 'description', 123, 'This should be new.', 'This should be new.w', '2013-07-11 06:19:31'),
+(38, 2, 'description', 123, 'This should be UTC', 'This should be UTC1', '2013-07-11 06:23:15'),
+(39, 1, 'state', 123, '286', '287', '2013-07-11 08:19:41'),
+(40, 14, 'assigned_to', 123, '123', '111', '2013-07-11 08:33:57'),
+(41, 18, 'state', 123, '286', '276', '2013-07-11 08:59:14'),
+(42, 4, 'state', 123, '276', '277', '2013-07-11 09:06:00'),
+(43, 4, 'state', 123, '277', '278', '2013-07-11 09:06:51'),
+(44, 4, 'state', 123, '278', '279', '2013-07-11 09:07:35'),
+(45, 2, 'state', 123, '276', '277', '2013-07-11 09:08:38'),
+(46, 2, 'state', 123, '277', '279', '2013-07-11 09:09:05'),
+(47, 18, 'state', 123, '276', '279', '2013-07-11 09:09:26'),
+(48, 19, 'state', 123, '286', '277', '2013-07-11 09:09:49'),
+(49, 20, 'state', 123, '286', '277', '2013-07-11 09:11:56'),
+(50, 22, 'state', 123, '286', '277', '2013-07-11 09:12:29'),
+(51, 21, 'state', 123, '286', '277', '2013-07-11 09:14:30'),
+(52, 19, 'state', 123, '277', '278', '2013-07-11 09:14:38'),
+(53, 18, 'state', 123, '279', '278', '2013-07-11 09:15:25'),
+(54, 4, 'state', 123, '279', '278', '2013-07-11 09:15:51'),
+(55, 2, 'description', 123, 'This should be UTC1', 'This should appear in timeline', '2013-07-11 15:01:51'),
+(56, 3, 'state', 111, '286', '277', '2013-07-11 17:03:54'),
+(57, 14, 'title', 111, 'ut, pellentesque eget, dictum placerat,', 'lets change its title', '2013-07-11 17:04:42'),
+(58, 3, 'description', 111, 'urna. Ut tincidunt vehicula risus. Nulla eget metus eu erat', 'Lets change the description', '2013-07-12 10:12:19'),
+(59, 3, 'importance', 111, '0', '1', '2013-07-12 10:17:58'),
+(60, 18, 'title', 123, 'Nullam velit dui, semper et,', 'Implement planning view', '2013-07-12 11:46:33'),
+(61, 19, 'title', 123, 'pharetra nibh. Aliquam ornare, libero', 'Finish timeline filters', '2013-07-13 13:40:41'),
+(62, 19, 'description', 123, 'ultrices, mauris ipsum porta elit, a', 'User should be able to set filters in task', '2013-07-13 13:40:41'),
+(63, 19, 'state', 123, '278', '276', '2013-07-13 13:40:41'),
+(64, 4, 'title', 123, 'New name !', 'Add impediments view', '2013-07-15 17:46:13'),
+(65, 1, 'description', 123, 'ok', 'Lets change this', '2013-07-16 15:06:47'),
+(66, 20, 'description', 123, 'aliquet nec, imperdiet', 'This has a new description', '2013-07-19 12:57:06'),
+(67, 1, 'description', 123, 'Lets change this', 'Lets change this again', '2013-07-24 16:10:47'),
+(68, 1, 'title', 123, 'New Title I have', 'New Title I have2', '2013-08-02 13:33:01');
 
 -- --------------------------------------------------------
 
@@ -4727,27 +5970,30 @@ CREATE TABLE IF NOT EXISTS `tbl_workitem_tasks` (
   `user_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_tbl_workitem_tasks_workitem_id` (`workitem_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;
 
 --
 -- Dumping data for table `tbl_workitem_tasks`
 --
 
 INSERT INTO `tbl_workitem_tasks` (`id`, `task`, `done`, `done_date`, `workitem_id`, `user_id`) VALUES
-(7, 'Is there something wrong ?', 1, '2013-07-11 20:14:05', 1, 123),
-(8, 'Lets have chinmay do this', 1, '2013-07-11 20:16:38', 2, 123),
-(9, 'one more task', 1, '2013-07-11 20:16:15', 2, 123),
-(10, 'Whats up with this ?', 1, '2013-07-11 20:20:25', 2, 123),
-(11, 'No idea', 0, '2013-07-11 20:16:50', 2, 123),
-(12, 'This should add as faded', 1, '2013-07-11 21:11:27', 1, 123),
-(13, 'Why not!', 0, '2013-07-11 22:34:17', 3, 111),
-(14, 'Let me finish this task', 1, '2013-07-11 22:34:28', 3, 111),
-(15, 'Ok this seems nice', 1, '2013-07-11 22:39:32', 14, 111),
-(16, 'Add another task', 0, '2013-07-12 23:09:31', 4, 123),
-(17, 'And complete me', 1, '2013-07-12 23:09:37', 4, 123),
-(18, 'Allow filters for users', 1, '2013-07-13 19:16:38', 19, 123),
-(19, 'Allow filters for date', 0, '2013-07-13 19:10:34', 19, 123),
-(20, 'New task', 1, '2013-07-19 19:16:29', 1, 123);
+(7, 'Is there something wrong ?', 1, '2013-07-11 14:44:05', 1, 123),
+(8, 'Lets have chinmay do this', 1, '2013-07-11 14:46:38', 2, 123),
+(9, 'one more task', 1, '2013-07-11 14:46:15', 2, 123),
+(10, 'Whats up with this ?', 1, '2013-07-11 14:50:25', 2, 123),
+(11, 'No idea', 0, '2013-07-11 14:46:50', 2, 123),
+(12, 'This should add as faded', 1, '2013-07-11 15:41:27', 1, 123),
+(13, 'Why not!', 0, '2013-07-11 17:04:17', 3, 111),
+(14, 'Let me finish this task', 1, '2013-07-11 17:04:28', 3, 111),
+(15, 'Ok this seems nice', 1, '2013-07-11 17:09:32', 14, 111),
+(16, 'Add another task', 0, '2013-07-12 17:39:31', 4, 123),
+(17, 'And complete me', 1, '2013-07-12 17:39:37', 4, 123),
+(18, 'Allow filters for users', 1, '2013-07-13 13:46:38', 19, 123),
+(19, 'Allow filters for date', 0, '2013-07-13 13:40:34', 19, 123),
+(20, 'New task', 1, '2013-07-24 10:49:33', 1, 123),
+(21, 'lol task', 0, '2013-08-02 07:55:28', 1, 123),
+(22, 'wow', 0, '2013-07-24 16:19:46', 1, 123),
+(23, 'new task duh', 0, '2013-08-02 13:25:44', 1, 123);
 
 -- --------------------------------------------------------
 
@@ -4807,6 +6053,13 @@ ALTER TABLE `tbl_milestones`
 ALTER TABLE `tbl_projects`
   ADD CONSTRAINT `FK_tbl_projects_workitem_state` FOREIGN KEY (`velocity_state`) REFERENCES `tbl_workitem_states` (`id`),
   ADD CONSTRAINT `FK_tbl_projects_workitem_type` FOREIGN KEY (`calculate_velocity_on`) REFERENCES `tbl_workitem_types` (`id`);
+
+--
+-- Constraints for table `tbl_project_log`
+--
+ALTER TABLE `tbl_project_log`
+  ADD CONSTRAINT `FK_tbl_project_log_projects` FOREIGN KEY (`project_id`) REFERENCES `tbl_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_tbl_project_log_users` FOREIGN KEY (`user_id`) REFERENCES `tbl_users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `tbl_project_modules`
@@ -4879,3 +6132,7 @@ ALTER TABLE `tbl_workitem_tasks`
 --
 ALTER TABLE `tbl_workitem_types`
   ADD CONSTRAINT `FK_tbl_workitem_types_project_id` FOREIGN KEY (`project_id`) REFERENCES `tbl_projects` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

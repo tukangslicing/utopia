@@ -59,6 +59,21 @@ class Test extends REST_Controller {
 		//$sql = "SELECT * FROM tbl_workitem_comments WHERE created_at BETWEEN '2013-07-10' AND '2013-07-12s'";
 	}
 
+	public function project_log_get()
+	{
+		$this->load->model('project_model');
+
+		$this->project_model->project_log_insert('task-add',1,123,NULL);
+		$this->project_model->project_log_insert('project-update',52,123,NULL);
+	}
+
+	public function get_diff_get()
+	{
+		$this->load->model('project_model');
+
+		$this->project_model->get_diff(5,42,1);
+	}
+
 }
 
 /* End of file  */

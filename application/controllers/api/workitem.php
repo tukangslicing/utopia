@@ -9,6 +9,8 @@ class Workitem extends REST_Controller {
 		parent::__construct();
 		$this->load->model('workitem_model');
 		$this->load->model('user_model');
+		$this->load->model('project_model');
+
 		// do validation here
 	}
 
@@ -26,6 +28,9 @@ class Workitem extends REST_Controller {
 		$workitem_id = $this->post('workitem_id');
 		$result = $this->workitem_model->update($workitem_id, $data, $this->user_id);
 		$response['data'] = $result; 
+		//insert into tbl_project_log
+		$this->project_model->project_log_insert('workitem-update',$workitem_id,$this->user_id,NULL);
+
 		$this->response($response, 200);
 	}
 
@@ -52,6 +57,10 @@ class Workitem extends REST_Controller {
 		$comment_body = $this->post('comment_body');
 		$data = $this->workitem_model->add_comment($workitem_id, $this->user_id, $comment_body);
 		$response['data'] = $data;
+
+		//insert into tbl_project_log
+		$this->project_model->project_log_insert('comment-add',$workitem_id,$this->user_id,NULL);
+
 		$this->response($response, 200);
 	}
 
@@ -60,6 +69,10 @@ class Workitem extends REST_Controller {
 		$workitem_comment_id = $this->get('workitem_comment_id');
 		$data = $this->workitem_model->delete_comment($workitem_comment_id);
 		$response['data'] = $data;
+
+		//insert into tbl_project_log
+		$this->project_model->project_log_insert('comment-remove',$workitem_comment_id,$this->user_id,NULL);
+
 		$this->response($response, 200);
 	}
 
@@ -78,6 +91,9 @@ class Workitem extends REST_Controller {
 		if(!$task_id)
 		{
 			$response['data'] = $this->workitem_model->add_task($body, $workitem_id, $this->user_id);
+			//insert into tbl_project_log
+			$this->project_model->project_log_insert('task-add',$workitem_id,$this->user_id,NULL);
+
 		}
 		else
 		{
@@ -85,6 +101,9 @@ class Workitem extends REST_Controller {
 			$data['user_id'] = $this->user_id;
 			$response['data'] = $this->workitem_model->update_task($task_id, $data);	
 			$response['task_id'] = $task_id;
+			//insert into tbl_project_log
+			$this->project_model->project_log_insert('task-update',$workitem_id,$this->user_id,NULL);
+
 		}
 		$this->response($response, 200);
 	}
@@ -95,6 +114,10 @@ class Workitem extends REST_Controller {
 		$workitem_id = $this->get('workitem_id');
 		$data = $this->workitem_model->delete_task($task_id, $workitem_id);
 		$response['data'] = $data;
+
+		//insert into tbl_project_log
+		$this->project_model->project_log_insert('task-remove',$workitem_id,$this->user_id,NULL);
+
 		$this->response($response, 200);
 	}
 }

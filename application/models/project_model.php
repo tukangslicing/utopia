@@ -122,6 +122,67 @@ class Project_model extends CI_Model {
 		return $data;
 	}
 
+	public function project_log_insert($event,$subject_id,$user_id,$target_id)
+	{
+		$query = " INSERT INTO `tbl_project_log` (event,project_id,user_id,target_id) VALUES ( ?,?,?,? )";
+		//id (auto), timestamp (default)
+		//`project_id` to be selected depending on `event`
+
+
+		switch ($event) {
+
+			//here $subject_id is `workitem_id` => select project_id 
+			case 'workitem-update':
+			case 'comment-add':
+			case 'comment-remove':
+			case 'task-add':
+			case 'task-remove':
+			case 'task-update':
+				 	$query_project = "SELECT project_id FROM tbl_workitems WHERE id = ?";
+				 	$exec = $this->db->query($query_project,$subject_id);
+				 	$result = $exec->row_array();
+				 	$project_id = $result['project_id'];
+				break;
+
+			//project_id = subject_id
+			case 'project-update':
+					$project_id = $subject_id;
+				break;
+							
+			default:
+
+				break;
+		}
+
+		$binds = array($event,$project_id,$user_id,$target_id);
+
+		//print_r($binds);
+		$exec  = $this->db->query($query,$binds);
+
+		return $this->db->affected_rows();
+	}
+
+	public function get_diff($log_id,$project_id,$user_id)
+	{
+		$query = "SELECT 
+				  tbl_project_log.id, 
+				  tbl_project_log.event, 
+				  tbl_project_log.project_id, 
+				  tbl_project_log.user_id, 
+				  tbl_project_log.target_id, 
+				  tbl_project_log.`timestamp`
+				FROM tbl_project_log
+				WHERE 
+				  id > ?
+				  AND project_id = ? 
+				  AND user_id != ?
+				ORDER BY id DESC";
+		$binds = array($log_id,$project_id,$user_id);
+		$exec  = $this->db->query($query,$binds);
+		$result = $exec->result_array();
+
+		echo json_encode($result);
+	}
 }
 /* End of file  */
 /* Location: ./application/models/ */
