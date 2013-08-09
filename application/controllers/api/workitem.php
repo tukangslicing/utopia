@@ -29,7 +29,7 @@ class Workitem extends REST_Controller {
 		$result = $this->workitem_model->update($workitem_id, $data, $this->user_id);
 		$response['data'] = $result; 
 		//insert into tbl_project_log
-		$this->project_model->project_log_insert('workitem-update',$workitem_id,$this->user_id,NULL);
+		$this->project_model->project_log_insert('workitem-update',$workitem_id,$this->user_id,$workitem_id);
 
 		$this->response($response, 200);
 	}
@@ -59,7 +59,7 @@ class Workitem extends REST_Controller {
 		$response['data'] = $data;
 
 		//insert into tbl_project_log
-		$this->project_model->project_log_insert('comment-add',$workitem_id,$this->user_id,NULL);
+		$this->project_model->project_log_insert('comment-add',$workitem_id,$this->user_id,$workitem_id);
 
 		$this->response($response, 200);
 	}
@@ -71,7 +71,7 @@ class Workitem extends REST_Controller {
 		$response['data'] = $data;
 
 		//insert into tbl_project_log
-		$this->project_model->project_log_insert('comment-remove',$workitem_comment_id,$this->user_id,NULL);
+		$this->project_model->project_log_insert('comment-remove',$workitem_comment_id,$this->user_id,$workitem_comment_id);
 
 		$this->response($response, 200);
 	}
@@ -92,7 +92,7 @@ class Workitem extends REST_Controller {
 		{
 			$response['data'] = $this->workitem_model->add_task($body, $workitem_id, $this->user_id);
 			//insert into tbl_project_log
-			$this->project_model->project_log_insert('task-add',$workitem_id,$this->user_id,NULL);
+			$this->project_model->project_log_insert('task-add',$workitem_id,$this->user_id,$workitem_id);
 
 		}
 		else
@@ -102,7 +102,7 @@ class Workitem extends REST_Controller {
 			$response['data'] = $this->workitem_model->update_task($task_id, $data);	
 			$response['task_id'] = $task_id;
 			//insert into tbl_project_log
-			$this->project_model->project_log_insert('task-update',$workitem_id,$this->user_id,NULL);
+			$this->project_model->project_log_insert('task-update',$workitem_id,$this->user_id,$workitem_id);
 
 		}
 		$this->response($response, 200);
@@ -116,7 +116,7 @@ class Workitem extends REST_Controller {
 		$response['data'] = $data;
 
 		//insert into tbl_project_log
-		$this->project_model->project_log_insert('task-remove',$workitem_id,$this->user_id,NULL);
+		$this->project_model->project_log_insert('task-remove',$workitem_id,$this->user_id,$workitem_id);
 
 		$this->response($response, 200);
 	}
