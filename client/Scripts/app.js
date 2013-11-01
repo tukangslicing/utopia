@@ -1,29 +1,29 @@
 /* create main utopia module for angular */
-var ut = angular.module('utopia', ['ngResource', 'localytics.directives', 'ui.bootstrap']);
-ut.config(function($routeProvider, $locationProvider) {
-	$routeProvider.when('/', {
-		redirectTo : 'projects'
-	});
-	$routeProvider.when('/login', {
-		templateUrl : 'login',
-		controller : LoginController
-	});
-	$routeProvider.when('/projects', {
-		templateUrl : 'projects',
-		controller : ProjectsController
-	});
-	$routeProvider.when('/logout', {
-		templateUrl : 'logout',
-		controller : LogoutController
-	});
-	$routeProvider.when('/projects/:project_id/white-board', {
-		templateUrl : 'white-board',
-		controller : WhiteboardController
-	});
-	$routeProvider.when('/projects/:project_id/timeline', {
-		templateUrl : 'timeline',
-		controller : TimelineController
-	});
+var ut = angular.module('utopia', ['ngResource', 'localytics.directives', 'ui.bootstrap', 'ngProgress']);
+
+ut.host = "http://10.77.112.42/utopia/";
+ut.apihost = "http://10.77.112.42/utopia/api/";
+
+ut.constant("route", {
+	resolve : function(route) {
+		return {
+			templateUrl : route,
+			controller : this.capitalise(route) + 'Controller'
+		} 
+	},
+	capitalise : function (string) {
+	    return string.charAt(0).toUpperCase() + string.slice(1);
+	}
+})
+
+ut.config(function($routeProvider, $locationProvider, route) {
+	$routeProvider.when('/', { redirectTo : 'projects' });
+	$routeProvider.when('/login', route.resolve('login'));
+	$routeProvider.when('/projects', route.resolve('projects'));
+	$routeProvider.when('/logout', route.resolve('logout'));
+	$routeProvider.when('/projects/:project_id/whiteboard', route.resolve('whiteboard'));
+	$routeProvider.when('/projects/:project_id/whiteboard/:workitem_id', route.resolve('whiteboard'));
+	$routeProvider.when('/projects/:project_id/timeline', route.resolve('timeline'));
 	$routeProvider.otherwise({
 		templateUrl : 'under-construction',
 		controller : function() {}
@@ -38,10 +38,8 @@ ut.config(function($httpProvider, $routeProvider) {
 		}
 		function error(response) {
 			var status = response.status;
-			console.log(status);
 			if (status != 200) {
 				$routeProvider.location = "#/login";
-				alert('server call failed');
 				return;
 			}
 			return $q.reject(response);

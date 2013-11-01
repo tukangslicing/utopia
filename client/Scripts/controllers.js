@@ -21,7 +21,7 @@ function ProjectsController($scope, $resource, project, $location, db) {
 		var project_id = this.project.id;
 		project.details.get({project_id : project_id }, function(response) {
 			db.set('project_details', response.data);
-			$location.path('/projects/' + project_id  + '/white-board');
+			$location.path('/projects/' + project_id  + '/whiteboard');
 		});
 	}
 }
@@ -30,26 +30,31 @@ function LogoutController($scope, db) {
 	db.clear();
 }
 
-function WhiteboardController($scope, $routeParams, workitem, $window, db) {
+function WhiteboardController($scope, $routeParams, workitem, $window, db, progressbar) {
+	progressbar.start();
 	$scope.project_id = $routeParams.project_id;
 	workitem.crud.get({project_id : $scope.project_id }, function(data) {
 		$scope.workitems = data.data;
+		progressbar.complete();
 	});
 
-	$scope.currentUser = 123; //db.get('project_details').workitem_types;
+	//$scope.currentUser = 123; //db.get('project_details').workitem_types;
 	$scope.users = db.get('project_details').users;
 	$scope.types = db.get('project_details').workitem_types;
-	$scope.flash('data-pulled!', 'alert-success');
+	//$scope.flash('data-pulled!', 'alert-success');
+	
 	$scope.select = function() {
 		$scope.swkitm = this.wk;
 		$scope.selectedIndex = this.$index;
 		$scope.newComment = "";
 		$scope.updateStates();
+		progressbar.start();
 		workitem.comments.get({project_id: $scope.project_id, workitem_id : this.wk.id}, function(data) {
 			$scope.comments = data.data;
 		});
 		workitem.tasks.get({workitem_id : this.wk.id}, function(data) {
 			$scope.tasks = data.data;
+			progressbar.complete();
 		});
 	}	
 

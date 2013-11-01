@@ -59,6 +59,7 @@ html, body {
 .container.ng-view {
 	width: 97%;
 	margin: 20px;
+	margin-top:10px;
 }
 
 .workitems {

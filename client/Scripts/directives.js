@@ -1,4 +1,3 @@
-{}
 ut.directive('resize', function ($window) {
     return function (scope, element) {
         var w = angular.element($window);
@@ -65,8 +64,9 @@ ut.directive('utFilterPane', function(db) {
         controller : function($scope) {
             $scope.users = db.get('project_details').users;
             $scope.selectedUsers = [];
+            $scope.from = new Date().toJSON().slice(0,10);
+            $scope.to = new Date();
             $scope.applyFilter = function() {
-                console.log($scope.selectedUsers);
                 var filterObj = {
                     from : $scope.from,
                     to : $scope.to,

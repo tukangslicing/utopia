@@ -74,7 +74,7 @@
                     <h1>Beautiful timeline view</h1>
                     <span>Get to know who's working on what</span>
                 </div>
-                 <div class="item">
+                <div class="item">
                     <h1>Emphasis on planning and testing</h1>
                     <span>It's important</span>
                 </div>
@@ -107,7 +107,7 @@
                   <label class="checkbox">
                     <input type="checkbox"> Remember me
                   </label>
-                  <input type="submit" class="btn" ng-click='submit()'>Sign in</input>
+                  <input type="submit" class="btn" ng-click='submit()'></input>
                 </div>
               </div>
             </form>
@@ -140,12 +140,12 @@
         </div>
     </script>
 
-    <script type="text/ng-template" id="white-board">
+    <script type="text/ng-template" id="whiteboard">
     <!-- whiteboard View -->
         <div class='row-fluid'>
             <ul class="nav nav-pills">
                 <li><a href='#/projects/{{project_id}}/dashboard'>Dashboard</a></li>
-                <li class='active'><a href='#/projects/{{project_id}}/white-board'>Whiteboard</a></li>
+                <li class='active'><a href='#/projects/{{project_id}}/whiteboard'>Whiteboard</a></li>
                 <li><a href='#/projects/{{project_id}}/timeline'>Timeline</a></li>
                 <li><a href='#/projects/{{project_id}}/planning'>Planning</a></li>
             </ul>
@@ -322,7 +322,7 @@
         <div class='row-fluid'>
             <ul class="nav nav-pills">
                 <li><a href='#/projects/{{project_id}}/dashboard'>Dashboard</a></li>
-                <li><a href='#/projects/{{project_id}}/white-board'>Whiteboard</a></li>
+                <li><a href='#/projects/{{project_id}}/whiteboard'>Whiteboard</a></li>
                 <li class='active'><a href='#/projects/{{project_id}}/timeline'>Timeline</a></li>
                 <li><a href='#/projects/{{project_id}}/planning'>Planning</a></li>
             </ul>
@@ -419,7 +419,7 @@
                 <div>End</div>
                 <input type="date" ng-model='to' />
             </label>
-            <div><strong>Group by</strong></div>
+            <!-- <div><strong>Group by</strong></div>
             <label class="radio inline">
               <input type="radio" name="group-radios" value="User" checked>
               User
@@ -427,7 +427,7 @@
             <label class="radio inline">
               <input type="radio" name="group-radios" value="Workitem">
               Workitem
-            </label>
+            </label> -->            
             <div>
                 <input type='button' class="btn btn-medium pull-right" ng-click='applyFilter()' value='Apply' />
             </div>
@@ -439,11 +439,13 @@
     <script type="text/javascript" src="scripts\libs\jquery-ui-1.10.3.custom.min.js"></script>
     <script type="text/javascript" src="scripts\libs\bootstrap.min.js"></script>
     <script type="text/javascript" src="scripts\libs\angular.min.js"></script>
+    <script type="text/javascript" src="scripts\libs\angular-progress.js"></script>
     <script type="text/javascript" src="scripts\libs\angular-resource.min.js"></script>
     <script type="text/javascript" src="scripts\libs\angular-ui-bootstrap.min.js"></script>
     <script type="text/javascript" src="scripts\libs\moment.min.js"></script>
     <script type="text/javascript" src="scripts\libs\chosen.jquery.js"></script>
     <script type="text/javascript" src="scripts\libs\chosen.js"></script>
+
     <script type="text/javascript" src="scripts\app.js"></script>
     <script type="text/javascript" src="scripts\services.js"></script>
     <script type="text/javascript" src="scripts\utils.js"></script>

@@ -1,5 +1,4 @@
-ut.host = "http://localhost/utopia/";
-ut.apihost = "http://localhost/utopia/api/";
+
 
 ut.factory('project', function($resource) {
 	var project = {
