@@ -11,20 +11,28 @@ function LoginController($scope, $http, $location, db) {
 	}
 }
 
-function ProjectsController($scope, $resource, project, $location, db, Restangular) {
-	var projects = Restangular.all('project').getList();
+function ProjectsController($scope, $resource, $location, db, Restangular) {
+	var projects = Restangular.all('project');
 	
-	projects.then(function(pData) {
-		console.log(pData);
+	projects.getList().then(function(pData) {
 		$scope.projects = pData;
 	});
 	
 	$scope.load_project = function() {
 		var project_id = this.project.id;
-		project.details.get({project_id : project_id }, function(response) {
-			db.set('project_details', response.data);
-			$location.path('/projects/' + project_id  + '/whiteboard');
+		projects.one(project_id).getList('types').then(function(response) {
+			db.set('types', response);
 		});
+		projects.one(project_id).getList('states').then(function(response) {
+			db.set('states', response);
+		});
+		projects.one(project_id).getList('sprints').then(function(response) {
+			db.set('sprints', response);
+		});
+		projects.one(project_id).getList('users').then(function(response) {
+			db.set('users', response);
+		});
+		$location.path('/projects/' + project_id + '/whiteboard');
 	}
 }
 
@@ -32,32 +40,24 @@ function LogoutController($scope, db) {
 	db.clear();
 }
 
-function WhiteboardController($scope, $routeParams, workitem, $window, db, progressbar) {
-	progressbar.start();
+function WhiteboardController($scope, $routeParams, $window, db, Restangular) {
 	$scope.project_id = $routeParams.project_id;
-	workitem.crud.get({project_id : $scope.project_id }, function(data) {
-		$scope.workitems = data.data;
-		progressbar.complete();
-	});
+	var project = Restangular.all('project');
+	var workitem = Restangular.all('workitem')
 
-	//$scope.currentUser = 123; //db.get('project_details').workitem_types;
-	$scope.users = db.get('project_details').users;
-	$scope.types = db.get('project_details').workitem_types;
-	//$scope.flash('data-pulled!', 'alert-success');
+	$scope.users = db.get('users');
+	$scope.types = db.get('types');
+	$scope.states = db.get('states');
+
+	project.one($scope.project_id).getList('workitems').then(function(workitems){
+		$scope.workitems = workitems;
+	});
 	
 	$scope.select = function() {
 		$scope.swkitm = this.wk;
 		$scope.selectedIndex = this.$index;
 		$scope.newComment = "";
 		$scope.updateStates();
-		progressbar.start();
-		workitem.comments.get({project_id: $scope.project_id, workitem_id : this.wk.id}, function(data) {
-			$scope.comments = data.data;
-		});
-		workitem.tasks.get({workitem_id : this.wk.id}, function(data) {
-			$scope.tasks = data.data;
-			progressbar.complete();
-		});
 	}	
 
 	$scope.search = function() {
@@ -83,8 +83,8 @@ function WhiteboardController($scope, $routeParams, workitem, $window, db, progr
 	}
 
 	$scope.updateStates = function() {
-		var types = db.get('project_details').workitem_types;
-		$scope.states = types.filter(function(d) { return d.id == $scope.swkitm.type })[0].states;
+		var types = db.get('states');
+		$scope.states = types.filter(function(d) { return d.workitem_type_id == $scope.swkitm.type });
 	}
 
 	$scope.setImportance = function(d) {

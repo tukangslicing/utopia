@@ -1,135 +1,311 @@
-/*global angular: true, document: true, setInterval: true,
-clearInterval: true, setTimeout: true */
-/*
-ngProgress v0.0.3 - slim, site-wide progressbar for AngularJS
-(C) 2013 - Victor Bjelkholm
-License: MIT (see LICENSE)
-Source: https://github.com/victorbjelkholm/ngprogress
-*/
+;(function(factory) {
 
-angular.module('ngProgress', []).provider('progressbar', function () {
+  if (typeof module === 'function') {
+    module.exports = factory(this.jQuery || require('jquery'));
+  } else if (typeof define === 'function' && define.amd) {
+    define(['jquery'], function($) {
+      return factory($);
+    });
+  } else {
+    this.NProgress = factory(this.jQuery);
+  }
 
-    'use strict';
-    //Default values for provider
-    this.count = 0;
-    this.height = '2px';
-    this.color = 'firebrick';
+})(function($) {
+  var NProgress = {};
 
-    this.$get = ['$document', '$window', function ($document, $window) {
-        var count = this.count,
-            height = this.height,
-            color = this.color,
-            $body = $document.find('body'),
-        // Create elements that is needed
-            progressbarContainer = angular.element('<div class="progressbar-container"></div>'),
-            progressbar = angular.element('<div class="progressbar"></div>'),
+  NProgress.version = '0.1.2';
 
-        //Add CSS3 styles for transition smoothing
-        css = document.createElement("style");
-        css.type = "text/css";
-        css.innerHTML = ".progressbar {-webkit-transition: all 0.5s ease-in-out; -moz-transition: all 0.5s ease-in-out; -o-transition: all 0.5s ease-in-out; transition: all 0.5s ease-in-out;}";
-        document.body.appendChild(css);
+  var Settings = NProgress.settings = {
+    minimum: 0.08,
+    easing: 'ease',
+    positionUsing: '',
+    speed: 200,
+    trickle: true,
+    trickleRate: 0.02,
+    trickleSpeed: 800,
+    showSpinner: true,
+    template: '<div class="bar" role="bar"><div class="peg"></div></div><div class="spinner" role="spinner"><div class="spinner-icon"></div></div>'
+  };
 
-        //Styling for the progressbar-container
-        progressbarContainer.css('position', 'fixed');
-        progressbarContainer.css('margin', '0');
-        progressbarContainer.css('padding', '0');
-        progressbarContainer.css('bottom', '31px');
-        progressbarContainer.css('left', '0px');
-        progressbarContainer.css('right', '0px');
-        progressbarContainer.css('z-index', '99999');
+  /**
+   * Updates configuration.
+   *
+   *     NProgress.configure({
+   *       minimum: 0.1
+   *     });
+   */
+  NProgress.configure = function(options) {
+    $.extend(Settings, options);
+    return this;
+  };
 
-        //Styling for the progressbar itself
-        progressbar.css('height', height);
-        progressbar.css('box-shadow', '0px 0px 10px 0px ' + color);
-        progressbar.css('width', count + '%');
-        progressbar.css('margin', '0');
-        progressbar.css('padding', '0');
-        progressbar.css('background-color', color);
-        progressbar.css('z-index', '99998');
+  /**
+   * Last number.
+   */
 
-        //Add progressbar to progressbar-container and progressbar-container
-        // to body
-        progressbarContainer.append(progressbar);
-        $body.append(progressbarContainer);
+  NProgress.status = null;
 
+  /**
+   * Sets the progress bar status, where `n` is a number from `0.0` to `1.0`.
+   *
+   *     NProgress.set(0.4);
+   *     NProgress.set(1.0);
+   */
 
-        return {
-            // Starts the animation and adds between 0 - 5 percent to loading
-            // each 400 milliseconds. Should always be finished with progressbar.complete()
-            // to hide it
-            start: function () {
-                progressbar.css('width', count + '%');
-                progressbar.css('opacity', '1');
-                $window.interval = setInterval(function () {
-                    var remaining = 100 - count;
-                    count = count + (0.15 * Math.pow(1-Math.sqrt(remaining), 2));
-                    progressbar.css('width', count + '%');
-                }, 400);
-            },
-            // Sets the height of the progressbar. Use any valid CSS value
-            // Eg '10px', '1em' or '1%'
-            height: function (new_height) {
-                progressbar.css('height', new_height);
-            },
-            // Sets the color of the progressbar and it's shadow. Use any valid HTML
-            // color
-            color: function (color) {
-                progressbar.css('box-shadow', '0px 0px 10px 0px ' + color);
-                progressbar.css('background-color', color);
-            },
-            // Returns on how many percent the progressbar is at. Should'nt be needed
-            status: function () {
-                return this.count;
-            },
-            // Stops the progressbar at it's current location
-            stop: function () {
-                clearInterval($window.interval);
-            },
-            // Set's the progressbar percentage. Use a number between 0 - 100. 
-            // If 100 is provided, complete will be called.
-            set: function (new_count) {
-                clearInterval($window.interval);
-                if (new_count >= 100) {
-                    this.complete();
-                }
-                count = new_count;
-                progressbar.css('width', count + '%');
-                progressbar.css('opacity', '1');
-                return count;
-            },
-            // Resets the progressbar to percetage 0 and therefore will be hided after
-            // it's rollbacked
-            reset: function () {
-                clearInterval($window.interval);
-                count = 0;
-                progressbar.css('width', count + '%');
-                progressbar.css('opacity', '1');
-                return 0;
-            },
-            // Jumps to 100% progress and fades away progressbar.
-            complete: function () {
-                clearInterval($window.interval);
-                count = 100;
-                progressbar.css('width', count + '%');
-                setTimeout(function () {
-                    progressbar.css('opacity', '0');
-                }, 500);
-                setTimeout(function () {
-                    count = 0;
-                    progressbar.css('width', count + '%');
-                }, 1000);
-                return count;
-            }
-        };
-    }];
+  NProgress.set = function(n) {
+    var started = NProgress.isStarted();
 
-    this.setColor = function (color) {
-        this.color = color;
+    n = clamp(n, Settings.minimum, 1);
+    NProgress.status = (n === 1 ? null : n);
+
+    var $progress = NProgress.render(!started),
+        $bar      = $progress.find('[role="bar"]'),
+        speed     = Settings.speed,
+        ease      = Settings.easing;
+
+    $progress[0].offsetWidth; /* Repaint */
+
+    $progress.queue(function(next) {
+      // Set positionUsing if it hasn't already been set
+      if (Settings.positionUsing === '') Settings.positionUsing = NProgress.getPositioningCSS();
+
+      // Add transition
+      $bar.css(barPositionCSS(n, speed, ease));
+
+      if (n === 1) {
+        // Fade out
+        $progress.css({ transition: 'none', opacity: 1 });
+        $progress[0].offsetWidth; /* Repaint */
+
+        setTimeout(function() {
+          $progress.css({ transition: 'all '+speed+'ms linear', opacity: 0 });
+          setTimeout(function() {
+            NProgress.remove();
+            next();
+          }, speed);
+        }, speed);
+      } else {
+        setTimeout(next, speed);
+      }
+    });
+
+    return this;
+  };
+
+  NProgress.isStarted = function() {
+    return typeof NProgress.status === 'number';
+  };
+
+  /**
+   * Shows the progress bar.
+   * This is the same as setting the status to 0%, except that it doesn't go backwards.
+   *
+   *     NProgress.start();
+   *
+   */
+  NProgress.start = function() {
+    if (!NProgress.status) NProgress.set(0);
+
+    var work = function() {
+      setTimeout(function() {
+        if (!NProgress.status) return;
+        NProgress.trickle();
+        work();
+      }, Settings.trickleSpeed);
     };
 
-    this.setHeight = function (height) {
-        this.height = height;
-    };
+    if (Settings.trickle) work();
 
+    return this;
+  };
+
+  /**
+   * Hides the progress bar.
+   * This is the *sort of* the same as setting the status to 100%, with the
+   * difference being `done()` makes some placebo effect of some realistic motion.
+   *
+   *     NProgress.done();
+   *
+   * If `true` is passed, it will show the progress bar even if its hidden.
+   *
+   *     NProgress.done(true);
+   */
+
+  NProgress.done = function(force) {
+    if (!force && !NProgress.status) return this;
+
+    return NProgress.inc(0.3 + 0.5 * Math.random()).set(1);
+  };
+
+  /**
+   * Increments by a random amount.
+   */
+
+  NProgress.inc = function(amount) {
+    var n = NProgress.status;
+
+    if (!n) {
+      return NProgress.start();
+    } else {
+      if (typeof amount !== 'number') {
+        amount = (1 - n) * clamp(Math.random() * n, 0.1, 0.95);
+      }
+
+      n = clamp(n + amount, 0, 0.994);
+      return NProgress.set(n);
+    }
+  };
+
+  NProgress.trickle = function() {
+    return NProgress.inc(Math.random() * Settings.trickleRate);
+  };
+
+  /**
+   * Waits for all supplied jQuery promises and
+   * increases the progress as the promises resolve.
+   * 
+   * @param $promise jQUery Promise
+   */
+  (function() {
+    var initial = 0, current = 0;
+    
+    NProgress.promise = function($promise) {
+      if (!$promise || $promise.state() == "resolved") {
+        return this;
+      }
+      
+      if (current == 0) {
+        NProgress.start();
+      }
+      
+      initial++;
+      current++;
+      
+      $promise.always(function() {
+        current--;
+        if (current == 0) {
+            initial = 0;
+            NProgress.done();
+        } else {
+            NProgress.set((initial - current) / initial);
+        }
+      });
+      
+      return this;
+    };
+    
+  })();
+
+  /**
+   * (Internal) renders the progress bar markup based on the `template`
+   * setting.
+   */
+
+  NProgress.render = function(fromStart) {
+    if (NProgress.isRendered()) return $("#nprogress");
+    $('html').addClass('nprogress-busy');
+
+    var $el = $("<div id='nprogress'>")
+      .html(Settings.template);
+
+    var perc = fromStart ? '-100' : toBarPerc(NProgress.status || 0);
+
+    $el.find('[role="bar"]').css({
+      transition: 'all 0 linear',
+      transform: 'translate3d('+perc+'%,0,0)'
+    });
+
+    if (!Settings.showSpinner)
+      $el.find('[role="spinner"]').remove();
+
+    $el.appendTo(document.body);
+
+    return $el;
+  };
+
+  /**
+   * Removes the element. Opposite of render().
+   */
+
+  NProgress.remove = function() {
+    $('html').removeClass('nprogress-busy');
+    $('#nprogress').remove();
+  };
+
+  /**
+   * Checks if the progress bar is rendered.
+   */
+
+  NProgress.isRendered = function() {
+    return ($("#nprogress").length > 0);
+  };
+
+  /**
+   * Determine which positioning CSS rule to use.
+   */
+
+  NProgress.getPositioningCSS = function() {
+    // Sniff on document.body.style
+    var bodyStyle = document.body.style;
+
+    // Sniff prefixes
+    var vendorPrefix = ('WebkitTransform' in bodyStyle) ? 'Webkit' :
+                       ('MozTransform' in bodyStyle) ? 'Moz' :
+                       ('msTransform' in bodyStyle) ? 'ms' :
+                       ('OTransform' in bodyStyle) ? 'O' : '';
+
+    if (vendorPrefix + 'Perspective' in bodyStyle) {
+      // Modern browsers with 3D support, e.g. Webkit, IE10
+      return 'translate3d';
+    } else if (vendorPrefix + 'Transform' in bodyStyle) {
+      // Browsers without 3D support, e.g. IE9
+      return 'translate';
+    } else {
+      // Browsers without translate() support, e.g. IE7-8
+      return 'margin';
+    }
+  };
+
+  /**
+   * Helpers
+   */
+
+  function clamp(n, min, max) {
+    if (n < min) return min;
+    if (n > max) return max;
+    return n;
+  }
+
+  /**
+   * (Internal) converts a percentage (`0..1`) to a bar translateX
+   * percentage (`-100%..0%`).
+   */
+
+  function toBarPerc(n) {
+    return (-1 + n) * 100;
+  }
+
+
+  /**
+   * (Internal) returns the correct CSS for changing the bar's
+   * position given an n percentage, and speed and ease from Settings
+   */
+
+  function barPositionCSS(n, speed, ease) {
+    var barCSS;
+
+    if (Settings.positionUsing === 'translate3d') {
+      barCSS = { transform: 'translate3d('+toBarPerc(n)+'%,0,0)' };
+    } else if (Settings.positionUsing === 'translate') {
+      barCSS = { transform: 'translate('+toBarPerc(n)+'%,0)' };
+    } else {
+      barCSS = { 'margin-left': toBarPerc(n)+'%' };
+    }
+
+    barCSS.transition = 'all '+speed+'ms '+ease;
+
+    return barCSS;
+  }
+
+  return NProgress;
 });
