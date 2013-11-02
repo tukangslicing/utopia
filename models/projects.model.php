@@ -1,12 +1,24 @@
 <?php
 
 class Project extends ActiveRecord\Model {
+	/**
+	 * table name
+	 * @var string
+	 */
 	public static $table_name = 'tbl_projects';
 
+	/**
+	 * associations
+	 * @var array
+	 */
 	static $belongs_to = array(
       	array('user', 'select' => 'id, user_name, display_name', 'class_name' => 'User')
     );
 
+	/**
+	 * associations
+	 * @var array
+	 */
     static $has_many = array(
 	    array('workitems', 'class_name' => 'Workitem'),
 	    array('sprints', 'class_name' => 'Sprint'),
@@ -14,6 +26,10 @@ class Project extends ActiveRecord\Model {
 	    array('members', 'class_name' => 'User', 'through' => 'mappings'),
     );
 
+    /**
+     * returns active workitems for a user in the given project
+     * @return array::Workitem
+     */
     public function in_progress_workitems() {
     	$complex_sql_query = "SELECT * FROM `tbl_workitems` 
 								WHERE tbl_workitems.project_id = ? AND tbl_workitems.assigned_to = ?
@@ -23,7 +39,10 @@ class Project extends ActiveRecord\Model {
 		return self::find_by_sql($complex_sql_query, array($this->id, Utopia::$user->id));
 	}
 
-	//Gets distinct workitem states
+	/**
+	 * Returns distinct states in a project
+	 * @return array::WorkitemState
+	 */
 	public function get_states() {
 		$states = Workitem::find_by_sql("SELECT DISTINCT state FROM `tbl_workitems` 
 			WHERE tbl_workitems.project_id = ?", array($this->id));
@@ -32,7 +51,10 @@ class Project extends ActiveRecord\Model {
 		return WorkitemState::find('all', $options);
 	}
 
-	//Gets distinct workitem types
+	/**
+	 * Returns distinct workitem types 
+	 * @return array::WorkitemType
+	 */
 	public function get_types() {
 		$types = self::find_by_sql("SELECT DISTINCT type FROM `tbl_workitems` 
 			WHERE tbl_workitems.project_id = ?", array($this->id));
@@ -43,7 +65,6 @@ class Project extends ActiveRecord\Model {
 }
 
 class ProjectUser extends ActiveRecord\Model {
-	
 	static $table_name = 'tbl_project_users';
 
 	static $belongs_to = array(

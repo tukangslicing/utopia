@@ -1,4 +1,11 @@
 
+/**
+ * Login screen controller
+ * @param {[type]} $scope
+ * @param {[type]} $http
+ * @param {[type]} $location
+ * @param {[type]} db
+ */
 function LoginController($scope, $http, $location, db) {
 	$scope.submit = function() {
 		var data = {username : $scope.username, password : $scope.password};
@@ -11,6 +18,14 @@ function LoginController($scope, $http, $location, db) {
 	}
 }
 
+/**
+ * Project list page controller, handles fetching appropriate data for a project
+ * @param {[type]} $scope
+ * @param {[type]} $resource
+ * @param {[type]} $location
+ * @param {[type]} db
+ * @param {[type]} Restangular
+ */
 function ProjectsController($scope, $resource, $location, db, Restangular) {
 	var projects = Restangular.all('project');
 	
@@ -36,10 +51,15 @@ function ProjectsController($scope, $resource, $location, db, Restangular) {
 	}
 }
 
-function LogoutController($scope, db) {
-	db.clear();
-}
 
+/**
+ * Handles everything on whiteboard screen, CRUD of workitem and related components
+ * @param {[type]} $scope
+ * @param {[type]} $routeParams
+ * @param {[type]} $window
+ * @param {[type]} db
+ * @param {[type]} Restangular
+ */
 function WhiteboardController($scope, $routeParams, $window, db, Restangular) {
 	$scope.project_id = $routeParams.project_id;
 	var project = Restangular.all('project');
@@ -148,6 +168,12 @@ function WhiteboardController($scope, $routeParams, $window, db, Restangular) {
 	});
 }
 
+/**
+ * Shows beautiful timeline
+ * @param {[type]} $scope
+ * @param {[type]} $routeParams
+ * @param {[type]} timeline
+ */
 function TimelineController($scope, $routeParams, timeline) {
 	$scope.project_id = $routeParams.project_id;
 	var oldLogs = [];
@@ -245,4 +271,8 @@ function TimelineController($scope, $routeParams, timeline) {
 		});
 		return updatedLog;
 	}
+}
+
+function LogoutController($scope, db) {
+	db.clear();
 }

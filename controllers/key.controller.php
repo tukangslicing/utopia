@@ -2,10 +2,19 @@
 
 class KeyController extends BaseController {
 
+    /**
+     * Base method
+     * @return Read it through!
+     */
     public function index_get() {
         return 'An an an, you did not say the magic word!';
     }
 
+    /**
+     * Creates a new key
+     * @param  POST - username, password 
+     * @return 40 digit md5 hash
+     */
     public function index_post()
     {
         $key = self::_generate_key();
@@ -17,6 +26,11 @@ class KeyController extends BaseController {
         return $key;
     }
 
+    /**
+     * Deletes a key
+     * @param  md5 hash $key
+     * @return boolean
+     */
     public function index_delete($key)
     {
         // Kill it
@@ -25,6 +39,10 @@ class KeyController extends BaseController {
         return "API key deleted successfully";
     }
 
+    /**
+     * helper method to generate the key
+     * @return [type]
+     */
     private function _generate_key()
     {
         do
@@ -37,16 +55,31 @@ class KeyController extends BaseController {
         return $new_key;
     }
 
+    /**
+     * helper method for finding the key in database
+     * @param  $key
+     * @return key
+     */
     private function _get_key($key)
     {
         return Token::find_by_key($key);
     }
 
+    /**
+     * name suffices it
+     * @param  $key
+     * @return key
+    */
     private function _key_exists($key)
     {
         return count(Token::find_by_key($key)) > 0;
     }
 
+    /**
+     * name suffices it
+     * @param  $key
+     * @return key
+    */
     private function _insert_key($key, $user)
     {
         $data = new Token();
@@ -57,6 +90,11 @@ class KeyController extends BaseController {
         return $data;
     }
 
+    /**
+     * name suffices it
+     * @param  $key
+     * @return key
+    */
     private function _delete_key($key)
     {
         $token = Token::find_by_key($key);

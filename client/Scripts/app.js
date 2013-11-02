@@ -1,11 +1,17 @@
-/* create main utopia module for angular */
+/**
+ * Main module
+ * @type {[type]}
+ */
 var ut = angular.module('utopia', ['ngResource', 
 						'localytics.directives', 
 						'ui.bootstrap', 
 						'restangular']);
 
+/**
+ * Constants
+ * @type {String}
+ */
 ut.host = "http://localhost/utopia/";
-
 ut.constant("route", {
 	resolve : function(route) {
 		return {
@@ -18,6 +24,13 @@ ut.constant("route", {
 	}
 })
 
+/**
+ * Configuring route provider
+ * @param  {[type]} $routeProvider
+ * @param  {[type]} $locationProvider
+ * @param  {[type]} route
+ * @return {[type]}
+ */
 ut.config(function($routeProvider, $locationProvider, route) {
 	$routeProvider.when('/', { redirectTo : 'projects' });
 	$routeProvider.when('/login', route.resolve('login'));
@@ -32,6 +45,13 @@ ut.config(function($routeProvider, $locationProvider, route) {
 	});
 });
 
+/**
+ * Setup $http interceptor and NProgress plugin
+ * @param  {[type]} $httpProvider
+ * @param  {[type]} $routeProvider
+ * @param  {[type]} RestangularProvider
+ * @return {[type]}
+ */
 ut.config(function($httpProvider, $routeProvider, RestangularProvider) {
 	//global error handlers
 	var interceptor = function ($rootScope, $q) {
@@ -57,6 +77,15 @@ ut.config(function($httpProvider, $routeProvider, RestangularProvider) {
 	RestangularProvider.setBaseUrl(ut.host);
 });
 
+/**
+ * Setup global authentication check and header settings
+ * @param  {[type]} $rootScope
+ * @param  {[type]} $location
+ * @param  {[type]} $http
+ * @param  {[type]} db
+ * @param  {[type]} $timeout
+ * @return {[type]}
+ */
 ut.run(function($rootScope, $location, $http, db, $timeout) {
 	//global authentication
 	$rootScope.$on("$routeChangeStart", function(event, next, current) {
@@ -79,5 +108,4 @@ ut.run(function($rootScope, $location, $http, db, $timeout) {
 	});
 	//global header settings
 	$http.defaults.headers.common['utopia-server-version'] = JSON.parse(db.get('api-key'));
-
 });
