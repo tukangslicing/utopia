@@ -26,29 +26,42 @@ class Application {
 	**/
 	public function before_request() { }
 	public function after_request() { }
-	public function app_start() { }
 
 	function __construct() {
 	}
 
 	public function init() {
-		$this->app_start();
 		$this->parse_request();
 		if(!class_exists($this->class)) {
 			$this->response = new Response(Response::NOTFOUND, 'No resource found');
 			$this->response->output();
 			return;
 		}
+		try {
+			$this->after_request();
+		} catch(Exception $e) {
+			$this->end_reponse($e);
+			return;
+		}
 		$this->generate_response();
 		$this->response->output();
-		$this->after_request();
 	}
 
 	private function parse_request() {
-		$this->before_request();
+		try {
+			$this->before_request();
+		} catch(Exception $e) {
+			$this->end_reponse($e);
+			return;
+		}
 		$this->request = new Request();
 		$this->response = new Response();
 		$this->extract_class();
+	}
+
+	private function end_reponse($ex) {
+		$this->response = new Response(Response::INTERNALSERVERERROR, $ex->getMessage());
+		$this->response->output();
 	}
 
 	private function generate_response() {

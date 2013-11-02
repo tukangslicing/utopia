@@ -66,6 +66,10 @@ class Request
         $this->ifNoneMatch = $this->getMatchArray($this->getOption($options, 'ifNoneMatch'));
     }
 
+    public function get_header($key) {
+        return $this->headers;
+    }
+
     /**
      * Get an item from the given options array if it exists, otherwise fetch from HTTP header
      * or return the given default

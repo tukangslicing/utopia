@@ -2,7 +2,7 @@
 
 class DefaultController extends BaseController {
 	public function index_get() {
-		return "Welcome to only-REST! This response is coming from Controllers#DefaultController#index_get method!";
+		return "I think you are lost";
 	}
 	
 	public function index_post() {
@@ -15,9 +15,5 @@ class DefaultController extends BaseController {
 	
 	public function index_delete() {
 		return 'Hello ' . $this->delete('name') . '!';
-	}
-
-	public function greet_get() {
-		return DefaultModel::greet_me();
 	}
 }

@@ -2,6 +2,10 @@
 
 class KeyController extends BaseController {
 
+    public function index_get() {
+        return 'Use post request';
+    }
+
     public function index_post()
     {
         // Build a new key
@@ -16,13 +20,10 @@ class KeyController extends BaseController {
         return $key;
     }
 
-    public function index_delete()
+    public function index_delete($key)
     {
-        $key = $this->delete('key');
-
         // Kill it
-        //self::_delete_key($key);
-        echo 'called';
+        self::_delete_key($key);
         // Tell em we killed it
         return "API key deleted successfully";
     }
