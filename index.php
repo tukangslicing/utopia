@@ -2,6 +2,8 @@
 if (!defined('PHP_VERSION_ID') || PHP_VERSION_ID < 50300)
 	die('only-REST requires PHP 5.3 or higher');
 
+error_reporting(E_ERROR);
+
 define('OR_VERSION', "0.1");
 define('BASEPATH', dirname(__FILE__));
 define('LIBPATH', dirname(__FILE__) . '/core');

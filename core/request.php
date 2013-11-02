@@ -170,9 +170,14 @@ class Request
     private function getData($options)
     {
         if ($this->getOption($options, 'contentLength') > 0) {
-            $str = file_get_contents('php://input');
             $ar = array();
-            parse_raw_http_request($str, $ar);
+            $str = file_get_contents('php://input');
+            if($this->contentType == 'application/json') {
+                $ar = (array)json_decode($str);
+                $_POST = $ar;
+            } else {
+                parse_raw_http_request($str, $ar);
+            }
             return $ar;
         } elseif (isset($options['data'])) {
             return $options['data'];
@@ -268,24 +273,7 @@ class Request
 
     public function __toString()
     {
-        $accept = join(', ', $this->accept);
-        $acceptLanguage = join(', ', $this->acceptLanguage);
-        $ifMatch = join(', ', $this->ifMatch);
-        $ifNoneMatch = join(', ', $this->ifNoneMatch);
-
-        return <<<EOF
-=============
-=============
-URI: $this->uri
-HTTP method: $this->method
-Content type: $this->contentType
-Request data: $this->data
-Accept: $accept
-Accept language: $acceptLanguage
-If match: $ifMatch
-If none match: $ifNoneMatch
-
-EOF;
+        return "";
     }
 
 }

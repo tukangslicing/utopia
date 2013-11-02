@@ -1,8 +1,8 @@
 /* create main utopia module for angular */
 var ut = angular.module('utopia', ['ngResource', 'localytics.directives', 'ui.bootstrap', 'ngProgress']);
 
-ut.host = "http://10.77.112.42/utopia/";
-ut.apihost = "http://10.77.112.42/utopia/api/";
+ut.host = "http://localhost/utopia/";
+ut.apihost = ut.host;
 
 ut.constant("route", {
 	resolve : function(route) {

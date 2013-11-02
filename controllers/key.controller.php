@@ -10,7 +10,6 @@ class KeyController extends BaseController {
     {
         // Build a new key
         $key = self::_generate_key();
-
         $username = $this->post('username');
         $password = $this->post('password');
 
