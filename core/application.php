@@ -126,7 +126,7 @@ class Application {
 	private function is_model_array($result) {
 		return gettype($result) == 'array' 
 					&& count($result) != 0 
-					&& $result[0] instanceof ActiveRecord\Model;
+					&& array_shift($result) instanceof ActiveRecord\Model;
 	}
 
 	private function extract_class() {

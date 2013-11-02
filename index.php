@@ -13,7 +13,7 @@ define('LIBRARIES', dirname(__FILE__) . '/libraries');
 
 require LIBPATH . '/autoloader.php';
 
-$app = new MyApplication();
+$app = new Utopia();
 $app->init();
 
 ?>
