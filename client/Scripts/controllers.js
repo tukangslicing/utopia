@@ -5,16 +5,18 @@ function LoginController($scope, $http, $location, db) {
 		//login.post(data);
 		$http.post(ut.host + 'key', data).success(function(d) {
 			$location.path('/');
-			db.set('api-key', d.key);
-			db.set('currentUser', d.user);
+			db.set('api-key', d);
 			$http.defaults.headers.common['utopia-server-version'] = db.get('api-key');
 		})
 	}
 }
 
-function ProjectsController($scope, $resource, project, $location, db) {
-	project.crud.get(function(response) {
-		$scope.projects	= response.data;	
+function ProjectsController($scope, $resource, project, $location, db, Restangular) {
+	var projects = Restangular.all('project').getList();
+	
+	projects.then(function(pData) {
+		console.log(pData);
+		$scope.projects = pData;
 	});
 	
 	$scope.load_project = function() {

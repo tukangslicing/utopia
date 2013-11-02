@@ -83,15 +83,22 @@ class Application {
 		} catch(Exception $e) {
 			$this->response = new Response(Response::INTERNALSERVERERROR, 'Oops! something went wrong! ' . $e->getMessage());
 		}
+
+		if(RESPONSE_TYPE == 'json') {
+			$this->response->contentType = 'application/json';
+		} else {
+			$this->response->contentType = 'application/xml';
+		}
 	}
 
 	private function get_serialized_response_for_array($result) {
 		if(RESPONSE_TYPE == 'json') {
 			$arr = "[";
+			$dataArr = array();
 			foreach ($result as $key => $value) {
-				$arr .= $value->to_json();
+				array_push($dataArr, $value->to_json());
 			}
-			$arr .= "]";
+			$arr .= implode(",", $dataArr) . "]";
 		} else {
 			$arr = "<response>";
 			foreach ($result as $key => $value) {

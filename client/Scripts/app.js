@@ -1,8 +1,11 @@
 /* create main utopia module for angular */
-var ut = angular.module('utopia', ['ngResource', 'localytics.directives', 'ui.bootstrap', 'ngProgress']);
+var ut = angular.module('utopia', ['ngResource', 
+						'localytics.directives', 
+						'ui.bootstrap', 
+						'ngProgress', 
+						'restangular']);
 
 ut.host = "http://localhost/utopia/";
-ut.apihost = ut.host;
 
 ut.constant("route", {
 	resolve : function(route) {
@@ -30,7 +33,7 @@ ut.config(function($routeProvider, $locationProvider, route) {
 	});
 });
 
-ut.config(function($httpProvider, $routeProvider) {
+ut.config(function($httpProvider, $routeProvider, RestangularProvider) {
 	//global error handlers
 	var interceptor = function ($rootScope, $q) {
 		function success(response) {
@@ -49,6 +52,7 @@ ut.config(function($httpProvider, $routeProvider) {
 		}
 	};
 	$httpProvider.responseInterceptors.push(interceptor);
+	 RestangularProvider.setBaseUrl(ut.host);
 });
 
 ut.run(function($rootScope, $location, $http, db, $timeout) {
@@ -70,7 +74,7 @@ ut.run(function($rootScope, $location, $http, db, $timeout) {
 		}
 	});
 	//global header settings
-	$http.defaults.headers.common['utopia-server-version'] = db.get('api-key');
+	$http.defaults.headers.common['utopia-server-version'] = JSON.parse(db.get('api-key'));
 
 	//utility methods
 	$rootScope.getType = function(id) {
