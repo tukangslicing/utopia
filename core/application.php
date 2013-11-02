@@ -68,8 +68,7 @@ class Application {
 		} catch(ResourceNotFound $ex) {
 			$this->response = new Response(Response::NOTFOUND, 'Resource not found! ' .$ex->getMessage());
 		} catch(Exception $e) {
-			var_dump($e);
-			$this->response = new Response(Response::INTERNALSERVERERROR, 'Oops! something went wrong!');
+			$this->response = new Response(Response::INTERNALSERVERERROR, 'Oops! something went wrong! ' . $e->getMessage());
 		}
 	}
 
