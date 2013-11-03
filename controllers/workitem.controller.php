@@ -47,6 +47,7 @@ class WorkitemController extends BaseController {
 	 * @return [type]              [description]
 	 */
 	public function tasks_get($workitem_id = NULL, $id = NULL) {
+		self::validate_access($workitem_id);
 		if($id) {
 
 		} else {
@@ -79,6 +80,23 @@ class WorkitemController extends BaseController {
 	public function tasks_delete($workitem_id) {
 	}
 	
+
+	public function comments_get($workitem_id) {
+		
+	}
+
+	public function comments_post($workitem_id) {
+		
+	}
+
+	public function comments_put($workitem_id) {
+		
+	}
+
+	public function comments_delete($workitem_id) {
+		
+	}
+
 	/**
 	 * Validates access to the workitem based on whether it belongs to the user project or not
 	 * @param  [type] $workitem_id [description]
