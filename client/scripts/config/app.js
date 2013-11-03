@@ -2,8 +2,7 @@
  * Main module
  * @type {[type]}
  */
-var ut = angular.module('utopia', ['ngResource', 
-						'localytics.directives', 
+var ut = angular.module('utopia', ['localytics.directives', 
 						'ui.bootstrap', 
 						'restangular']);
 

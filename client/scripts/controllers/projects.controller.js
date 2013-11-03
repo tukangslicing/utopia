@@ -7,7 +7,7 @@
  * @param {[type]} db
  * @param {[type]} Restangular
  */
-function ProjectsController($scope, $resource, $location, db, Restangular) {
+function ProjectsController($scope, $location, db, Restangular) {
 	var projects = Restangular.all('project');
 	
 	projects.getList().then(function(pData) {
