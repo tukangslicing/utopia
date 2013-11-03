@@ -6,7 +6,7 @@ ut.service('db', function($rootScope) {
 			return dataset[key] ? JSON.parse(dataset[key]) : undefined;
 		},
 		set : function(key, value) {
-			dataset[key] = JSON.stringify(value);
+			dataset[key] = (typeof value == "string") ? value : JSON.stringify(value);
 		},
 		clear : function(key) {
 			if(key) {

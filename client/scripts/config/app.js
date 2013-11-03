@@ -107,5 +107,5 @@ ut.run(function($rootScope, $location, $http, db, $timeout) {
 		}
 	});
 	//global header settings
-	$http.defaults.headers.common['utopia-server-version'] = JSON.parse(db.get('api-key'));
+	$http.defaults.headers.common['utopia-server-version'] = db.get('api-key');
 });

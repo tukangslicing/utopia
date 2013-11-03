@@ -102,7 +102,3 @@ function TimelineController($scope, $routeParams, timeline) {
 		return updatedLog;
 	}
 }
-
-function LogoutController($scope, db) {
-	db.clear();
-}
