@@ -9,28 +9,28 @@ class Utopia extends Application {
 
 	public function after_request() {
 		/**
-		 * Token is not present but he's trying to get it!
+		 * Token is not present, and request is not for KeyController!
 		 * @var [type]
 		 */
-		if($this->request->utopiaServerVersion ==  null && $this->class != 'KeyController') {
-			throw new AuthRequired("Authorization required");
+		if($this->class != 'KeyController') {
+			if($this->request->utopiaServerVersion == null) {
+				throw new AuthRequired("Authorization required");	
+			}
+			$token  = Token::find_by_key($this->request->utopiaServerVersion);
+			self::$user = $token->user;
 		} 
 		/**
-		 * Token is present, check for user if not there throw an exception
+		 * Request for KeyController, 
+		 * check whether he wants a key or wants to delete it!
+		 * TODO: simplify this complex if condition
 		 */
-		else if($this->request->utopiaServerVersion !=  null) {
+		else if ($this->class_method == 'index_delete') {
 			if($token  = Token::find_by_key($this->request->utopiaServerVersion)) {
 				self::$user = $token->user;	
 			} else {
 				throw new AuthRequired("Token not present");
 			}
 		} 
-		/**
-		 * If both of two failed means something is wrong, don't let the request pass through
-		 */
-		else {
-			throw new AuthRequired("Token not present");
-		}
 	}
 }
 
