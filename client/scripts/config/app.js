@@ -73,7 +73,14 @@ ut.config(function($httpProvider, $routeProvider, RestangularProvider) {
 		}
 	};
 	$httpProvider.responseInterceptors.push(interceptor);
+
 	RestangularProvider.setBaseUrl(ut.host);
+	RestangularProvider.setRequestInterceptor(function(elem, operation) {
+	   if (operation === "remove") {
+	      return undefined;
+	   } 
+	   return elem;
+	});
 });
 
 /**

@@ -25,6 +25,5 @@ function LoginController($scope, $http, $location, db) {
 function LogoutController($scope, db, Restangular) {
 	var key = db.get('api-key');
 	NProgress.start();
-	Restangular.one('key/' + key).remove().then(function(data){	NProgress.done(); });
-	db.clear();
+	Restangular.one('key/' + key).remove().then(function(data){	NProgress.done(); db.clear(); });
 }
