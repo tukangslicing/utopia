@@ -40,7 +40,7 @@ angular.module('utopia').config(function($routeProvider, $locationProvider, rout
 	$routeProvider.when('/projects/:project_id/timeline', route.resolve('timeline'));
 	$routeProvider.otherwise({
 		templateUrl : 'under-construction',
-		controller : function() {}
+		controller : nothing
 	});
 });
 
@@ -61,6 +61,7 @@ angular.module('utopia').config(function($httpProvider, $routeProvider, Restangu
 		function error(response) {
 			NProgress.done();
 			var status = response.status;
+			console.log('are error ala ki', response);
 			if (status != 200) {
 				$routeProvider.location = "#/login";
 				return;
@@ -76,7 +77,8 @@ angular.module('utopia').config(function($httpProvider, $routeProvider, Restangu
 
 	RestangularProvider.setBaseUrl(ut.host);
 	RestangularProvider.setRequestInterceptor(function(elem, operation) {
-	   if (operation === "remove") {
+	   console.log(operation);
+	   if (operation === "remove" || operation === 'customDELETE') {
 	      return undefined;
 	   } 
 	   return elem;

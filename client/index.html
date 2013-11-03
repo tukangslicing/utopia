@@ -13,7 +13,7 @@
 </head>
 <body>
      <!-- Nav bar -->
-    <div class="navbar">
+    <div class="navbar navbar-inverse">
       <div class="navbar-inner">
         <div class="container">
           <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -199,7 +199,6 @@
                             <td>Description</td>
                             <td><textarea type='text' ng-model='swkitm.description'></textarea></td>
                         </tr>
-                        
                         <tr>
                             <td>Importance</td>
                             <td>
@@ -270,11 +269,11 @@
                         <h6 class='hover-hand' ng-click='tasksCollapse = !tasksCollapse'>Todos</h6>
                         <ul class="unstyled" collapse='tasksCollapse'>
                             <li class='hover-parent' ng-repeat="task in tasks" ng-animate="'animate'">
-                            <label class='checkbox' >
-                              <input type="checkbox" ng-click='toggleTask()' ng-model="task.done" ng-checked="task.done==1">
-                              <span class="done-{{task.done}}" ng-click='toggleTask()'>{{task.task}}</span>
-                              <button class="close hover-child" ng-click='deleteTask()'>x</button>
-                            </label>
+                                <button class="close hover-child" ng-click='deleteTask()'>x</button>
+                                <label class='checkbox' >
+                                  <input type="checkbox" ng-click='toggleTask()' ng-model="task.done" ng-checked="task.done==1">
+                                  <span class="done-{{task.done}}" ng-click='toggleTask()'>{{task.task}}</span>
+                                </label>
                             </li>
                             <li>
                             <form ng-submit="addTask()">    

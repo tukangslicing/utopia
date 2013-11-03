@@ -140,9 +140,9 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	 * Explains itself!
 	 */
 	$scope.addTask = function() {
-		workitem.tasks.save({workitem_id : $scope.swkitm.id, task : $scope.newTask}, function(data){
+		workitem.one($scope.swkitm.id).post('tasks', {task : $scope.newTask}).then(function(task){
 			$scope.newTask = '';
-			$scope.tasks.push(data.data[0]);
+			$scope.tasks.push(task);
 		});
 	}
 
@@ -152,8 +152,7 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	 */
 	$scope.toggleTask = function() {
 		$scope.swkitm.last_updated = new Date().toUTCString();
-		var task = new workitem.tasks({data : this.task, task_id : this.task.id, workitem_id : $scope.swkitm.id});
-		task.$save();
+		workitem.customPUT(this.task, 'tasks').then(nothing);
 	}
 
 	/**
@@ -161,9 +160,9 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	 * @return {[type]} [description]
 	 */
 	$scope.deleteTask = function() {
-		var task = new workitem.tasks({task_id : this.task.id, workitem_id : $scope.swkitm.id});
-		task.$delete();
-		$scope.tasks.splice(this.task.$index, 1);
+		workitem.customDELETE('tasks/' + this.task.id).then(function(task){
+			$scope.tasks = _.filter($scope.tasks, function(d) { return d.id != task.id });
+		});
 	}
 
 	/**

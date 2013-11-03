@@ -14,8 +14,7 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 	 * @return WorkitemType
 	 */
 	$rootScope.getType = function(id) {
-		var types = db.get('types');
-		return types.filter(function(d) { return d.id == id; })[0].title;
+		return _.find(db.get('types'), function(d) { return d.id == id; }).title;
 	}
 
 	/**
@@ -24,8 +23,7 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 	 * @return {[type]}    [description]
 	 */
 	$rootScope.getState = function(id) {
-		var states = db.get('states');
-		var state = states.filter(function(d) { return d.id == id; })[0];
+		var state = _.find(db.get('states'), function(d) { return d.id == id; });
 		return state.title;
 	};
 
@@ -38,7 +36,7 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 		if(!id) {
 			return '';
 		}   
-		return db.get('sprints').filter(function(d) { return d.id == id })[0].title;
+		return _.find(db.get('sprints'), function(d) { return d.id == id }).title;
 	};
 
 	/**

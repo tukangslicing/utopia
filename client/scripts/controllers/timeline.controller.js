@@ -4,15 +4,16 @@
  * @param {[type]} $routeParams
  * @param {[type]} timeline
  */
-angular.module('utopia').controller('TimelineController', function ($scope, $routeParams, timeline) {
+angular.module('utopia').controller('TimelineController', function ($scope, $routeParams) {
+	
 	$scope.project_id = $routeParams.project_id;
 	var oldLogs = [];
 	$scope.logs = [];
 
-	timeline.get({project_id : $scope.project_id} ,function(data){
-		var logs = formatLogs(data);
-		$scope.logs = logs;
-	});
+	// timeline.get({project_id : $scope.project_id} ,function(data){
+	// 	var logs = formatLogs(data);
+	// 	$scope.logs = logs;
+	// });
 	
 	$scope.filterUsers = function(userIds) {
 		if(userIds.length == 0) {
