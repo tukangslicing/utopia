@@ -47,7 +47,8 @@ module.exports = function(grunt) {
               expand :true
           }]
       }
-    } 
+    },
+    clean : ["build"]
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -55,6 +56,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-clean');
 
-  grunt.registerTask('default', ['ngmin', 'concat', 'cssmin', 'copy']);
+  grunt.registerTask('default', ['ngmin', 'concat', 'cssmin', 'copy', 'clean']);
+  
 };
