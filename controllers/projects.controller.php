@@ -84,7 +84,7 @@ class ProjectController extends BaseController {
 			return $project->id == $id;
 		});
 		if(count($result) > 0) { } else {
-			throw new Exception("You're not allowed to access this data");
+			throw new Exception(NOT_ALLOWED);
 		}
 	}
 }
