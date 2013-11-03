@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * Standard project model
+ */
 class Project extends ActiveRecord\Model {
 	/**
 	 * table name
@@ -27,7 +29,7 @@ class Project extends ActiveRecord\Model {
     );
 
     /**
-     * returns active workitems for a user in the given project
+     * Returns active workitems for a user in the given project
      * @return array::Workitem
      */
     public function in_progress_workitems() {
@@ -64,6 +66,9 @@ class Project extends ActiveRecord\Model {
 	}
 }
 
+/**
+ * Supplementary class for mapping projects and users
+ */
 class ProjectUser extends ActiveRecord\Model {
 	static $table_name = 'tbl_project_users';
 

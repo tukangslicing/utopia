@@ -29,8 +29,7 @@ class WorkitemController extends BaseController {
 	public function index_put($id = NULL) {
 		$id = $id == NULL ? $this->put('id') : $id;
 		self::validate_access($id);
-		$workitem = Workitem::find($id);
-		$workitem = deserialize($this->get_data());
+		$workitem = deserialize($this->get_data(), Workitem::find($id));
 		$workitem->save();
 		return $workitem;
 	}
