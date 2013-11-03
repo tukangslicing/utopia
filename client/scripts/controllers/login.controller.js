@@ -5,7 +5,7 @@
  * @param {[type]} $location
  * @param {[type]} db
  */
-function LoginController($scope, $http, $location, db) {
+angular.module('utopia').controller('LoginController', function ($scope, $http, $location, db) {
 	$scope.submit = function() {
 		var data = {username : $scope.username, password : $scope.password};
 		$http.post(ut.host + 'key', data).success(function(d) {
@@ -14,7 +14,7 @@ function LoginController($scope, $http, $location, db) {
 			$http.defaults.headers.common['utopia-server-version'] = db.get('api-key');
 		})
 	}
-}
+});
 
 /**
  * Handles logout screen
@@ -22,8 +22,8 @@ function LoginController($scope, $http, $location, db) {
  * @param {[type]} $scope [description]
  * @param {[type]} db     [description]
  */
-function LogoutController($scope, db, Restangular) {
+angular.module('utopia').controller('LogoutController', function ($scope, db, Restangular) {
 	var key = db.get('api-key');
 	NProgress.start();
 	Restangular.one('key/' + key).remove().then(function(data){	NProgress.done(); db.clear(); });
-}
+})

@@ -82,7 +82,8 @@ class WorkitemController extends BaseController {
 	
 
 	public function comments_get($workitem_id) {
-		
+		self::validate_access($workitem_id);
+		return Workitem::find($workitem_id)->comments;
 	}
 
 	public function comments_post($workitem_id) {
@@ -104,7 +105,7 @@ class WorkitemController extends BaseController {
 	 */
 	public static function validate_access($workitem_id) {
 		$workitem = Workitem::find($workitem_id);
-		$result = array_filter(Utopia::$user->projects, function($project) use($id){
+		$result = array_filter(Utopia::$user->projects, function($project) use($workitem_id, $workitem){
 			return $project->id == $workitem->project_id;
 		});
 		if(count($result) > 0) { } else {

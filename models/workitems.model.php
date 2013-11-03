@@ -15,6 +15,7 @@ class Workitem extends ActiveRecord\Model {
     );
 
     static $has_many = array(
-      array('tasks', 'class_name' => 'WorkitemTask')
+      array('tasks', 'class_name' => 'WorkitemTask'),
+      array('comments', 'class_name' => 'WorkitemComment')
     );
 }

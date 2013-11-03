@@ -1,16 +1,39 @@
-ut.run(function($rootScope, $location, $http, db, $timeout) {
-	//utility methods
+/**
+ * Defines utility methods for $scope hierarchy
+ * @param  {[type]} $rootScope [description]
+ * @param  {[type]} $location  [description]
+ * @param  {[type]} $http      [description]
+ * @param  {[type]} db         [description]
+ * @param  {[type]} $timeout   [description]
+ * @return {[type]}            [description]
+ */
+angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout) {
+	/**
+	 * Returns workitem type 
+	 * @param  WorkitemType id 
+	 * @return WorkitemType
+	 */
 	$rootScope.getType = function(id) {
 		var types = db.get('types');
 		return types.filter(function(d) { return d.id == id; })[0].title;
 	}
 
+	/**
+	 * Returns state based on WorkitemState id
+	 * @param  {[type]} id [description]
+	 * @return {[type]}    [description]
+	 */
 	$rootScope.getState = function(id) {
 		var states = db.get('states');
 		var state = states.filter(function(d) { return d.id == id; })[0];
 		return state.title;
 	};
 
+	/**
+	 * Returns Sprint of project based on SprintID 
+	 * @param  {[type]} id [description]
+	 * @return {[type]}    [description]
+	 */
 	$rootScope.getSprint = function(id) {
 		if(!id) {
 			return '';
@@ -18,6 +41,11 @@ ut.run(function($rootScope, $location, $http, db, $timeout) {
 		return db.get('sprints').filter(function(d) { return d.id == id })[0].title;
 	};
 
+	/**
+	 * Converts regular date into momentjs ago
+	 * @param  {[type]} date [description]
+	 * @return {[type]}      [description]
+	 */
 	$rootScope.ago = function(date) {
 		if(!date) {
 			return '';
@@ -26,18 +54,24 @@ ut.run(function($rootScope, $location, $http, db, $timeout) {
 		return moment(d).fromNow();
 	};
 
+	/**
+	 * Returns a user from id
+	 * @param  {[type]} id [description]
+	 * @return {[type]}    [description]
+	 */
 	$rootScope.getUser = function(id) {
 		var users = db.get('users');
-		return users.filter(function(d) {
-			return d.user_id == id;
-		})[0].display_name;
+		var a = _.find(users, function(d) { return d.id == id; });
+		return a.display_name;
 	};
 
-	$rootScope.getProjectTitle = function() {
-		var project = db.get('project_details').project[0];
-		return project.title;
-	}
-
+	/**
+	 * Multipurpose function
+	 * used in timeline
+	 * @param  {[type]} value  [description]
+	 * @param  {[type]} action [description]
+	 * @return {[type]}        [description]
+	 */
 	$rootScope.getValue = function(value, action) {
 		var actionObject = {
 			state : function(value) {
@@ -56,6 +90,13 @@ ut.run(function($rootScope, $location, $http, db, $timeout) {
 		return actionObject[action] ? actionObject[action](value) : value;
 	}
 
+	/**
+	 * used to show a flash message to use
+	 * NOTE: Yet to add an HTML elemnt for it
+	 * @param  {[type]} message [description]
+	 * @param  {[type]} cls     [description]
+	 * @return {[type]}         [description]
+	 */
 	$rootScope.flash = function(message, cls) {
 		$rootScope.flashMessage = message;
 		$rootScope.flashClass = cls || 'alert-block';
@@ -65,6 +106,12 @@ ut.run(function($rootScope, $location, $http, db, $timeout) {
 		},500)
 	}
 
+	/**
+	 * Formats date into a readable format
+	 * @param  {[type]} date   [description]
+	 * @param  {[type]} noTime [description]
+	 * @return {[type]}        [description]
+	 */
 	$rootScope.formatDate = function(date, noTime) {
 		var expression = noTime ? "Do MMM YYYY" : "Do MMM YYYY, h:mm a";
 		return moment(date).format(expression);

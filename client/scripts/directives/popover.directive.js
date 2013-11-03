@@ -1,4 +1,15 @@
-ut.directive("utWkPopover", function($document, $parse, $http, $compile) {
+/**
+ * Popover directive for showing workitem
+ * Need to use this at multiple places
+ * 
+ * TODO: figure out data binding
+ * @param  {[type]} $document [description]
+ * @param  {[type]} $parse    [description]
+ * @param  {[type]} $http     [description]
+ * @param  {[type]} $compile  [description]
+ * @return {[type]}           [description]
+ */
+angular.module('utopia').directive("utWkPopover", function($document, $parse, $http, $compile) {
     return {
         restrict: 'A',
         link: function(scope, element, attrs) {

@@ -1,4 +1,9 @@
-ut.directive('utFilterPane', function(db) {
+/**
+ * Timeline filter pane directive
+ * @param  {[type]} db [description]
+ * @return {[type]}    [description]
+ */
+angular.module('utopia').directive('utFilterPane', function(db) {
     return {
         templateUrl : 'filter-pane',
         controller : function($scope) {

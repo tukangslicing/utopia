@@ -1,4 +1,9 @@
-ut.directive('resize', function ($window) {
+/**
+ * Helpful directive for handling full page view of workitems and timeline
+ * @param  {[type]} $window [description]
+ * @return {[type]}         [description]
+ */
+angular.module('utopia').directive('resize', function ($window) {
     return function (scope, element) {
         var w = angular.element($window);
         scope.getWindowDimensions = function () {

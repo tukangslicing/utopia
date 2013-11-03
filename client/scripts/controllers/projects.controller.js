@@ -7,13 +7,18 @@
  * @param {[type]} db
  * @param {[type]} Restangular
  */
-function ProjectsController($scope, $location, db, Restangular) {
+angular.module('utopia').controller('ProjectsController', function ($scope, $location, db, Restangular) {
 	var projects = Restangular.all('project');
 	
 	projects.getList().then(function(pData) {
 		$scope.projects = pData;
 	});
 	
+	/**
+	 * Sends out requests for loading individual data items
+	 * Includes : WorkitemTypes, WorkitemStates, ProjectSprints, ProjectUsers
+	 * @return {[type]} [description]
+	 */
 	$scope.load_project = function() {
 		var project_id = this.project.id;
 		projects.one(project_id).getList('types').then(function(response) {
@@ -30,4 +35,4 @@ function ProjectsController($scope, $location, db, Restangular) {
 		});
 		$location.path('/projects/' + project_id + '/whiteboard');
 	}
-}
+});

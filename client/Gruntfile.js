@@ -19,6 +19,9 @@ module.exports = function(grunt) {
       }
     },
     uglify : {
+      options: {
+        mangle: false
+      },
       dist: {
         src: 'dist/utopia.js',
         dest: 'dist/utopia.min.js'
@@ -58,6 +61,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
 
-  grunt.registerTask('default', ['ngmin', 'concat', 'cssmin', 'copy', 'clean']);
+  grunt.registerTask('default', ['ngmin', 'concat', 'uglify', 'cssmin', 'copy', 'clean']);
   
 };

@@ -11,7 +11,7 @@ var ut = angular.module('utopia', ['localytics.directives',
  * @type {String}
  */
 ut.host = "http://localhost/utopia/";
-ut.constant("route", {
+angular.module('utopia').constant("route", {
 	resolve : function(route) {
 		return {
 			templateUrl : route,
@@ -30,7 +30,7 @@ ut.constant("route", {
  * @param  {[type]} route
  * @return {[type]}
  */
-ut.config(function($routeProvider, $locationProvider, route) {
+angular.module('utopia').config(function($routeProvider, $locationProvider, route) {
 	$routeProvider.when('/', { redirectTo : 'projects' });
 	$routeProvider.when('/login', route.resolve('login'));
 	$routeProvider.when('/projects', route.resolve('projects'));
@@ -51,7 +51,7 @@ ut.config(function($routeProvider, $locationProvider, route) {
  * @param  {[type]} RestangularProvider
  * @return {[type]}
  */
-ut.config(function($httpProvider, $routeProvider, RestangularProvider) {
+angular.module('utopia').config(function($httpProvider, $routeProvider, RestangularProvider) {
 	//global error handlers
 	var interceptor = function ($rootScope, $q) {
 		function success(response) {
@@ -92,7 +92,7 @@ ut.config(function($httpProvider, $routeProvider, RestangularProvider) {
  * @param  {[type]} $timeout
  * @return {[type]}
  */
-ut.run(function($rootScope, $location, $http, db, $timeout) {
+angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout) {
 	//global authentication
 	$rootScope.$on("$routeChangeStart", function(event, next, current) {
 		NProgress.start();
