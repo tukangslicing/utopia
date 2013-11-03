@@ -115,3 +115,5 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 	//global header settings
 	$http.defaults.headers.common['utopia-server-version'] = db.get('api-key');
 });
+
+var nothing = function() {}

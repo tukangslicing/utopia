@@ -120,13 +120,11 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	 */
 	$scope.saveWorkitem = function() {
 		$scope.swkitm.last_updated = new Date().toUTCString();
-		var wk = new workitem.crud({project_id: $scope.project_id, workitem_id: $scope.swkitm.id, data: $scope.swkitm});
-		wk.$save();
-		$scope.flash('Workitem saved', 'alert-success');
+		workitem.customPUT($scope.swkitm).then(nothing);
 	}
 
 	/**
-	 * DELETE request to server
+	 * DELETE request to server for workitem
 	 * splice using underscore
 	 * @return {[type]} [description]
 	 */
