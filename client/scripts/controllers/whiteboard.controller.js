@@ -95,10 +95,9 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	 * Explains itself
 	 */
 	$scope.addComment = function() {
-		workitem.comments.save({ workitem_id : $scope.swkitm.id, 
-			comment_body : $scope.newComment }, function(data) {
+		workitem.one($scope.swkitm.id).post('comments', {comment_body : $scope.newComment}).then(function(data) {
 			$scope.newComment = '';
-			$scope.comments.push(data.data[0]);
+			$scope.comments.push(data);
 		});
 	}
 
@@ -108,10 +107,9 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	 * @return {[type]}       [description]
 	 */
 	$scope.deleteComment = function(index) {
-		var comment = new workitem.comments({workitem_id : $scope.swkitm.id,
-			workitem_comment_id : this.comment.id});
-		comment.$delete();
-		$scope.comments.splice(index, 1);
+		workitem.customDELETE('comments/' + this.comment.id).then(function(comment){
+			$scope.comments = _.filter($scope.comments, function(d) { return d.id != comment.id });
+		});
 	}
 
 	/**

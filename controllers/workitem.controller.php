@@ -29,7 +29,9 @@ class WorkitemController extends BaseController {
 	public function index_put($id = NULL) {
 		$id = $id == NULL ? $this->put('id') : $id;
 		self::validate_access($id);
-		$workitem = deserialize($this->get_data(), Workitem::find($id));
+		$workitem = Workitem::find($id);
+		$workitem->update_log($this->get_data());
+		$workitem = deserialize($this->get_data(), $workitem);
 		$workitem->save();
 		return $workitem;
 	}
@@ -107,16 +109,35 @@ class WorkitemController extends BaseController {
 		return Workitem::find($workitem_id)->comments;
 	}
 
+	/**
+	 * Adds a new comment
+	 * @param  [type] $workitem_id [description]
+	 * @return [type]              [description]
+	 */
 	public function comments_post($workitem_id) {
-		
+		self::validate_access($workitem_id);
+		$comment = new WorkitemComment();
+		$comment->workitem_id = $workitem_id;
+		$comment->comment_body = $this->post('comment_body');
+		$comment->user_id = Utopia::$user->id;
+		$comment->save();
+		return $comment;
 	}
 
 	public function comments_put($workitem_id) {
 		
 	}
 
-	public function comments_delete($workitem_id) {
-		
+	/**
+	 * deletes a comment
+	 * @param  [type] $workitem_id [description]
+	 * @return [type]              [description]
+	 */
+	public function comments_delete($id) {
+		$comment = WorkitemComment::find($id);
+		self::validate_access($comment->workitem_id);
+		$comment->delete();
+		return $comment;
 	}
 
 	/**

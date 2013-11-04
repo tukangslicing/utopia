@@ -290,7 +290,7 @@
                         <blockquote class="comments hover-parent" ng-repeat='comment in comments' ng-animate=" 'animate' ">
                             <button class='close pull-right hover-hand hover-child' type='button' ng-show='comment.created_by == currentUser' ng-click='deleteComment($index)'>x</button>
                             <p><pre>{{comment.comment_body}}</pre></p> 
-                            <small>by {{getUser(comment.created_by)}}, {{ago(comment.created_at)}}</small> 
+                            <small>by {{getUser(comment.user_id)}}, {{ago(comment.created_at)}}</small> 
                         </blockquote>
                         </li>
                         <li>
