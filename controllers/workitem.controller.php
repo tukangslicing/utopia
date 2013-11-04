@@ -41,7 +41,9 @@ class WorkitemController extends BaseController {
 	 * @return [type]     [description]
 	 */
 	public function index_delete($id)	{
-
+		self::validate_access($id);
+		Workitem::find($id)->delete();
+		return 'workitem deleted successfully';
 	}
 
 	/**

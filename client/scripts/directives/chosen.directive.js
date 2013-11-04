@@ -18,12 +18,7 @@ angular.module('utopia').directive('chosen', function($timeout) {
 				element.trigger("liszt:updated");
 			});
 			scope.$watch(model, function () {
-				var modelValue = scope.$eval(model);
-				var index = 1;
-				element.find('select').val(index);
-				if(!attr['multiple']) {
-					element.trigger("liszt:updated");
-				}
+				element.trigger("liszt:updated");
 			});
 			return scope.$watch(model, function(newVal, oldVal) {
 				element.trigger("liszt:updated");

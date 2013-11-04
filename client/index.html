@@ -398,10 +398,11 @@
                 <input type="text" ng-model='workitem_ids'/>
             </label>
             <div><strong>By users</strong></div>
-            <select chosen
+            <select
+                chosen
                 multiple='true'
                 ng-model='selectedUsers'
-                ng-options='t.user_id as t.display_name for t in users'/>
+                ng-options='t.id as t.display_name for t in users'/>
             <div>
                 <strong>By date</strong>
             </div>

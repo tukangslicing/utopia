@@ -126,15 +126,16 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 
 	/**
 	 * DELETE request to server for workitem
-	 * splice using underscore
+	 * TODO : splice using underscore
+	 * And change the logic once white-board filters are in place
 	 * @return {[type]} [description]
 	 */
 	$scope.deleteWorkitem = function() {
-		var wk = new workitem.crud({project_id : $scope.project_id, workitem_id : $scope.swkitm.id});
 		var index = $scope.workitems.indexOf($scope.swkitm);
-		$scope.workitems.splice(index, 1);
-		wk.$delete();
-		$scope.swkitm = null;
+		workitem.one($scope.swkitm.id).remove().then(function(){
+			$scope.workitems.splice(index, 1);	
+			$scope.swkitm = null;
+		})
 	}
 
 	/**

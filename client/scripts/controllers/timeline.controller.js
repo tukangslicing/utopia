@@ -4,9 +4,10 @@
  * @param {[type]} $routeParams
  * @param {[type]} timeline
  */
-angular.module('utopia').controller('TimelineController', function ($scope, $routeParams) {
+angular.module('utopia').controller('TimelineController', function ($scope, $routeParams, db) {
 	
 	$scope.project_id = $routeParams.project_id;
+	$scope.users = db.get('users');
 	var oldLogs = [];
 	$scope.logs = [];
 

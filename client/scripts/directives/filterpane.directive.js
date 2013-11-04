@@ -7,7 +7,6 @@ angular.module('utopia').directive('utFilterPane', function(db) {
     return {
         templateUrl : 'filter-pane',
         controller : function($scope) {
-            $scope.users = db.get('project_details').users;
             $scope.selectedUsers = [];
             $scope.from = new Date().toJSON().slice(0,10);
             $scope.to = new Date();
