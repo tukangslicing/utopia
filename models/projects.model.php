@@ -38,7 +38,7 @@ class Project extends ActiveRecord\Model {
 								AND tbl_workitems.state in 
 								(SELECT id FROM tbl_workitem_states WHERE tbl_workitem_states.is_final = 0)";
 		
-		return self::find_by_sql($complex_sql_query, array($this->id, Utopia::$user->id));
+		return Workitem::find_by_sql($complex_sql_query, array($this->id, Utopia::$user->id));
 	}
 
 	/**

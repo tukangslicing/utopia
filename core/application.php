@@ -131,7 +131,7 @@ class Application {
 			$arr = "[";
 			$dataArr = array();
 			foreach ($result as $key => $value) {
-				array_push($dataArr, $value->to_json());
+				array_push($dataArr, $value->to_json(array()));
 			}
 			$arr .= implode(",", $dataArr) . "]";
 		} else {

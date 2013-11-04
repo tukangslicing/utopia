@@ -65,6 +65,12 @@ class WorkitemController extends BaseController {
 	 * @return [type]              [description]
 	 */
 	public function tasks_post($workitem_id) {
+		self::validate_access($workitem_id);
+		$task = new WorkitemTask();
+		$task = deserialize($this->get_data(), $task);
+		$task->workitem_id = $workitem_id;
+		$task->save();
+		return $task;
 	}
 
 	/**
@@ -72,7 +78,12 @@ class WorkitemController extends BaseController {
 	 * @param  [type] $workitem_id [description]
 	 * @return [type]              [description]
 	 */
-	public function tasks_put($workitem_id) {
+	public function tasks_put($id = NULL) {
+		$id = $id == NULL ? $this->put('workitem_id') : $id;
+		self::validate_access($id);
+		$task = deserialize($this->get_data(), WorkitemTask::find($this->put('id')));
+		$task->save();
+		return $task;
 	}
 
 	/**
@@ -81,7 +92,11 @@ class WorkitemController extends BaseController {
 	 * @param  [type] $workitem_id [description]
 	 * @return [type]              [description]
 	 */
-	public function tasks_delete($workitem_id) {
+	public function tasks_delete($id = NULL) {
+		$task = WorkitemTask::find($id);
+		self::validate_access($task->workitem_id);
+		$task->delete();
+		return $task;
 	}
 	
 

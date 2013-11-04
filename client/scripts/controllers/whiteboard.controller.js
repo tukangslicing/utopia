@@ -17,6 +17,7 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	$scope.types = db.get('types');
 	$scope.states = db.get('states');
 	$scope.project_id = $routeParams.project_id;
+	$scope.swkitm = null;
 
 	//do the first pull
 	project.one($scope.project_id).getList('workitems').then(function(workitems){

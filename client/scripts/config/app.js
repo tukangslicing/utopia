@@ -2,9 +2,7 @@
  * Main module
  * @type {[type]}
  */
-var ut = angular.module('utopia', ['localytics.directives', 
-						'ui.bootstrap', 
-						'restangular']);
+var ut = angular.module('utopia', ['ui.bootstrap', 'restangular']);
 
 /**
  * Constants
@@ -77,7 +75,6 @@ angular.module('utopia').config(function($httpProvider, $routeProvider, Restangu
 
 	RestangularProvider.setBaseUrl(ut.host);
 	RestangularProvider.setRequestInterceptor(function(elem, operation) {
-	   console.log(operation);
 	   if (operation === "remove" || operation === 'customDELETE') {
 	      return undefined;
 	   } 
