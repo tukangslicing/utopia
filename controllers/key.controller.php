@@ -7,7 +7,7 @@ class KeyController extends BaseController {
      * @return Read it through!
      */
     public function index_get() {
-        return 'An an an, you did not say the magic word!';
+        return Sprint::find(1)->project->id;
     }
 
     /**

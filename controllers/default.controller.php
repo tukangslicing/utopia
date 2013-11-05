@@ -2,7 +2,7 @@
 
 class DefaultController extends BaseController {
 	public function index_get() {
-		return "I think you are lost";
+		return now();
 	}
 	
 	public function index_post() {

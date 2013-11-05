@@ -58,11 +58,8 @@ class Project extends ActiveRecord\Model {
 	 * @return array::WorkitemType
 	 */
 	public function get_types() {
-		$types = self::find_by_sql("SELECT DISTINCT type FROM `tbl_workitems` 
-			WHERE tbl_workitems.project_id = ?", array($this->id));
-		$ids = array_map(function($value) { return $value->type; }, $types);
-		$options['conditions'] = array("id in (?)", $ids);
-		return WorkitemType::find('all', $options);
+		return self::find_by_sql("SELECT * FROM `tbl_workitem_types` 
+			WHERE tbl_workitem_types.project_id = ?", array($this->id));
 	}
 }
 

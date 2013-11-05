@@ -40,9 +40,6 @@ h1 {
 	background-color: #e5e5e5;
 	cursor: pointer;
 }
-.workitem {
-	padding: 2px;
-}
 
 [resize] {
 	height: inherit;
@@ -286,4 +283,36 @@ html, body {
 
 .align-right {
 	text-align: right;
+}
+
+/**
+ * Planning view styles
+ */
+.sprint-panel {
+	border: 1px solid silver;
+	border-radius: 5px;
+	width: 300px;
+	padding:0px !important;
+	margin-left: 5px;
+	float: left;
+	min-height: 500px;
+}
+
+.sprint-list {
+	padding: 0px;
+}
+
+.sprint-panel-header {
+	font-weight: bold;
+	padding: 5px;
+	background-color: gainsboro;
+}
+
+.sprint-workitems {
+	padding:5px;
+}
+
+.sprint-workitems:hover {
+	background: #e5e5e5;
+	pointer:resize;
 }

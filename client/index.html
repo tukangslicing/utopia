@@ -159,8 +159,7 @@
                 </legend>
                 <ul class='unstyled workitems' resize ng-style='style()' id='internal-view'>
                     <a class='workitem-anchor workitem' ng-repeat='wk in workitems' ng-class="{true : 'selected', false : ''}[wk.id==swkitm.id]" ng-animate="'animate'" href="#projects/{{project_id}}/whiteboard?id={{wk.id}}">
-                    <span class="badge pull-right" ng-class="{0:'badge-important', 1: 'badge-success', 2: 'badge-warning'}[wk.importance]" title='Priority'>
-                        {{wk.importance}}</span>
+                    <span class="badge pull-right" ng-class="{0:'badge-important', 1: 'badge-success', 2: 'badge-warning'}[wk.importance]" title='Priority'>{{wk.importance}}</span>
                     <span><b>{{wk.title}}</b></span>
                     <p>
                         <span class='text-info '>{{getType(wk.type)}}</span>
@@ -481,6 +480,42 @@
         </tr>
         </table>
     </script>
+
+    <script type="text/ng-template" id='planning'>
+        <div class='row-fluid'>
+            <ul class="nav nav-pills">
+                <li><a href='#/projects/{{project_id}}/dashboard'>Dashboard</a></li>
+                <li><a href='#/projects/{{project_id}}/whiteboard'>Whiteboard</a></li>
+                <li><a href='#/projects/{{project_id}}/timeline'>Timeline</a></li>
+                <li class='active'><a href='#/projects/{{project_id}}/planning'>Planning</a></li>
+            </ul>
+        </div>
+        <div resize ng-style="style()" id="internal-view">
+        <div class='sprint-panel'  ng-repeat="sprint in sprints" 
+            data-drop="true" ng-model="sprint.workitems" jqyoui-droppable="{multiple:true, drop:finishDrop()}">
+            <div class='sprint-panel-header' onDrop="finishDrop()">
+                    {{sprint.title}}
+            </div>
+            <div class='sprint-workitems hover-hand' ng-repeat='wk in sprint.workitems' data-drag="true" ng-show="wk.id" ng-model="wk" data-jqyoui-options="{revert: 'invalid'}" jqyoui-draggable="{placeholder:true, animate:true, drop:finishDrop()}">
+                <span class="badge pull-right" 
+                      ng-class="{0:'badge-important', 1: 'badge-success', 2: 'badge-warning'}[wk.importance]" 
+                      title='Priority'>
+                      {{wk.importance}}
+                </span>
+                <span><b>{{wk.title}}</b></span>
+                <p>
+                    <span class='text-info '>{{getType(wk.type)}}</span>
+                    <span class='muted capitalize'>{{getState(wk.state)}}</span>
+                    <small class='pull-right'><i>Last updated: {{ago(wk.last_updated)}}</i></small>
+                </p>
+            </div>
+        </div>
+        </div>
+    </script>
+
+    <script type="text/ng-tempalte" id='workitem-card'>
+    </script>
+
     <script type="text/javascript" src="dist/utopia.min.js"></script>
 </body>
 </html>
