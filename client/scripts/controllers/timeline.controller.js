@@ -4,103 +4,116 @@
  * @param {[type]} $routeParams
  * @param {[type]} timeline
  */
-angular.module('utopia').controller('TimelineController', function ($scope, $routeParams, db) {
+angular.module('utopia').controller('TimelineController', function ($scope, $routeParams, db, Restangular, $timeout) {
 	
+	/**
+	 * Setup basic constants for the controller
+	 * @type {[type]}
+	 */
 	$scope.project_id = $routeParams.project_id;
 	$scope.users = db.get('users');
-	var oldLogs = [];
 	$scope.logs = [];
-
-	// timeline.get({project_id : $scope.project_id} ,function(data){
-	// 	var logs = formatLogs(data);
-	// 	$scope.logs = logs;
-	// });
+	var timeline = Restangular.one('timeline', $scope.project_id);
 	
-	$scope.filterUsers = function(userIds) {
-		if(userIds.length == 0) {
-			updateTimeline();
-		}
-		$scope.logs.forEach(function(d) {
-			d.entries = d.entries.filter(function(e) {
-				return userIds.indexOf(e.user_id || e.created_by) != -1; 
-			})
+	/**
+	 * Initial fetch
+	 * @param  {[type]} comments [description]
+	 * @return {[type]}          [description]
+	 */
+	timeline.getList('comments').then(function(comments){
+		normalizeAndPush(comments, 'comments');	
+	});
+
+	timeline.getList('tasks').then(function(tasks){
+		normalizeAndPush(tasks, 'task_log');
+	});
+
+	timeline.getList('logs').then(function(logs){
+		normalizeAndPush(logs, 'workitem_log');
+	});
+
+	/**
+	 * Retrieves the data for workitem
+	 * @param  {[type]} id [description]
+	 * @return {[type]}    [description]
+	 */
+	$scope.fetchDetails = function(id) {
+		$scope.swkitm = null;
+		Restangular.one('workitem', id).get().then(function(d){
+			$scope.swkitm = d;
+			$scope.$emit('popover-shown');
 		})
 	}
 
-	$scope.filterTimeline = function(filterObj) {
-		filterObj.project_id = $scope.project_id;
-		timeline.get(filterObj, function(data){
-			var logs = formatLogs(data);
-			logs = filterByUsers(filterObj, logs);
-			$scope.logs = logs;
-		});
-	}
-
-	function filterByUsers(filterObj, logs) {
-		if(filterObj.users.length == 0) {
-			return logs;
-		}
-		logs.forEach(function(d) {
-			d.entries = d.entries.filter(function(e) {
-				console.log(filterObj.users);
-				return filterObj.users.indexOf(e.user_id || e.created_by) != -1; 
-			})
-		});
-		return logs;
-	}
-
-	function formatLogs(data) {
-		var logs = [];
-		data.data.workitem_log.forEach(function(d) {
-			d.log_type = 'workitem_log';
-			d.last_updated = d.timestamp;
-			logs.push(d);
-		});
-		data.data.task_log.forEach(function(d) {
-			d.log_type = 'task_log';
-			d.last_updated = d.done_date;
-			logs.push(d);
-		});
-		data.data.comments.forEach(function(d) {
-			d.log_type = 'comments';
-			d.last_updated = d.created_at;
-			d.user_id = d.created_by;
-			logs.push(d);
-		});
-		logs = logs.sort(function(one, two) { 
-			var key1 = new Date(one.last_updated);
-		    var key2 = new Date(two.last_updated);
-
-		    if (key1 > key2) {
-		        return -1;
-		    } else if (key1 == key2) {
-		        return 0;
-		    } else {
-		        return 1;
-		    }
-		});
+	/**
+	 * Get the popover inside if
+	 * @return {[type]} [description]
+	 */
+	$scope.$on('popover-shown', function(){
+		$popover = $(".popover");
+		$popover.find(".arrow").hide();
 		
-		var insertUs = [];
-		logs.forEach(function(d, i) {
-			var curDate = new Date(d.last_updated);
-			curDate.setHours(0,0,0);
-			var index = i == 0 ? i : i + 1;
-			var dataObj = {log_type:'year', last_updated : curDate, index: index};
-			var exists = insertUs.filter(function(ins) {
-				return ins.last_updated.toString() == curDate.toString(); 
-			}).length;
-			if(!exists) {
-				insertUs.push(dataObj);
+		/**
+		 * 50ms delay to let it paint, 
+		 * TODO : need to repeat this process till popover is properly adjusted
+		 * @return {[type]} [description]
+		 */
+		$timeout(function() {
+			/**
+		 	* If going below the screen, bring it up
+		 	*/
+			if(($popover.height() + $popover.offset().top) > $(window).height()) {
+				$popover.css({top : $(window).height() - $popover.height() - 30});
 			}
+			/**
+			 * If its going above the top line, bring it down.
+			 */
+			if($popover.offset().top < 0) {
+				$popover.css({top : 30});
+			}
+		}, 50)
+		
+	});
+
+	$scope.$on("popover-hide",function() {
+		$popover = $(".popover");
+		$popover.hide();
+	});
+
+	/**
+	 * Helper function to add logs in timeline
+	 * @param  {[type]} data [description]
+	 * @param  {[type]} type [description]
+	 * @return {[type]}      [description]
+	 */
+	function normalizeAndPush(data, type) {
+		data.forEach(function(d) {
+			d.log_type = type;
+			$scope.logs.push(d);
 		});
-		var updatedLog = [];
-		var testLog = logs;
-		console.log(logs);
-		insertUs.forEach(function(d,i) {
-			var last_index = insertUs[i+1] ? insertUs[i+1].index - 1 : logs.length;
-			last_index = d.index == last_index ? last_index+ 1 : last_index;
-			updatedLog.push({year : d, entries : logs.slice(d.index, last_index)})
+	}
+
+	/**
+	 * Called from filter directive,
+	 * @param  {[type]} filterObj [description]
+	 * @return {[type]}           [description]
+	 */
+	$scope.filterTimeline = function(filterObj) {
+		
+		filterObj.project_id = $scope.project_id;
+		filter = angular.copy(filterObj);
+		filter.users = filterObj.users.join(',');
+		$scope.logs = [];
+		timeline.getList('comments', filter).then(function(comments){
+			normalizeAndPush(comments, 'comments');	
 		});
-		return updatedLog;
+
+		timeline.getList('tasks', filter).then(function(tasks){
+			normalizeAndPush(tasks, 'task_log');
+		});
+
+		timeline.getList('logs', filter).then(function(logs){
+			normalizeAndPush(logs, 'workitem_log');
+		});
 	}
 });

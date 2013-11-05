@@ -8,7 +8,8 @@ class WorkitemController extends BaseController {
 	 * @return [type]     [description]
 	 */
 	public function index_get($id) {
-
+		self::validate_access($id);
+		return Workitem::find($id);
 	}
 
 	/**

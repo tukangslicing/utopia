@@ -8,15 +8,21 @@ angular.module('utopia').directive('utFilterPane', function(db) {
         templateUrl : 'filter-pane',
         controller : function($scope) {
             $scope.selectedUsers = [];
-            $scope.from = new Date().toJSON().slice(0,10);
-            $scope.to = new Date();
+            $scope.from;
+            $scope.to;
             $scope.applyFilter = function() {
+                var filterObj = {};
                 var filterObj = {
                     from : $scope.from,
                     to : $scope.to,
                     workitem_id : $scope.workitem_ids,
                     users : $scope.selectedUsers
                 }   
+                for(a in filterObj) {
+                    if(!filterObj[a]) {
+                        delete filterObj[a];
+                    }
+                }
                 $scope.filterTimeline(filterObj);
             }
 

@@ -15,7 +15,7 @@ module.exports = function(grunt) {
     concat: {
       dist: {
         src: ['scripts/libs/core-libs/*.js','scripts/libs/*.js', 'scripts/config/*.js', 'build/*.js'],
-        dest: 'dist/utopia.js'
+        dest: 'dist/utopia.min.js'
       }
     },
     uglify : {
@@ -51,7 +51,16 @@ module.exports = function(grunt) {
           }]
       }
     },
-    clean : ["build"]
+    clean : ["build"],
+    watch: {
+        scripts: {
+        files: ['scripts/**/*.js', 'css/**/*.css'],
+        tasks: ['ngmin', 'concat', 'cssmin', 'copy', 'clean'],
+        options: {
+          debounceDelay: 250,
+        },
+      }
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -60,6 +69,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   grunt.registerTask('default', ['ngmin', 'concat', 'uglify', 'cssmin', 'copy', 'clean']);
   

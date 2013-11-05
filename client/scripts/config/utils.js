@@ -9,3 +9,5 @@ ut.notLoggedInNav = [{text : "Get started", href: "#/get-started"}];
 ut.flashMessage = function (message) {
   console.log('flash-message', message);
 }
+
+jQuery.fn.exists = function(){return this.length>0;}

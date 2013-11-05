@@ -2,7 +2,7 @@
  * Main module
  * @type {[type]}
  */
-var ut = angular.module('utopia', ['ui.bootstrap', 'restangular']);
+var ut = angular.module('utopia', ['restangular', '$strap.directives']);
 
 /**
  * Constants
@@ -13,7 +13,8 @@ angular.module('utopia').constant("route", {
 	resolve : function(route) {
 		return {
 			templateUrl : route,
-			controller : this.capitalise(route) + 'Controller'
+			controller : this.capitalise(route) + 'Controller',
+			reloadOnSearch: false
 		} 
 	},
 	capitalise : function (string) {

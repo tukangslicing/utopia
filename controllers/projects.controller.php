@@ -9,7 +9,7 @@ class ProjectController extends BaseController {
 	 */
 	public function index_get($id = NULL) {
 		if($id) {
-			self::validate_project($id);
+			self::validate_access($id);
 			return Project::find($id);
 		}
 		return Utopia::$user->projects;
@@ -21,7 +21,7 @@ class ProjectController extends BaseController {
 	 * @return array::Workitem
 	 */
 	public function workitems_get($id) {
-		self::validate_project($id);
+		self::validate_access($id);
 		return Project::find($id)->in_progress_workitems();
 	}
 
@@ -31,7 +31,7 @@ class ProjectController extends BaseController {
 	 * @return array::WorkitemType
 	 */
 	public function types_get($id) {
-		self::validate_project($id);
+		self::validate_access($id);
 		return Project::find($id)->get_types();
 	}
 
@@ -41,7 +41,7 @@ class ProjectController extends BaseController {
 	 * @return array::WorkitemState
 	 */
 	public function states_get($id) {
-		self::validate_project($id);
+		self::validate_access($id);
 		return Project::find($id)->get_states();
 	}
 
@@ -52,7 +52,7 @@ class ProjectController extends BaseController {
 	 * @return array::Sprint
 	 */
 	public function sprints_get($id) {
-		self::validate_project($id);
+		self::validate_access($id);
 		return Project::find($id)->sprints;
 	}
 
@@ -62,7 +62,7 @@ class ProjectController extends BaseController {
 	 * @return array:User
 	 */
 	public function users_get($id) {
-		self::validate_project($id);
+		self::validate_access($id);
 		$options['conditions'] = array('project_id = ?', $id);
 		$options['include'] = array('user');
 		$options['select'] = 'user_id';
@@ -79,7 +79,7 @@ class ProjectController extends BaseController {
 	 * @param  project_id $id
 	 * @return none. throws exception is not valid
 	 */
-	private static function validate_project($id) {
+	public static function validate_access($id) {
 		$result = array_filter(Utopia::$user->projects, function($project) use($id){
 			return $project->id == $id;
 		});

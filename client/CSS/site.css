@@ -225,6 +225,7 @@ html, body {
   right: 15px;
 }
 
+.spinner-icon,
 #nprogress .spinner-icon {
   width: 14px;
   height: 14px;
@@ -239,6 +240,11 @@ html, body {
   -ms-animation:     nprogress-spinner 600ms linear infinite;
   -o-animation:      nprogress-spinner 600ms linear infinite;
   animation:         nprogress-spinner 600ms linear infinite;
+}
+
+.spinner-inverse {
+	border-top-color:  #333;
+  	border-left-color: #333;
 }
 
 @-webkit-keyframes nprogress-spinner {
@@ -260,4 +266,24 @@ html, body {
 @keyframes nprogress-spinner {
   0%   { transform: rotate(0deg);   transform: rotate(0deg); }
   100% { transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+.workitem-details {
+	min-height:300px;
+	max-height:500px;
+	overflow: scroll;
+}
+
+.workitem-anchor:hover,
+.workitem-anchor {
+	text-decoration: none;
+	color : #333;
+}
+
+.workitem-anchor:hover {
+	background-color: #e7e7e7;
+}
+
+.align-right {
+	text-align: right;
 }

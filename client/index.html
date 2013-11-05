@@ -158,7 +158,7 @@
                      </span>
                 </legend>
                 <ul class='unstyled workitems' resize ng-style='style()' id='internal-view'>
-                    <li ng-repeat='wk in workitems | filter:query | orderBy:predicate:reverse' class='workitem' ng-click='select()' ng-class="{true : 'selected', false : ''}[wk.id==swkitm.id]" ng-animate=" 'animate' ">
+                    <a class='workitem-anchor workitem' ng-repeat='wk in workitems' ng-class="{true : 'selected', false : ''}[wk.id==swkitm.id]" ng-animate="'animate'" href="#projects/{{project_id}}/whiteboard?id={{wk.id}}">
                     <span class="badge pull-right" ng-class="{0:'badge-important', 1: 'badge-success', 2: 'badge-warning'}[wk.importance]" title='Priority'>
                         {{wk.importance}}</span>
                     <span><b>{{wk.title}}</b></span>
@@ -167,7 +167,7 @@
                         <span class='muted capitalize'>{{getState(wk.state)}}</span>
                         <small class='pull-right'><i>Last updated: {{ago(wk.last_updated)}}</i></small>
                     </p>
-                    </li>
+                    </a>
                 </ul>
                 </div>
             <div class="span8" id='details-pane'>
@@ -321,74 +321,58 @@
                 <li><a href='#/projects/{{project_id}}/planning'>Planning</a></li>
             </ul>
         </div>
-        <div class="row-fluid text-center" resize ng-style='style()' id='internal-view'>
+        <div class="row-fluid" resize ng-style='style()' id='internal-view'>
             <div class='span3'>
                 <div ut-filter-pane></div>
             </div>
             <div class="span9">
-            <ul class="work-timeline" ng-repeat='l in logs'>
-                <div class='year'>
-                        {{formatDate(l.year.last_updated, true)}}
+                <div class='align-right'>
+                <label class="radio inline"><b>Sort by</b></label>
+                <label class="radio inline">
+                  <input type="radio" name="grouping" id="optionsRadios1" ng-click="sortPredicate = 'user_id'">
+                  User
+                </label>
+                <label class="radio inline">
+                  <input type="radio" name="grouping" id="optionsRadios2" ng-click="sortPredicate = 'workitem_id'">
+                  Workitem
+                </label>
                 </div>
-                <div>
-                    <li class="entry" ng-repeat='log in l.entries' ng-switch='log.log_type'>
-                        <div ng-switch-when="workitem_log">
-                            <div class='header'>
-                            <i class="icon-edit"></i> {{getUser(log.user_id)}}
-                                <small title='{{formatDate(log.last_updated)}}' class='pull-right'>{{ago(log.timestamp)}}</small>
-                            </div>
-                            <span class="muted">changed </span>{{log.action}} 
-                            <span class="muted">from </span>{{getValue(log.old_value, log.action)}}
-                            <span class="muted">to </span>{{getValue(log.new_value, log.action)}} 
-                            <div>
-                                for workitem <span class='hover-hand' ut-wk-popover="{{log.workitem_id}}">#{{log.workitem_id}}</span>
-                            </div>
-                        </div>
-                        <div ng-switch-when="task_log">
-                            <div class='header'>
-                                <i class="icon-ok"></i> {{getUser(log.user_id)}}
-                                <small title='{{formatDate(log.last_updated)}}' class='pull-right'>{{ago(log.last_updated)}}</small>
-                            </div>
-                            <span class="muted">completed task</span> {{log.task}}
-                            <div>
-                                for workitem <a href="" ut-wk-popover=""{{log.workitem_id}}"">#{{log.workitem_id}}</a>
-                            </div>
-                        </div>
-                        <div ng-switch-when="comments">
-                            <div class='header'>
-                            <i class="icon-comment"></i> {{getUser(log.created_by)}}
-                                <small title='{{log.last_updated}}' class='pull-right'>{{ago(log.last_updated)}}</small>
-                            </div>
-                            <span class="muted">commented</span> {{log.comment_body}}
-                            <div>
-                                on workitem <a href="" ut-wk-popover="{{log.workitem_id}}">#{{log.workitem_id}}</a>
-                            </div>
-                        </div>
-                    </li>
-                </div>
-            </ul>
-            <p></p>
-            <div class="alert alert-info"><strong class='hover-hand'>Load more</strong></div>
+                <ul class="timeline unstyled">
+                <li ng-repeat='l in logs | orderBy:sortPredicate:reverse' ng-switch='l.log_type'>
+                    <span ng-switch-when="workitem_log">
+                        <span>
+                            <i class="icon-edit"></i> {{getUser(l.user_id)}}
+                            <small title='{{formatDate(l.last_updated)}}' class='pull-right'>{{ago(l.timestamp)}}</small>
+                        </span>
+                        <span class="muted">changed </span>{{l.action}} 
+                        <span class="muted">from </span>{{getValue(l.old_value, l.action)}}
+                        <span class="muted">to </span>{{getValue(l.new_value, l.action)}} 
+                            for
+                    </span>
+                    <span ng-switch-when="task_log">
+                        <span>
+                            <i class="icon-ok"></i> {{getUser(l.user_id)}}
+                            <small title='{{formatDate(l.last_updated)}}' class='pull-right'>{{ago(l.last_updated)}}</small>
+                        </span>
+                        <span class="muted">completed task</span> {{l.task}}
+                    </span>
+                    <span ng-switch-when="comments">
+                        <span>
+                            <i class="icon-comment"></i> {{getUser(l.user_id)}}
+                            <small title='{{l.last_updated}}' class='pull-right'>{{ago(l.last_updated)}}</small>
+                        </span>
+                        <span class="muted">commented</span> {{l.comment_body}}
+                        <span>
+                            on 
+                        </span>
+                    </span>
+                    <span> workitem <button class='btn btn-small' type="button" data-placement="right" data-title="Workitem details" data-unique="1" bs-popover="'workitem-details'" ng-click="fetchDetails(l.workitem_id)">#{{l.workitem_id}}</button></span>
+                </li>
+                </ul>
             </div>
         </div>
     </script>
     
-    <script type="text/ng-template" id="workitem-details">
-    <!-- workitem details popover -->
-        <span>
-        {{content}}
-        <div class="popover {{placement}}" ng-class="{ in: isOpen(), fade: animation() }">
-          <div class="arrow"></div>
-          <div class="popover-inner">
-              <h3 class="popover-title" ng-bind="title" ng-show="title"></h3>
-              <div class="popover-content" ng-bind="content">
-                <h1>Hello World</h1>
-              </div>
-          </div>
-        </div>
-        </span>
-    </script>
-
     <script id="filter-pane" type="text/ng-template">
     <!-- filter pane -->
         <div class="well text-left side-nav affix">
@@ -430,6 +414,73 @@
         </div>
     </script>
 
+    <script id='workitem-details' type="text/ng-template">
+         <a href='#projects/{{project_id}}/whiteboard/?id={{swkitm.id}}' class='icon-share-alt hover-hand pull-right' title='Open in whiteboard'></a>
+         <table class='table-condensed workitem-details' ng-show='swkitm'>
+            <tr class='hover-hand'>
+                <td><small>ID</small></td>
+                <td><code><span ng-bind="swkitm.id"></span></code></td>
+            </tr>
+            <tr>
+                <td>Title</td>
+                <td><span type='text' ng-bind='swkitm.title'></span></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td><span type='text' ng-bind='swkitm.description'></span></td>
+            </tr>
+            <tr>
+                <td>Importance</td>
+                <td>
+                    <span class='badge'>{{swkitm.importance}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td>Points</td>
+                <td>
+                    <span class='badge hover-hand'>{{swkitm.story_points}}</span>
+                </td>
+            </tr>
+            <tr>
+                <td>Type</td>
+                <td>
+                    {{getType(swkitm.type)}}
+                </td>
+            </tr>
+            <tr>
+                <td>State</td>
+                <td>
+                   {{getState(swkitm.state)}}
+                </td>
+            </tr>
+            <tr>
+                <td>Assigned</td>
+                <td>
+                   {{getUser(swkitm.assigned_to)}}
+                </td>
+            </tr>
+            <tr>
+                <td>Created</td>
+                <td>
+                   {{getUser(swkitm.created_by)}}
+                </td>
+            </tr>
+            <tr>
+                <td>Sprint</td>
+                <td>{{getSprint(swkitm.planned_for)}}</td>
+            </tr>
+            <tr>
+                <td>Created</td>
+                <td><span type='text'>{{format(swkitm.created_date)}}</span></td>
+            </tr>
+        </table>
+        <table ng-show='!swkitm'>
+        <tr>
+            <td>Just a sec!</td>
+            <td><div class='spinner-icon spinner-inverse'></td>
+        </tr>
+        </table>
+    </script>
     <script type="text/javascript" src="dist/utopia.min.js"></script>
 </body>
 </html>

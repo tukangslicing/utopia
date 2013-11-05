@@ -6,7 +6,7 @@
  * @param {[type]} db
  * @param {[type]} Restangular
  */
-angular.module('utopia').controller('WhiteboardController', function ($scope, $routeParams, $window, db, Restangular) {
+angular.module('utopia').controller('WhiteboardController', function ($scope, $routeParams, $window, db, Restangular, $location) {
 	
 	//init restangular URLs!
 	var project = Restangular.all('project');
@@ -22,6 +22,13 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	//do the first pull
 	project.one($scope.project_id).getList('workitems').then(function(workitems){
 		$scope.workitems = workitems;
+		if($location.search().id) {
+			$scope.select($location.search().id);
+		}
+	});
+
+	$scope.$on('$routeUpdate', function(){
+		$scope.select($location.search().id);
 	});
 	
 	/**
@@ -30,15 +37,46 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	 * udpate the scope
 	 * @return {[type]} [description]
 	 */
-	$scope.select = function() {
-		$scope.swkitm = this.wk;
-		$scope.selectedIndex = this.$index;
+	$scope.select = function(id) {
+		
+		/**
+		 * If ID is not defined its coming from view
+		 * else from the controller itself
+		 */
+		if(!id) {
+			$scope.swkitm = this.wk;
+			id = $scope.swkitm.id;
+		} else {
+			$scope.swkitm = _.find($scope.workitems, function(d) { return d.id == $location.search().id });
+		}
+
+		/**
+		 * Still not found ? may be its not in your workitems!
+		 * get a fresh copy from server!
+		 */
+		if(!$scope.swkitm) {
+			var index = 0;
+			Restangular.one('workitem', id).get().then(function(d){
+				$scope.workitems.unshift(d);
+				$scope.swkitm = d;
+			});
+		}
+
+		/**
+		 * Just some constants
+		 */
+		$scope.selectedIndex = this.$index || index;
 		$scope.newComment = "";
+		$scope.task = "";
 		$scope.updateStates();
-		workitem.one($scope.swkitm.id).getList('comments').then(function(data){
+
+		/**
+		 * Fetch other depencies of comments and tasks
+		 */
+		workitem.one(id).getList('comments').then(function(data){
 			$scope.comments = data;
 		});
-		workitem.one($scope.swkitm.id).getList('tasks').then(function(data){
+		workitem.one(id).getList('tasks').then(function(data){
 			$scope.tasks = data;
 		});
 	}	

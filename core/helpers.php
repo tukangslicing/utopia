@@ -33,6 +33,13 @@ function deserialize($arr, $obj) {
 	return $obj;
 }
 
+function is_empty($arr) {
+	if(gettype($arr) == 'array')
+		return count($arr) > 0;
+	if(gettype($arr) == 'string')
+		return $arr == '';
+}
+
 /**
  * Set of exceptions to ease your pain of handling responses!
  */

@@ -14,7 +14,8 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 	 * @return WorkitemType
 	 */
 	$rootScope.getType = function(id) {
-		return _.find(db.get('types'), function(d) { return d.id == id; }).title;
+		var type = _.find(db.get('types'), function(d) { return d.id == id; });
+		return type ? type.title : '';
 	}
 
 	/**
@@ -24,7 +25,7 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 	 */
 	$rootScope.getState = function(id) {
 		var state = _.find(db.get('states'), function(d) { return d.id == id; });
-		return state.title;
+		return state ? state.title : '';
 	};
 
 	/**
@@ -58,14 +59,20 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 	 * @return {[type]}    [description]
 	 */
 	$rootScope.getUser = function(id) {
+		if(!id) {
+			return
+		}
 		var users = db.get('users');
 		var a = _.find(users, function(d) { return d.id == id; });
-		return a.display_name;
+		return a ? a.display_name : '';
 	};
 
 	/**
 	 * Multipurpose function
-	 * used in timeline
+	 * used in timeline. handles conversion from 
+	 * type_id = type
+	 * state_id = state
+	 * user_id = user
 	 * @param  {[type]} value  [description]
 	 * @param  {[type]} action [description]
 	 * @return {[type]}        [description]
