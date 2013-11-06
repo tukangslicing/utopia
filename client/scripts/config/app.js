@@ -30,7 +30,7 @@
  * Main module
  * @type {[type]}
  */
-var ut = angular.module('utopia', ['restangular', '$strap.directives', 'ngDragDrop', 'btford.dragon-drop']);
+var ut = angular.module('utopia', ['restangular', '$strap.directives', 'ngDragDrop']);
 
 /**
  * Constants
