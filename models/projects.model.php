@@ -74,3 +74,11 @@ class ProjectUser extends ActiveRecord\Model {
       array('project', 'class_name' => 'Project')
     );
 }
+
+class ProjectTags extends ActiveRecord\Model {
+	static $table_name = 'tbl_project_modules';
+
+	static $belongs_to = array(
+      array('project', 'class_name' => 'Project')
+    );
+}

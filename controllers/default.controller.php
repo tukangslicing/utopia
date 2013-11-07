@@ -2,7 +2,8 @@
 
 class DefaultController extends BaseController {
 	public function index_get() {
-		return now();
+		$options['conditions'] = array('project_id = ?',42);
+		return ProjectTags::find('all', $options);
 	}
 	
 	public function index_post() {
