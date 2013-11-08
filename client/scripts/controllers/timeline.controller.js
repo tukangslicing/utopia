@@ -46,41 +46,6 @@ angular.module('utopia').controller('TimelineController', function ($scope, $rou
 	}
 
 	/**
-	 * Get the popover inside if
-	 * @return {[type]} [description]
-	 */
-	$scope.$on('popover-shown', function(){
-		$popover = $(".popover");
-		$popover.find(".arrow").hide();
-		
-		/**
-		 * 50ms delay to let it paint, 
-		 * TODO : need to repeat this process till popover is properly adjusted
-		 * @return {[type]} [description]
-		 */
-		$timeout(function() {
-			/**
-		 	* If going below the screen, bring it up
-		 	*/
-			if(($popover.height() + $popover.offset().top) > $(window).height()) {
-				$popover.css({top : $(window).height() - $popover.height() - 30});
-			}
-			/**
-			 * If its going above the top line, bring it down.
-			 */
-			if($popover.offset().top < 0) {
-				$popover.css({top : 30});
-			}
-		}, 50)
-		
-	});
-
-	$scope.$on("popover-hide",function() {
-		$popover = $(".popover");
-		$popover.hide();
-	});
-
-	/**
 	 * Helper function to add logs in timeline
 	 * @param  {[type]} data [description]
 	 * @param  {[type]} type [description]

@@ -533,13 +533,16 @@
                 <li class='active'><a href='#/projects/{{project_id}}/planning'>Planning</a></li>
             </ul>
         </div>
+        <div style='padding:5px;margin-top:-20px;'>
+            <button class='btn' type="button" data-title="Create a new sprint" bs-popover="'new-sprint'"><i class='icon-plus'></i>Sprint</button>
+        </div>
         <div resize ng-style="style()" id="internal-view">
         <div class='sprint-panel'  
             ng-repeat="sprint in sprints" 
             data-drop="true" 
             ng-model="sprint.workitems" 
-            jqyoui-droppable="{multiple:true}"
-            data-jqyoui-options="{index: {{$index}}, drop: setSprintDrop({{sprint.id}})}">
+            jqyoui-droppable="{multiple:true , onDrop: 'setSprintDrop({{sprint.id}})'}"
+            data-jqyoui-options="{index: {{$index}}}">
 
             <div class='sprint-panel-header'>
                 {{sprint.title}}
@@ -548,9 +551,9 @@
                 ng-repeat='wk in sprint.workitems' 
                 data-drag="true" 
                 ng-show="wk.id" 
-                ng-model="wk" 
+                ng-model="sprint.workitems" 
                 data-jqyoui-options="{index: {{$index}}, revert: 'invalid'}" 
-                jqyoui-draggable="{animate:true, onDrop:setWorkitemDrop({{wk.id}})}">
+                jqyoui-draggable="{index: {{$index}}, animate:true, onDrag: 'setWorkitemDrop({{wk.id}})'}">
 
                 <span class="badge pull-right" 
                       ng-class="{0:'badge-important', 1: 'badge-success', 2: 'badge-warning'}[wk.importance]" 
@@ -568,7 +571,12 @@
         </div>
     </script>
 
-    <script type="text/ng-tempalte" id='workitem-card'>
+    <script type="text/ng-template" id='new-sprint'>
+      <form>
+        <input type='text' placeholder='Title' />
+        <textarea placeholder='Set some goals for this sprint !' />
+        <button class='btn btn-primary'>Submit</button>
+      </form>
     </script>
 
     <script type="text/javascript" src="dist/utopia.min.js"></script>

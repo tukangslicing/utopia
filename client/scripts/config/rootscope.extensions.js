@@ -121,4 +121,40 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 		var expression = noTime ? "Do MMM YYYY" : "Do MMM YYYY, h:mm a";
 		return moment(date).format(expression);
 	}
+
+
+	/**
+	 * Get the popover inside if
+	 * @return {[type]} [description]
+	 */
+	$rootScope.$on('popover-shown', function(){
+		$popover = $(".popover");
+		$popover.find(".arrow").hide();
+		
+		/**
+		 * 50ms delay to let it paint, 
+		 * TODO : need to repeat this process till popover is properly adjusted
+		 * @return {[type]} [description]
+		 */
+		$timeout(function() {
+			/**
+		 	* If going below the screen, bring it up
+		 	*/
+			if(($popover.height() + $popover.offset().top) > $(window).height()) {
+				$popover.css({top : $(window).height() - $popover.height() - 30});
+			}
+			/**
+			 * If its going above the top line, bring it down.
+			 */
+			if($popover.offset().top < 0) {
+				$popover.css({top : 30});
+			}
+		}, 50)
+		
+	});
+
+	$rootScope.$on("popover-hide",function() {
+		$popover = $(".popover");
+		$popover.hide();
+	});
 });
