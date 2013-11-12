@@ -105,19 +105,26 @@ class Application {
 			} else {
 				$data = json_encode($result);
 			}
-
-			$this->response = new Response(Response::OK, $data);
+			if($result instanceof Response) {
+				$this->response = $result;
+			} else {
+				$this->response = new Response(Response::OK, $data);	
+			}
 
 		} catch(ResourceNotFound $ex) {
 			$this->response = new Response(Response::NOTFOUND, 'Resource not found! ' .$ex->getMessage());
+		} catch(BadRequest $ex) {
+			$this->response = new Response(Response::BADREQUEST, 'Resource not found! ' .$ex->getMessage());
 		} catch(Exception $e) {
 			$this->response = new Response(Response::INTERNALSERVERERROR, 'Oops! something went wrong! ' . $e->getMessage());
 		}
 
-		if(RESPONSE_TYPE == 'json') {
+		if(RESPONSE_TYPE == 'json' && $this->class != 'SpecsController') {
 			$this->response->contentType = 'application/json';
-		} else {
+		} else if(RESPONSE_TYPE == 'xml' && $this->class != 'SpecsController') {
 			$this->response->contentType = 'application/xml';
+		} else {
+			//$this->response->contentType = 'text/html';
 		}
 	}
 
@@ -131,7 +138,7 @@ class Application {
 			$arr = "[";
 			$dataArr = array();
 			foreach ($result as $key => $value) {
-				array_push($dataArr, $value->to_json(array()));
+				array_push($dataArr, $value->to_json());
 			}
 			$arr .= implode(",", $dataArr) . "]";
 		} else {
@@ -187,6 +194,7 @@ class Application {
 	 */
 	private function extract_class() {
 		$split_uri = array_filter(explode("/" , str_replace(strtolower(BASE_URL), "", strtolower($this->request->uri))));
+
 		if(count($split_uri) == 0) {
 			$this->class = DEFAULT_CONTROLLER;
 			$this->class_method = 'index_' . strtolower($this->request->method);

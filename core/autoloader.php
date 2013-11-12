@@ -8,7 +8,9 @@ require LIBPATH .'/request.php';
 require LIBPATH .'/response.php';
 require LIBPATH .'/application.php';
 require LIBPATH .'/base.controller.php';
+require LIBPATH .'/documentor.php';
 require LIBPATH .'/orm/Activerecord.php';
+
 
 /**
  * Start loading application files!

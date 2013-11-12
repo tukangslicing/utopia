@@ -12,7 +12,7 @@ class Utopia extends Application {
 		 * Token is not present, and request is not for KeyController!
 		 * @var [type]
 		 */
-		if($this->class != 'KeyController') {
+		if($this->class != 'SpecsController') {
 			if($this->request->utopiaServerVersion == null) {
 				throw new AuthRequired("Authorization required");	
 			}
