@@ -41,4 +41,11 @@ angular.module('utopia').controller('PlanningController', function($scope, db, $
 		}
 	}
 
+	$scope.createSprint = function(newsprint) {
+		sprint.one(project_id).post('', newsprint).then(function(d){
+			$scope.sprints.push(d);
+			//db.set('sprints', $scope.sprints);
+		});
+	}
+
 });

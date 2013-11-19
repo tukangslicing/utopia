@@ -19,6 +19,7 @@ load(CONFIG);
 load(MODELS);
 load(CONTROLLERS);
 load(HOOKS);
+load(LIBRARIES);
 
 require LIBPATH .'/database.php';
 

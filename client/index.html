@@ -525,6 +525,7 @@
     </script>
 
     <script type="text/ng-template" id='planning'>
+    <!-- planning view -->    
         <div class='row-fluid'>
             <ul class="nav nav-pills">
                 <li><a href='#/projects/{{project_id}}/dashboard'>Dashboard</a></li>
@@ -536,23 +537,27 @@
         <div style='padding:5px;margin-top:-20px;'>
             <button class='btn' type="button" data-title="Create a new sprint" bs-popover="'new-sprint'"><i class='icon-plus'></i>Sprint</button>
         </div>
-        <div resize ng-style="style()" id="internal-view">
         <div class='sprint-panel'  
             ng-repeat="sprint in sprints" 
             data-drop="true" 
             ng-model="sprint.workitems" 
             jqyoui-droppable="{multiple:true , onDrop: 'setSprintDrop({{sprint.id}})'}"
-            data-jqyoui-options="{index: {{$index}}}">
+            data-jqyoui-options="{index: {{$index}}}" >
 
             <div class='sprint-panel-header'>
                 {{sprint.title}}
+                <i class='icon-plus pull-right hover-hand' 
+                title='New workitem' bs-popover="'new-workitem'"></i>
+                <i class='icon-cog pull-right hover-hand' 
+                title='Edit sprint' bs-popover="'edit-sprint'"></i>
             </div>
+            <div resize ng-style="style()" id="internal-view">
             <div class='sprint-workitems hover-hand' 
                 ng-repeat='wk in sprint.workitems' 
                 data-drag="true" 
                 ng-show="wk.id" 
                 ng-model="sprint.workitems" 
-                data-jqyoui-options="{index: {{$index}}, revert: 'invalid'}" 
+                data-jqyoui-options="{index: {{$index}}, revert: 'invalid', appendTo: 'body', helper: 'clone' }" 
                 jqyoui-draggable="{index: {{$index}}, animate:true, onDrag: 'setWorkitemDrop({{wk.id}})'}">
 
                 <span class="badge pull-right" 
@@ -567,16 +572,26 @@
                     <small class='pull-right'><i>Last updated: {{ago(wk.last_updated)}}</i></small>
                 </p>
             </div>
-        </div>
+            </div>
         </div>
     </script>
 
     <script type="text/ng-template" id='new-sprint'>
-      <form>
-        <input type='text' placeholder='Title' />
-        <textarea placeholder='Set some goals for this sprint !' />
-        <button class='btn btn-primary'>Submit</button>
+    <!-- new-sprint -->
+      <form ng-submit="createSprint(newsprint)">
+        <input type='text' placeholder='Title' ng-model='newsprint.title' required/>
+        <textarea placeholder='Set some goals for this sprint !' ng-model='newsprint.goals' />
+        <button class='btn btn-primary' type="submit">Create</button>
       </form>
+    </script>
+
+    <script type="text/ng-template" id='new-workitem'>
+    <!-- new workitem -->
+    <h1>Here you shall add a new workitem</h1>
+    </script>
+
+    <script type="text/ng-template" id='edit-sprint'>
+    <h1>Here you shall edit the sprint</h1>
     </script>
 
     <script type="text/javascript" src="dist/utopia.min.js"></script>
