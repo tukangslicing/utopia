@@ -37,6 +37,7 @@ class Workitem extends ActiveRecord\Model {
 				$log->action = $key;
 				$log->old_value = $array[$key];
 				$log->new_value = $data_val;
+				$log->timestamp = now();
 				$log->save();
 			}
 		}

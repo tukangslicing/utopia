@@ -33,6 +33,7 @@ class WorkitemController extends BaseController {
 		$workitem = Workitem::find($id);
 		$workitem->update_log($this->get_data());
 		$workitem = deserialize($this->get_data(), $workitem);
+		$workitem->last_updated = now();
 		$workitem->save();
 		return $workitem;
 	}
@@ -87,6 +88,7 @@ class WorkitemController extends BaseController {
 		$id = $id == NULL ? $this->put('workitem_id') : $id;
 		self::validate_access($id);
 		$task = deserialize($this->get_data(), WorkitemTask::find($this->put('id')));
+		$task->done_date = now();
 		$task->save();
 		return $task;
 	}
@@ -121,6 +123,7 @@ class WorkitemController extends BaseController {
 		$comment->workitem_id = $workitem_id;
 		$comment->comment_body = $this->post('comment_body');
 		$comment->user_id = Utopia::$user->id;
+		$comment->created_at = now();
 		$comment->save();
 		return $comment;
 	}

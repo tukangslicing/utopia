@@ -18,6 +18,10 @@ module.exports = function(grunt) {
         dest: 'dist/utopia.min.js'
       }
     },
+    /**
+     * For uglify to work, change concat dest to utopia.js
+     * @type {Object}
+     */
     uglify : {
       options: {
         mangle: false,

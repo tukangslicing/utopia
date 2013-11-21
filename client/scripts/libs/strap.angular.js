@@ -595,6 +595,7 @@ angular.module('$strap.directives').directive('bsPopover', [
           }
           element.popover(angular.extend({}, options, {
             content: template,
+            container : 'body',
             html: true
           }));
           var popover = element.data('popover');

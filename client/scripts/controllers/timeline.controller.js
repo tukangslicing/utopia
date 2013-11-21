@@ -32,18 +32,6 @@ angular.module('utopia').controller('TimelineController', function ($scope, $rou
 		normalizeAndPush(logs, 'workitem_log');
 	});
 
-	/**
-	 * Retrieves the data for workitem
-	 * @param  {[type]} id [description]
-	 * @return {[type]}    [description]
-	 */
-	$scope.fetchDetails = function(id) {
-		$scope.swkitm = null;
-		Restangular.one('workitem', id).get().then(function(d){
-			$scope.swkitm = d;
-			$scope.$emit('popover-shown');
-		})
-	}
 
 	/**
 	 * Helper function to add logs in timeline

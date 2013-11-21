@@ -66,6 +66,7 @@ angular.module('utopia').config(function($routeProvider, $locationProvider, rout
 	$routeProvider.when('/projects/:project_id/whiteboard/:workitem_id', route.resolve('whiteboard'));
 	$routeProvider.when('/projects/:project_id/timeline', route.resolve('timeline'));
 	$routeProvider.when('/projects/:project_id/planning', route.resolve('planning'));
+	$routeProvider.when('/projects/:project_id/dashboard', route.resolve('dashboard'));
 	$routeProvider.otherwise({
 		templateUrl : 'under-construction',
 		controller : nothing

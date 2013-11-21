@@ -72,6 +72,7 @@ html, body {
 /* Let's get this party started */
 ::-webkit-scrollbar {
 	width: 7px;
+	height: 7px;
 }
 
 /* Track */
@@ -288,13 +289,21 @@ html, body {
 /**
  * Planning view styles
  */
+
+.sprint-table {
+	max-width: 100%;
+	background-color: transparent;
+	border-collapse: separate;
+	border-spacing: 2px;
+}
 .sprint-panel {
 	border: 1px solid silver;
 	border-radius: 5px;
-	width: 300px;
+	min-width: 300px;
+	max-width: 300px;
 	padding:0px !important;
 	margin-left: 5px;
-	float: left;
+	/*float: left;*/
 	min-height: 500px;
 }
 
@@ -315,4 +324,12 @@ html, body {
 .sprint-workitems:hover {
 	background: #e5e5e5;
 	pointer:resize;
+}
+
+.padding {
+	padding: 5px;
+}
+
+.no-margin {
+	margin: 0px !important;
 }

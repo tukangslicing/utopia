@@ -4,7 +4,7 @@
  * @param  {[type]} $scope [description]
  * @return {[type]}        [description]
  */
-angular.module('utopia').controller('PlanningController', function($scope, db, $routeParams, Restangular, $timeout, $modal){
+angular.module('utopia').controller('PlanningController', function($scope, db, $routeParams, Restangular, $timeout, $modal) {
 	$scope.sprints = db.get('sprints');
 	$scope.project_id = $routeParams.project_id;
 	var sprint = Restangular.all('sprint');
@@ -55,12 +55,14 @@ angular.module('utopia').controller('PlanningController', function($scope, db, $
 	}
 
 	/**
-	 * deletes a sprint
-	 * @return {[type]} [description]
+	 * Either opens a edit or delete modal based on value
+	 * @param  string value - could be 'edit' or 'delete'
+	 * @param  sprint_id id
+	 * @return {[type]}
 	 */
-	$scope.deleteSprintModal = function(id) {
+	$scope.sprintModal = function(value, id) {
 		var modal = $modal({
-			template: 'delete-sprint',
+			template: value + '-sprint',
 			show: true,
 			backdrop: 'static',
 			scope: $scope,
@@ -68,10 +70,28 @@ angular.module('utopia').controller('PlanningController', function($scope, db, $
    		});
 		$scope.selectedSprint = _.find($scope.sprints, function(d) { return d.id === id; });
 		$scope.allowedSprints = _.filter($scope.sprints, function(d) { return d.id !== id; });
+		$scope.shiftedSprint = _.first($scope.sprints).id;
 	}
 
+	/**
+	 * Deletes the sprint
+	 * @param  {[type]} shiftedSprint
+	 * @return {[type]}
+	 */
 	$scope.deleteSprint = function(shiftedSprint){
-		console.log($scope.selectedSprint, shiftedSprint);
-		shiftedSprint = 0;
+		sprint.customDELETE($scope.selectedSprint.id + '/' + shiftedSprint).then(function(d){
+			$scope.sprints = _.filter($scope.sprints, function(d) { return d.id !== $scope.selectedSprint.id; });
+		});
+		$scope.selectedSprint.id = null;
+	}
+
+	/**
+	 * Changes sprint title and goals
+	 * @return {[type]}
+	 */
+	$scope.editSprint = function() {
+		var currentSprint = angular.copy($scope.selectedSprint);
+		delete currentSprint.workitems;
+		sprint.customPUT(currentSprint, $scope.selectedSprint.id).then(nothing);
 	}
 });

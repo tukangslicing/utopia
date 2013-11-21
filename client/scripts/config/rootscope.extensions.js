@@ -7,7 +7,7 @@
  * @param  {[type]} $timeout   [description]
  * @return {[type]}            [description]
  */
-angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout) {
+angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout, Restangular) {
 	/**
 	 * Returns workitem type 
 	 * @param  WorkitemType id 
@@ -30,6 +30,19 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 			return state ? state.title : '';
 		}
 	})();
+
+	/**
+	 * Retrieves the data for workitem
+	 * @param  {[type]} id [description]
+	 * @return {[type]}    [description]
+	 */
+	$rootScope.fetchDetails = function(id) {
+		$rootScope.swkitm = null;
+		Restangular.one('workitem', id).get().then(function(d){
+			$rootScope.swkitm = d;
+			$rootScope.$emit('popover-shown');
+		})
+	}
 
 	/**
 	 * Returns Sprint of project based on SprintID 

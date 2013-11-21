@@ -12,13 +12,11 @@ angular.module('utopia').directive('resize', function ($window) {
         scope.$watch(scope.getWindowDimensions, function (newValue, oldValue) {
             scope.windowHeight = newValue.h;
             scope.windowWidth = newValue.w;
-
             scope.style = function () {
                 return { 
-                    'height': (newValue.h - angular.element('#internal-view').offset().top - 35) + 'px'
+                    'height': Math.floor(newValue.h - angular.element(element).offset().top - 42) + 'px'
                 };
             };
-
         }, true);
 
         w.bind('resize', function () {
