@@ -1,2 +1,876 @@
 
-!function(a,b,c){"use strict";angular.module("$strap.config",[]).value("$strapConfig",{}),angular.module("$strap.filters",["$strap.config"]),angular.module("$strap.directives",["$strap.config"]),angular.module("$strap",["$strap.filters","$strap.directives","$strap.config"]),angular.module("$strap.directives").directive("bsAlert",["$parse","$timeout","$compile",function(a,b,c){return{restrict:"A",link:function(d,e,f){var g=a(f.bsAlert),h=(g.assign,g(d)),i=function(a){b(function(){e.alert("close")},1*a)};f.bsAlert?d.$watch(f.bsAlert,function(a,b){h=a,e.html((a.title?"<strong>"+a.title+"</strong>&nbsp;":"")+a.content||""),a.closed&&e.hide(),c(e.contents())(d),(a.type||b.type)&&(b.type&&e.removeClass("alert-"+b.type),a.type&&e.addClass("alert-"+a.type)),angular.isDefined(a.closeAfter)?i(a.closeAfter):f.closeAfter&&i(f.closeAfter),(angular.isUndefined(f.closeButton)||"0"!==f.closeButton&&"false"!==f.closeButton)&&e.prepend('<button type="button" class="close" data-dismiss="alert">&times;</button>')},!0):((angular.isUndefined(f.closeButton)||"0"!==f.closeButton&&"false"!==f.closeButton)&&e.prepend('<button type="button" class="close" data-dismiss="alert">&times;</button>'),f.closeAfter&&i(f.closeAfter)),e.addClass("alert").alert(),e.hasClass("fade")&&(e.removeClass("in"),setTimeout(function(){e.addClass("in")}));var j=f.ngRepeat&&f.ngRepeat.split(" in ").pop();e.on("close",function(a){var b;j?(a.preventDefault(),e.removeClass("in"),b=function(){e.trigger("closed"),d.$parent&&d.$parent.$apply(function(){for(var a=j.split("."),b=d.$parent,c=0;c<a.length;++c)b&&(b=b[a[c]]);b&&b.splice(d.$index,1)})},$.support.transition&&e.hasClass("fade")?e.on($.support.transition.end,b):b()):h&&(a.preventDefault(),e.removeClass("in"),b=function(){e.trigger("closed"),d.$apply(function(){h.closed=!0})},$.support.transition&&e.hasClass("fade")?e.on($.support.transition.end,b):b())})}}}]),angular.module("$strap.directives").directive("bsButton",["$parse","$timeout",function(a){return{restrict:"A",require:"?ngModel",link:function(b,c,d,e){if(e){c.parent('[data-toggle="buttons-checkbox"], [data-toggle="buttons-radio"]').length||c.attr("data-toggle","button");var f=!!b.$eval(d.ngModel);f&&c.addClass("active"),b.$watch(d.ngModel,function(a,b){var d=!!a,e=!!b;d!==e?$.fn.button.Constructor.prototype.toggle.call(g):d&&!f&&c.addClass("active")})}c.hasClass("btn")||c.on("click.button.data-api",function(){c.button("toggle")}),c.button();var g=c.data("button");g.toggle=function(){if(!e)return $.fn.button.Constructor.prototype.toggle.call(this);var d=c.parent('[data-toggle="buttons-radio"]');d.length?(c.siblings("[ng-model]").each(function(c,d){a($(d).attr("ng-model")).assign(b,!1)}),b.$digest(),e.$modelValue||(e.$setViewValue(!e.$modelValue),b.$digest())):b.$apply(function(){e.$setViewValue(!e.$modelValue)})}}}}]).directive("bsButtonsCheckbox",["$parse",function(){return{restrict:"A",require:"?ngModel",compile:function(a){a.attr("data-toggle","buttons-checkbox").find("a, button").each(function(a,b){$(b).attr("bs-button","")})}}}]).directive("bsButtonsRadio",["$timeout",function(a){return{restrict:"A",require:"?ngModel",compile:function(b,c){return b.attr("data-toggle","buttons-radio"),c.ngModel||b.find("a, button").each(function(a,b){$(b).attr("bs-button","")}),function(b,c,d,e){e&&(a(function(){c.find("[value]").button().filter('[value="'+e.$viewValue+'"]').addClass("active")}),c.on("click.button.data-api",function(a){b.$apply(function(){e.$setViewValue($(a.target).closest("button").attr("value"))})}),b.$watch(d.ngModel,function(a,e){if(a!==e){var f=c.find('[value="'+b.$eval(d.ngModel)+'"]');f.length&&f.button("toggle")}}))}}}}]),angular.module("$strap.directives").directive("bsButtonSelect",["$parse","$timeout",function(a){return{restrict:"A",require:"?ngModel",link:function(b,c,d,e){var f=a(d.bsButtonSelect);f.assign,e&&(c.text(b.$eval(d.ngModel)),b.$watch(d.ngModel,function(a){c.text(a)}));var g,h,i,j;c.bind("click",function(){g=f(b),h=e?b.$eval(d.ngModel):c.text(),i=g.indexOf(h),j=i>g.length-2?g[0]:g[i+1],b.$apply(function(){c.text(j),e&&e.$setViewValue(j)})})}}}]),angular.module("$strap.directives").directive("bsDatepicker",["$timeout","$strapConfig",function(a,b){var d=/(iP(a|o)d|iPhone)/g.test(navigator.userAgent),e=function(a){return $.fn.datepicker.dates[a]&&a||(a="en"),{"/":"[\\/]","-":"[-]",".":"[.]"," ":"[\\s]",dd:"(?:(?:[0-2]?[0-9]{1})|(?:[3][01]{1}))",d:"(?:(?:[0-2]?[0-9]{1})|(?:[3][01]{1}))",mm:"(?:[0]?[1-9]|[1][012])",m:"(?:[0]?[1-9]|[1][012])",DD:"(?:"+$.fn.datepicker.dates[a].days.join("|")+")",D:"(?:"+$.fn.datepicker.dates[a].daysShort.join("|")+")",MM:"(?:"+$.fn.datepicker.dates[a].months.join("|")+")",M:"(?:"+$.fn.datepicker.dates[a].monthsShort.join("|")+")",yyyy:"(?:(?:[1]{1}[0-9]{1}[0-9]{1}[0-9]{1})|(?:[2]{1}[0-9]{3}))(?![[0-9]])",yy:"(?:(?:[0-9]{1}[0-9]{1}))(?![[0-9]])"}},f=function(a,b){var c,d=a,f=e(b);return c=0,angular.forEach(f,function(a,b){d=d.split(b).join("${"+c+"}"),c++}),c=0,angular.forEach(f,function(a){d=d.split("${"+c+"}").join(a),c++}),new RegExp("^"+d+"$",["i"])},g=/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/;return{restrict:"A",require:"?ngModel",link:function(a,e,h,i){var j=angular.extend({autoclose:!0},b.datepicker||{}),k=h.dateType||j.type||"date",l=function(a,b,c){return a&&"iso"===k&&g.test(a)?$.fn.datepicker.DPGlobal.parseDate(new Date(a),$.fn.datepicker.DPGlobal.parseFormat(b),c):a&&"date"===k&&angular.isString(a)?$.fn.datepicker.DPGlobal.parseDate(a,$.fn.datepicker.DPGlobal.parseFormat(b),c):a},m=function(){j=angular.extend({autoclose:!0},b.datepicker||{}),k=h.dateType||j.type||"date",angular.forEach(["format","weekStart","calendarWeeks","startDate","endDate","daysOfWeekDisabled","autoclose","startView","minViewMode","todayBtn","todayHighlight","keyboardNavigation","language","forceParse"],function(a){angular.isDefined(h[a])&&(j[a]=h[a])});var g=j.language||"en",m=h.dateFormat||j.format||$.fn.datepicker.dates[g]&&$.fn.datepicker.dates[g].format||"mm/dd/yyyy",n=d?"yyyy-mm-dd":m,o=f(n,g);i&&(i.$formatters.unshift(function(a){return l(a,m,g)}),i.$parsers.unshift(function(a){return a?"date"!==k&&"iso"!==k||!angular.isDate(a)?angular.isString(a)&&o.test(a)?(i.$setValidity("date",!0),d?new Date(a):"string"===k?a:$.fn.datepicker.DPGlobal.parseDate(a,$.fn.datepicker.DPGlobal.parseFormat(n),g)):(i.$setValidity("date",!1),c):(i.$setValidity("date",!0),a):(i.$setValidity("date",!0),null)}),i.$render=function(){if(d){var a=i.$viewValue?$.fn.datepicker.DPGlobal.formatDate(i.$viewValue,$.fn.datepicker.DPGlobal.parseFormat(n),g):"";return e.val(a),a}return i.$viewValue||e.val(""),e.datepicker("update",i.$viewValue)}),d?e.prop("type","date").css("-webkit-appearance","textfield"):(i&&e.on("changeDate",function(b){a.$apply(function(){i.$setViewValue("string"===k?e.val():b.date)})}),e.datepicker(angular.extend(j,{format:n,language:g})),a.$on("$destroy",function(){var a=e.data("datepicker");a&&(a.picker.remove(),e.data("datepicker",null))}),h.$observe("startDate",function(a){e.datepicker("setStartDate",a)}),h.$observe("endDate",function(a){e.datepicker("setEndDate",a)}));var p=e.siblings('[data-toggle="datepicker"]');p.length&&p.on("click",function(){e.prop("disabled")||e.trigger("focus")})};m(),a.$watch(function(){return h.language},function(a,b){if(a!==b){var c=$.fn.datepicker.dates[b]?b:"en",d=h.dateFormat||j.format||$.fn.datepicker.dates[c]&&$.fn.datepicker.dates[c].format||"mm/dd/yyyy",f=$.fn.datepicker.DPGlobal.parseDate(e.val(),$.fn.datepicker.DPGlobal.parseFormat(d),c),g=$.fn.datepicker.dates[a]?a:"en",k=$.fn.datepicker.dates[g]&&$.fn.datepicker.dates[g].format||"mm/dd/yyyy",n=$.fn.datepicker.DPGlobal.formatDate(f,$.fn.datepicker.DPGlobal.parseFormat(k),g);e.datepicker("remove"),e.val(""),m();var o=l(n,k,g);i.$modelValue=o,i.$viewValue=n}})}}}]),angular.module("$strap.directives").directive("bsDropdown",["$parse","$compile","$timeout",function(a,b,c){var d=function(a,b){return b||(b=['<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">',"</ul>"]),angular.forEach(a,function(a,c){if(a.divider)return b.splice(c+1,0,'<li class="divider"></li>');var e="<li"+(a.submenu&&a.submenu.length?' class="dropdown-submenu"':"")+">"+'<a tabindex="-1" ng-href="'+(a.href||"")+'"'+(a.click?'" ng-click="'+a.click+'"':"")+(a.target?'" target="'+a.target+'"':"")+(a.method?'" data-method="'+a.method+'"':"")+">"+(a.icon&&'<i class="'+a.icon+'"></i>&nbsp;'||"")+(a.text||"")+"</a>";a.submenu&&a.submenu.length&&(e+=d(a.submenu).join("\n")),e+="</li>",b.splice(c+1,0,e)}),b};return{restrict:"EA",scope:!0,link:function(e,f,g){var h=a(g.bsDropdown),i=h(e);c(function(){!angular.isArray(i);var a=angular.element(d(i).join(""));a.insertAfter(f),b(f.next("ul.dropdown-menu"))(e)}),f.addClass("dropdown-toggle").attr("data-toggle","dropdown")}}}]),angular.module("$strap.directives").factory("$modal",["$rootScope","$compile","$http","$timeout","$q","$templateCache","$strapConfig",function(a,b,c,d,e,f,g){var h=function(h){function i(h){var i=angular.extend({show:!0},g.modal,h),j=i.scope?i.scope:a.$new(),k=i.template;return e.when(f.get(k)||c.get(k,{cache:!0}).then(function(a){return a.data})).then(function(a){var c=k.replace(".html","").replace(/[\/|\.|:]/g,"-")+"-"+j.$id,e=$('<div class="modal hide" tabindex="-1"></div>').attr("id",c).addClass("fade").html(a);return i.modalClass&&e.addClass(i.modalClass),$("body").append(e),d(function(){b(e)(j)}),j.$modal=function(a){e.modal(a)},angular.forEach(["show","hide"],function(a){j[a]=function(){e.modal(a)}}),j.dismiss=j.hide,angular.forEach(["show","shown","hide","hidden"],function(a){e.on(a,function(b){j.$emit("modal-"+a,b)})}),e.on("shown",function(){$("input[autofocus], textarea[autofocus]",e).first().trigger("focus")}),e.on("hidden",function(){i.persist||j.$destroy()}),j.$on("$destroy",function(){e.remove()}),e.modal(i),e})}return new i(h)};return h}]).directive("bsModal",["$q","$modal",function(a,b){return{restrict:"A",scope:!0,link:function(c,d,e){var f={template:c.$eval(e.bsModal),persist:!0,show:!1,scope:c};angular.forEach(["modalClass","backdrop","keyboard"],function(a){angular.isDefined(e[a])&&(f[a]=e[a])}),a.when(b(f)).then(function(a){d.attr("data-target","#"+a.attr("id")).attr("data-toggle","modal")})}}}]),angular.module("$strap.directives").directive("bsNavbar",["$location",function(a){return{restrict:"A",link:function(b,c){b.$watch(function(){return a.path()},function(a){$("li[data-match-route]",c).each(function(b,c){var d=angular.element(c),e=d.attr("data-match-route"),f=new RegExp("^"+e+"$",["i"]);if(f.test(a)){d.addClass("active");var g=d.find(".collapse.in");g.length&&g.collapse("hide")}else d.removeClass("active")})})}}}]),angular.module("$strap.directives").directive("bsPopover",["$parse","$compile","$http","$timeout","$q","$templateCache",function(a,b,c,d,e,f){return $("body").on("keyup",function(a){27===a.keyCode&&$(".popover.in").popover("hide")}),{restrict:"A",scope:!0,link:function(g,h,i){var j=a(i.bsPopover),k=(j.assign,j(g)),l={};angular.isObject(k)&&(l=k),e.when(l.content||f.get(k)||c.get(k,{cache:!0})).then(function(a){angular.isObject(a)&&(a=a.data),angular.forEach(["placement","trigger"],function(a){i[a]&&(l[a]=i[a])}),i.unique&&h.on("show",function(){$(".popover.in").not(h).popover("hide")}),i.hide&&g.$watch(i.hide,function(a,b){a?c.hide():a!==b&&d(function(){c.show()})}),i.show&&g.$watch(i.show,function(a,b){a?d(function(){c.show()}):a!==b&&c.hide()}),h.popover(angular.extend({},l,{content:a,html:!0}));var c=h.data("popover");c.hasContent=function(){return this.getTitle()||a},c.getPosition=function(){var a=$.fn.popover.Constructor.prototype.getPosition.apply(this,arguments);return b(this.$tip)(g),g.$digest(),this.$tip.data("popover",this),a},g.$popover=function(a){c(a)},angular.forEach(["show","hide"],function(a){g[a]=function(){c[a]()}}),g.dismiss=g.hide,angular.forEach(["show","shown","hide","hidden"],function(a){h.on(a,function(b){g.$emit("popover-"+a,b)})})})}}}]),angular.module("$strap.directives").directive("bsSelect",["$timeout",function(a){var b=/^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/;return{restrict:"A",require:"?ngModel",link:function(c,d,e,f){var g=c.$eval(e.bsSelect)||{};if(a(function(){d.selectpicker(g),d.next().removeClass("ng-scope")}),f){var h=function(a,b){angular.equals(a,b)||d.selectpicker("refresh")};if(c.$watch(e.ngModel,function(a,b){h(a,b)}),e.ngOptions){var i=e.ngOptions.match(b);i&&c[i[7]]&&c.$watch(function(){return c[i[7]]},function(a,b){angular.equals(a,b)||h(a,b)},!0)}}}}}]),angular.module("$strap.directives").directive("bsTabs",["$parse","$compile","$timeout",function(a,b,c){var d='<div class="tabs"><ul class="nav nav-tabs"><li ng-repeat="pane in panes" ng-class="{active:pane.active}"><a data-target="#{{pane.id}}" data-index="{{$index}}" data-toggle="tab">{{pane.title}}</a></li></ul><div class="tab-content" ng-transclude></div>';return{restrict:"A",require:"?ngModel",priority:0,scope:!0,template:d,replace:!0,transclude:!0,compile:function(){return function(b,d,e,f){var g=a(e.bsTabs);g.assign,g(b),b.panes=[];var h,i,j,k=d.find("ul.nav-tabs"),l=d.find("div.tab-content"),m=0;c(function(){l.find("[data-title], [data-tab]").each(function(a){var c=angular.element(this);h="tab-"+b.$id+"-"+a,i=c.data("title")||c.data("tab"),j=!j&&c.hasClass("active"),c.attr("id",h).addClass("tab-pane"),e.fade&&c.addClass("fade"),b.panes.push({id:h,title:i,content:this.innerHTML,active:j})}),b.panes.length&&!j&&(l.find(".tab-pane:first-child").addClass("active"+(e.fade?" in":"")),b.panes[0].active=!0)}),f&&(d.on("show",function(a){var c=$(a.target);b.$apply(function(){f.$setViewValue(c.data("index"))})}),b.$watch(e.ngModel,function(a){angular.isUndefined(a)||(m=a,setTimeout(function(){var b=$(k[0].querySelectorAll("li")[1*a]);b.hasClass("active")||b.children("a").tab("show")}))}))}}}}]),angular.module("$strap.directives").directive("bsTimepicker",["$timeout","$strapConfig",function(a,b){var c="((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)";return{restrict:"A",require:"?ngModel",link:function(d,e,f,g){var h=function(a){var b=String(a);return 1===b.length&&(b="0"+b),b},i=angular.extend({openOnFocus:!1},b.timepicker),j=f.defaultTime||i.defaultTime||!1;i.defaultTime=!1;var k=f.timeType||i.timeType||"string";if(angular.forEach(["template","minuteStep","showSeconds","secondStep","showMeridian","showInputs","disableFocus","modalBackdrop","openOnFocus"],function(a){angular.isDefined(f[a])&&(i[a]="true"===f[a]||"false"===f[a]?"true"===f[a]:/^\-?([0-9]+|Infinity)$/.test(f[a])?parseInt(f[a],10):f[a])}),g){e.on("changeTime.timepicker",function(b){a(function(){if("string"===k)g.$setViewValue(e.val());else if("date"===k){var a=new Date;a.setHours(b.time.hours),a.setMinutes(b.time.minutes),g.$setViewValue(a)}})});var l=new RegExp("^"+c+"$",["i"]);g.$formatters.unshift(function(a){if(a)return"date"===k?(g.$setViewValue(new Date(a)),e.val(new Date(a)),new Date(a)):(g.$setViewValue(a),e.val(a),a);if(j){if("current"===j){if("date"===k)return g.$setViewValue(new Date),e.val(new Date),new Date;var b=new Date;return h(b.getHours())+":"+h(b.getMinutes()),g.$setViewValue(b),e.val(b),b}return g.$setViewValue(j),e.val(j),j}return g.$setViewValue(e.val()),e.val()}),g.$render=function(){if(g.$viewValue){if("date"===k){var a;if(l.test(g.$viewValue)){a=new Date;var b=g.$viewValue.split(":"),c=isNaN(parseInt(b[0],10))?"0":parseInt(b[0],10),d=isNaN(parseInt(b[1],10))?"0":parseInt(b[1],10);return a.setHours(c),a.setMinutes(d),e.val(g.$viewValue),g.$setViewValue(a),a}a=new Date(g.$viewValue);var f="Invalid Date"!==a?h(a.getHours())+":"+h(a.getMinutes()):"";return e.val(f),g.$setViewValue(a),a}return e.val(g.$viewValue),g.$setViewValue(g.$viewValue),g.$viewValue}return e.val(""),""},g.$parsers.unshift(function(a){return!a||"string"===k&&l.test(a)?(g.$setValidity("time",!0),a):"date"===k&&"object"==typeof a&&"Invalid Date"!==a.toString()?(g.$setValidity("time",!0),a):(g.$setValidity("time",!1),void 0)})}e.attr("data-toggle","timepicker"),e.parent().addClass("bootstrap-timepicker"),e.timepicker(i||{});var m=e.data("timepicker"),n=e.siblings('[data-toggle="timepicker"]');n.length&&n.on("click",$.proxy(m.showWidget,m)),i.openOnFocus&&e.on("focus",$.proxy(m.showWidget,m))}}}]),angular.module("$strap.directives").directive("bsTooltip",["$parse","$compile",function(a){return{restrict:"A",scope:!0,link:function(b,c,d){var e=a(d.bsTooltip),f=(e.assign,e(b));b.$watch(d.bsTooltip,function(a){f=a}),d.unique&&c.on("show",function(){$(".tooltip.in").each(function(){var a=$(this),b=a.data("tooltip");b&&!b.$element.is(c)&&a.tooltip("hide")})}),c.tooltip({title:function(){return angular.isFunction(f)?f.apply(null,arguments):f},html:!0});var g=c.data("tooltip");g.show=function(){var a=$.fn.tooltip.Constructor.prototype.show.apply(this,arguments);return this.tip().data("tooltip",this),a},b._tooltip=function(a){c.tooltip(a)},b.hide=function(){c.tooltip("hide")},b.show=function(){c.tooltip("show")},b.dismiss=b.hide}}}]),angular.module("$strap.directives").directive("bsTypeahead",["$parse",function(a){return{restrict:"A",require:"?ngModel",link:function(b,c,d,e){var f=a(d.bsTypeahead),g=(f.assign,f(b));b.$watch(d.bsTypeahead,function(a,b){a!==b&&(g=a)}),c.attr("data-provide","typeahead"),c.typeahead({source:function(){return angular.isFunction(g)?g.apply(null,arguments):g},minLength:d.minLength||1,items:d.items,updater:function(a){return e&&b.$apply(function(){e.$setViewValue(a)}),b.$emit("typeahead-updated",a,d.id),a}});var h=c.data("typeahead");h.lookup=function(){var a;return this.query=this.$element.val()||"",this.query.length<this.options.minLength?this.shown?this.hide():this:(a=$.isFunction(this.source)?this.source(this.query,$.proxy(this.process,this)):this.source,a?this.process(a):this)},d.matchAll&&(h.matcher=function(){return!0}),"0"===d.minLength&&setTimeout(function(){c.on("focus",function(){0===c.val().length&&setTimeout(c.typeahead.bind(c,"lookup"),200)})})}}}])}(window,document);
+/**
+ * AngularStrap - Twitter Bootstrap directives for AngularJS
+ * @version v0.7.5 - 2013-07-21
+ * @link http://mgcrea.github.com/angular-strap
+ * @author Olivier Louvignes <olivier@mg-crea.com>
+ * @license MIT License, http://www.opensource.org/licenses/MIT
+ */
+angular.module('$strap.config', []).value('$strapConfig', {});
+angular.module('$strap.filters', ['$strap.config']);
+angular.module('$strap.directives', ['$strap.config']);
+angular.module('$strap', [
+  '$strap.filters',
+  '$strap.directives',
+  '$strap.config'
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsAlert', [
+  '$parse',
+  '$timeout',
+  '$compile',
+  function ($parse, $timeout, $compile) {
+    return {
+      restrict: 'A',
+      link: function postLink(scope, element, attrs) {
+        var getter = $parse(attrs.bsAlert), setter = getter.assign, value = getter(scope);
+        var closeAlert = function closeAlertFn(delay) {
+          $timeout(function () {
+            element.alert('close');
+          }, delay * 1);
+        };
+        if (!attrs.bsAlert) {
+          if (angular.isUndefined(attrs.closeButton) || attrs.closeButton !== '0' && attrs.closeButton !== 'false') {
+            element.prepend('<button type="button" class="close" data-dismiss="alert">&times;</button>');
+          }
+          if (attrs.closeAfter)
+            closeAlert(attrs.closeAfter);
+        } else {
+          scope.$watch(attrs.bsAlert, function (newValue, oldValue) {
+            value = newValue;
+            element.html((newValue.title ? '<strong>' + newValue.title + '</strong>&nbsp;' : '') + newValue.content || '');
+            if (!!newValue.closed) {
+              element.hide();
+            }
+            $compile(element.contents())(scope);
+            if (newValue.type || oldValue.type) {
+              oldValue.type && element.removeClass('alert-' + oldValue.type);
+              newValue.type && element.addClass('alert-' + newValue.type);
+            }
+            if (angular.isDefined(newValue.closeAfter))
+              closeAlert(newValue.closeAfter);
+            else if (attrs.closeAfter)
+              closeAlert(attrs.closeAfter);
+            if (angular.isUndefined(attrs.closeButton) || attrs.closeButton !== '0' && attrs.closeButton !== 'false') {
+              element.prepend('<button type="button" class="close" data-dismiss="alert">&times;</button>');
+            }
+          }, true);
+        }
+        element.addClass('alert').alert();
+        if (element.hasClass('fade')) {
+          element.removeClass('in');
+          setTimeout(function () {
+            element.addClass('in');
+          });
+        }
+        var parentArray = attrs.ngRepeat && attrs.ngRepeat.split(' in ').pop();
+        element.on('close', function (ev) {
+          var removeElement;
+          if (parentArray) {
+            ev.preventDefault();
+            element.removeClass('in');
+            removeElement = function () {
+              element.trigger('closed');
+              if (scope.$parent) {
+                scope.$parent.$apply(function () {
+                  var path = parentArray.split('.');
+                  var curr = scope.$parent;
+                  for (var i = 0; i < path.length; ++i) {
+                    if (curr) {
+                      curr = curr[path[i]];
+                    }
+                  }
+                  if (curr) {
+                    curr.splice(scope.$index, 1);
+                  }
+                });
+              }
+            };
+            $.support.transition && element.hasClass('fade') ? element.on($.support.transition.end, removeElement) : removeElement();
+          } else if (value) {
+            ev.preventDefault();
+            element.removeClass('in');
+            removeElement = function () {
+              element.trigger('closed');
+              scope.$apply(function () {
+                value.closed = true;
+              });
+            };
+            $.support.transition && element.hasClass('fade') ? element.on($.support.transition.end, removeElement) : removeElement();
+          } else {
+          }
+        });
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsButton', [
+  '$parse',
+  '$timeout',
+  function ($parse, $timeout) {
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      link: function postLink(scope, element, attrs, controller) {
+        if (controller) {
+          if (!element.parent('[data-toggle="buttons-checkbox"], [data-toggle="buttons-radio"]').length) {
+            element.attr('data-toggle', 'button');
+          }
+          var startValue = !!scope.$eval(attrs.ngModel);
+          if (startValue) {
+            element.addClass('active');
+          }
+          scope.$watch(attrs.ngModel, function (newValue, oldValue) {
+            var bNew = !!newValue, bOld = !!oldValue;
+            if (bNew !== bOld) {
+              $.fn.button.Constructor.prototype.toggle.call(button);
+            } else if (bNew && !startValue) {
+              element.addClass('active');
+            }
+          });
+        }
+        if (!element.hasClass('btn')) {
+          element.on('click.button.data-api', function (ev) {
+            element.button('toggle');
+          });
+        }
+        element.button();
+        var button = element.data('button');
+        button.toggle = function () {
+          if (!controller) {
+            return $.fn.button.Constructor.prototype.toggle.call(this);
+          }
+          var $parent = element.parent('[data-toggle="buttons-radio"]');
+          if ($parent.length) {
+            element.siblings('[ng-model]').each(function (k, v) {
+              $parse($(v).attr('ng-model')).assign(scope, false);
+            });
+            scope.$digest();
+            if (!controller.$modelValue) {
+              controller.$setViewValue(!controller.$modelValue);
+              scope.$digest();
+            }
+          } else {
+            scope.$apply(function () {
+              controller.$setViewValue(!controller.$modelValue);
+            });
+          }
+        };
+      }
+    };
+  }
+]).directive('bsButtonsCheckbox', [
+  '$parse',
+  function ($parse) {
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      compile: function compile(tElement, tAttrs, transclude) {
+        tElement.attr('data-toggle', 'buttons-checkbox').find('a, button').each(function (k, v) {
+          $(v).attr('bs-button', '');
+        });
+      }
+    };
+  }
+]).directive('bsButtonsRadio', [
+  '$timeout',
+  function ($timeout) {
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      compile: function compile(tElement, tAttrs, transclude) {
+        tElement.attr('data-toggle', 'buttons-radio');
+        if (!tAttrs.ngModel) {
+          tElement.find('a, button').each(function (k, v) {
+            $(v).attr('bs-button', '');
+          });
+        }
+        return function postLink(scope, iElement, iAttrs, controller) {
+          if (controller) {
+            $timeout(function () {
+              iElement.find('[value]').button().filter('[value="' + controller.$viewValue + '"]').addClass('active');
+            });
+            iElement.on('click.button.data-api', function (ev) {
+              scope.$apply(function () {
+                controller.$setViewValue($(ev.target).closest('button').attr('value'));
+              });
+            });
+            scope.$watch(iAttrs.ngModel, function (newValue, oldValue) {
+              if (newValue !== oldValue) {
+                var $btn = iElement.find('[value="' + scope.$eval(iAttrs.ngModel) + '"]');
+                if ($btn.length) {
+                  $btn.button('toggle');
+                }
+              }
+            });
+          }
+        };
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsButtonSelect', [
+  '$parse',
+  '$timeout',
+  function ($parse, $timeout) {
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      link: function postLink(scope, element, attrs, ctrl) {
+        var getter = $parse(attrs.bsButtonSelect), setter = getter.assign;
+        if (ctrl) {
+          element.text(scope.$eval(attrs.ngModel));
+          scope.$watch(attrs.ngModel, function (newValue, oldValue) {
+            element.text(newValue);
+          });
+        }
+        var values, value, index, newValue;
+        element.bind('click', function (ev) {
+          values = getter(scope);
+          value = ctrl ? scope.$eval(attrs.ngModel) : element.text();
+          index = values.indexOf(value);
+          newValue = index > values.length - 2 ? values[0] : values[index + 1];
+          scope.$apply(function () {
+            element.text(newValue);
+            if (ctrl) {
+              ctrl.$setViewValue(newValue);
+            }
+          });
+        });
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsDatepicker', [
+  '$timeout',
+  '$strapConfig',
+  function ($timeout, $strapConfig) {
+    var isAppleTouch = /(iP(a|o)d|iPhone)/g.test(navigator.userAgent);
+    var regexpMap = function regexpMap(language) {
+      language = language || 'en';
+      return {
+        '/': '[\\/]',
+        '-': '[-]',
+        '.': '[.]',
+        ' ': '[\\s]',
+        'dd': '(?:(?:[0-2]?[0-9]{1})|(?:[3][01]{1}))',
+        'd': '(?:(?:[0-2]?[0-9]{1})|(?:[3][01]{1}))',
+        'mm': '(?:[0]?[1-9]|[1][012])',
+        'm': '(?:[0]?[1-9]|[1][012])',
+        'DD': '(?:' + $.fn.datepicker.dates[language].days.join('|') + ')',
+        'D': '(?:' + $.fn.datepicker.dates[language].daysShort.join('|') + ')',
+        'MM': '(?:' + $.fn.datepicker.dates[language].months.join('|') + ')',
+        'M': '(?:' + $.fn.datepicker.dates[language].monthsShort.join('|') + ')',
+        'yyyy': '(?:(?:[1]{1}[0-9]{1}[0-9]{1}[0-9]{1})|(?:[2]{1}[0-9]{3}))(?![[0-9]])',
+        'yy': '(?:(?:[0-9]{1}[0-9]{1}))(?![[0-9]])'
+      };
+    };
+    var regexpForDateFormat = function regexpForDateFormat(format, language) {
+      var re = format, map = regexpMap(language), i;
+      i = 0;
+      angular.forEach(map, function (v, k) {
+        re = re.split(k).join('${' + i + '}');
+        i++;
+      });
+      i = 0;
+      angular.forEach(map, function (v, k) {
+        re = re.split('${' + i + '}').join(v);
+        i++;
+      });
+      return new RegExp('^' + re + '$', ['i']);
+    };
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      link: function postLink(scope, element, attrs, controller) {
+        var options = angular.extend({ autoclose: true }, $strapConfig.datepicker || {}), type = attrs.dateType || options.type || 'date';
+        angular.forEach([
+          'format',
+          'weekStart',
+          'calendarWeeks',
+          'startDate',
+          'endDate',
+          'daysOfWeekDisabled',
+          'autoclose',
+          'startView',
+          'minViewMode',
+          'todayBtn',
+          'todayHighlight',
+          'keyboardNavigation',
+          'language',
+          'forceParse'
+        ], function (key) {
+          if (angular.isDefined(attrs[key]))
+            options[key] = attrs[key];
+        });
+        var language = options.language || 'en', readFormat = attrs.dateFormat || options.format || $.fn.datepicker.dates[language] && $.fn.datepicker.dates[language].format || 'mm/dd/yyyy', format = isAppleTouch ? 'yyyy-mm-dd' : readFormat, dateFormatRegexp = regexpForDateFormat(format, language);
+        if (controller) {
+          controller.$formatters.unshift(function (modelValue) {
+            return type === 'date' && angular.isString(modelValue) && modelValue ? $.fn.datepicker.DPGlobal.parseDate(modelValue, $.fn.datepicker.DPGlobal.parseFormat(readFormat), language) : modelValue;
+          });
+          controller.$parsers.unshift(function (viewValue) {
+            if (!viewValue) {
+              controller.$setValidity('date', true);
+              return null;
+            } else if (type === 'date' && angular.isDate(viewValue)) {
+              controller.$setValidity('date', true);
+              return viewValue;
+            } else if (angular.isString(viewValue) && dateFormatRegexp.test(viewValue)) {
+              controller.$setValidity('date', true);
+              if (isAppleTouch)
+                return new Date(viewValue);
+              return type === 'string' ? viewValue : $.fn.datepicker.DPGlobal.parseDate(viewValue, $.fn.datepicker.DPGlobal.parseFormat(format), language);
+            } else {
+              controller.$setValidity('date', false);
+              return undefined;
+            }
+          });
+          controller.$render = function ngModelRender() {
+            if (isAppleTouch) {
+              var date = controller.$viewValue ? $.fn.datepicker.DPGlobal.formatDate(controller.$viewValue, $.fn.datepicker.DPGlobal.parseFormat(format), language) : '';
+              element.val(date);
+              return date;
+            }
+            if (!controller.$viewValue)
+              element.val('');
+            return element.datepicker('update', controller.$viewValue);
+          };
+        }
+        if (isAppleTouch) {
+          element.prop('type', 'date').css('-webkit-appearance', 'textfield');
+        } else {
+          if (controller) {
+            element.on('changeDate', function (ev) {
+              scope.$apply(function () {
+                controller.$setViewValue(type === 'string' ? element.val() : ev.date);
+              });
+            });
+          }
+          element.datepicker(angular.extend(options, {
+            format: format,
+            language: language
+          }));
+          scope.$on('$destroy', function () {
+            var datepicker = element.data('datepicker');
+            if (datepicker) {
+              datepicker.picker.remove();
+              element.data('datepicker', null);
+            }
+          });
+          attrs.$observe('startDate', function (value) {
+            element.datepicker('setStartDate', value);
+          });
+          attrs.$observe('endDate', function (value) {
+            element.datepicker('setEndDate', value);
+          });
+        }
+        var component = element.siblings('[data-toggle="datepicker"]');
+        if (component.length) {
+          component.on('click', function () {
+            if (!element.prop('disabled')) {
+              element.trigger('focus');
+            }
+          });
+        }
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsDropdown', [
+  '$parse',
+  '$compile',
+  '$timeout',
+  function ($parse, $compile, $timeout) {
+    var buildTemplate = function (items, ul) {
+      if (!ul)
+        ul = [
+          '<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">',
+          '</ul>'
+        ];
+      angular.forEach(items, function (item, index) {
+        if (item.divider)
+          return ul.splice(index + 1, 0, '<li class="divider"></li>');
+        var li = '<li' + (item.submenu && item.submenu.length ? ' class="dropdown-submenu"' : '') + '>' + '<a tabindex="-1"' + (item.click ? '" ng-click="' + item.click + '"' : '') + (item.target ? '" target="' + item.target + '"' : '') + (item.method ? '" data-method="' + item.method + '"' : '') + '>' + (item.text || '') + '</a>';
+        if (item.submenu && item.submenu.length)
+          li += buildTemplate(item.submenu).join('\n');
+        li += '</li>';
+        ul.splice(index + 1, 0, li);
+      });
+      return ul;
+    };
+    return {
+      restrict: 'EA',
+      scope: true,
+      link: function postLink(scope, iElement, iAttrs) {
+        var getter = $parse(iAttrs.bsDropdown), items = getter(scope);
+        $timeout(function () {
+          if (!angular.isArray(items)) {
+          }
+          var dropdown = angular.element(buildTemplate(items).join(''));
+          dropdown.insertAfter(iElement);
+          $compile(iElement.next('ul.dropdown-menu'))(scope);
+        });
+        iElement.addClass('dropdown-toggle').attr('data-toggle', 'dropdown');
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').factory('$modal', [
+  '$rootScope',
+  '$compile',
+  '$http',
+  '$timeout',
+  '$q',
+  '$templateCache',
+  '$strapConfig',
+  function ($rootScope, $compile, $http, $timeout, $q, $templateCache, $strapConfig) {
+    var ModalFactory = function ModalFactory(config) {
+      function Modal(config) {
+        var options = angular.extend({ show: true }, $strapConfig.modal, config), scope = options.scope ? options.scope : $rootScope.$new(), templateUrl = options.template;
+        return $q.when($templateCache.get(templateUrl) || $http.get(templateUrl, { cache: true }).then(function (res) {
+          return res.data;
+        })).then(function onSuccess(template) {
+          var id = templateUrl.replace('.html', '').replace(/[\/|\.|:]/g, '-') + '-' + scope.$id;
+          var $modal = $('<div class="modal hide" tabindex="-1"></div>').attr('id', id).addClass('fade').html(template);
+          if (options.modalClass)
+            $modal.addClass(options.modalClass);
+          $('body').append($modal);
+          $timeout(function () {
+            $compile($modal)(scope);
+          });
+          scope.$modal = function (name) {
+            $modal.modal(name);
+          };
+          angular.forEach([
+            'show',
+            'hide'
+          ], function (name) {
+            scope[name] = function () {
+              $modal.modal(name);
+            };
+          });
+          scope.dismiss = scope.hide;
+          angular.forEach([
+            'show',
+            'shown',
+            'hide',
+            'hidden'
+          ], function (name) {
+            $modal.on(name, function (ev) {
+              scope.$emit('modal-' + name, ev);
+            });
+          });
+          $modal.on('shown', function (ev) {
+            $('input[autofocus], textarea[autofocus]', $modal).first().trigger('focus');
+          });
+          $modal.on('hidden', function (ev) {
+            if (!options.persist)
+              scope.$destroy();
+          });
+          scope.$on('$destroy', function () {
+            $modal.remove();
+          });
+          $modal.modal(options);
+          return $modal;
+        });
+      }
+      return new Modal(config);
+    };
+    return ModalFactory;
+  }
+]).directive('bsModal', [
+  '$q',
+  '$modal',
+  function ($q, $modal) {
+    return {
+      restrict: 'A',
+      scope: true,
+      link: function postLink(scope, iElement, iAttrs, controller) {
+        var options = {
+            template: scope.$eval(iAttrs.bsModal),
+            persist: true,
+            show: false,
+            scope: scope
+          };
+        angular.forEach([
+          'modalClass',
+          'backdrop',
+          'keyboard'
+        ], function (key) {
+          if (angular.isDefined(iAttrs[key]))
+            options[key] = iAttrs[key];
+        });
+        $q.when($modal(options)).then(function onSuccess(modal) {
+          iElement.attr('data-target', '#' + modal.attr('id')).attr('data-toggle', 'modal');
+        });
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsNavbar', [
+  '$location',
+  function ($location) {
+    return {
+      restrict: 'A',
+      link: function postLink(scope, element, attrs, controller) {
+        scope.$watch(function () {
+          return $location.path();
+        }, function (newValue, oldValue) {
+          $('li[data-match-route]', element).each(function (k, li) {
+            var $li = angular.element(li), pattern = $li.attr('data-match-route'), regexp = new RegExp('^' + pattern + '$', ['i']);
+            if (regexp.test(newValue)) {
+              $li.addClass('active').find('.collapse.in').collapse('hide');
+            } else {
+              $li.removeClass('active');
+            }
+          });
+        });
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsPopover', [
+  '$parse',
+  '$compile',
+  '$http',
+  '$timeout',
+  '$q',
+  '$templateCache',
+  function ($parse, $compile, $http, $timeout, $q, $templateCache) {
+    $('body').on('keyup', function (ev) {
+      if (ev.keyCode === 27) {
+        $('.popover.in').each(function () {
+          $(this).popover('hide');
+        });
+      }
+    });
+    return {
+      restrict: 'A',
+      scope: true,
+      link: function postLink(scope, element, attr, ctrl) {
+        var getter = $parse(attr.bsPopover), setter = getter.assign, value = getter(scope), options = {};
+        if (angular.isObject(value)) {
+          options = value;
+        }
+        $q.when(options.content || $templateCache.get(value) || $http.get(value, { cache: true })).then(function onSuccess(template) {
+          if (angular.isObject(template)) {
+            template = template.data;
+          }
+          if (!!attr.unique) {
+            element.on('show', function (ev) {
+              $('.popover.in').each(function () {
+                var $this = $(this), popover = $this.data('popover');
+                if (popover && !popover.$element.is(element)) {
+                  $this.popover('hide');
+                }
+              });
+            });
+          }
+          if (!!attr.hide) {
+            scope.$watch(attr.hide, function (newValue, oldValue) {
+              if (!!newValue) {
+                popover.hide();
+              } else if (newValue !== oldValue) {
+                popover.show();
+              }
+            });
+          }
+          if (!!attr.show) {
+            scope.$watch(attr.show, function (newValue, oldValue) {
+              if (!!newValue) {
+                $timeout(function () {
+                  popover.show();
+                });
+              } else if (newValue !== oldValue) {
+                popover.hide();
+              }
+            });
+          }
+          element.popover(angular.extend({}, options, {
+            content: template,
+            html: true
+          }));
+          var popover = element.data('popover');
+          popover.hasContent = function () {
+            return this.getTitle() || template;
+          };
+          popover.getPosition = function () {
+            var r = $.fn.popover.Constructor.prototype.getPosition.apply(this, arguments);
+            $compile(this.$tip)(scope);
+            scope.$digest();
+            this.$tip.data('popover', this);
+            return r;
+          };
+          scope.$popover = function (name) {
+            popover(name);
+          };
+          angular.forEach([
+            'show',
+            'hide'
+          ], function (name) {
+            scope[name] = function () {
+              popover[name]();
+            };
+          });
+          scope.dismiss = scope.hide;
+          angular.forEach([
+            'show',
+            'shown',
+            'hide',
+            'hidden'
+          ], function (name) {
+            element.on(name, function (ev) {
+              scope.$emit('popover-' + name, ev);
+            });
+          });
+        });
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsSelect', [
+  '$timeout',
+  function ($timeout) {
+    var NG_OPTIONS_REGEXP = /^\s*(.*?)(?:\s+as\s+(.*?))?(?:\s+group\s+by\s+(.*))?\s+for\s+(?:([\$\w][\$\w\d]*)|(?:\(\s*([\$\w][\$\w\d]*)\s*,\s*([\$\w][\$\w\d]*)\s*\)))\s+in\s+(.*)$/;
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      link: function postLink(scope, element, attrs, controller) {
+        var options = scope.$eval(attrs.bsSelect) || {};
+        $timeout(function () {
+          element.selectpicker(options);
+          element.next().removeClass('ng-scope');
+        });
+        if (controller) {
+          scope.$watch(attrs.ngModel, function (newValue, oldValue) {
+            if (!angular.equals(newValue, oldValue)) {
+              element.selectpicker('refresh');
+            }
+          });
+        }
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsTabs', [
+  '$parse',
+  '$compile',
+  '$timeout',
+  function ($parse, $compile, $timeout) {
+    var template = '<div class="tabs">' + '<ul class="nav nav-tabs">' + '<li ng-repeat="pane in panes" ng-class="{active:pane.active}">' + '<a data-target="#{{pane.id}}" data-index="{{$index}}" data-toggle="tab">{{pane.title}}</a>' + '</li>' + '</ul>' + '<div class="tab-content" ng-transclude>' + '</div>';
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      priority: 0,
+      scope: true,
+      template: template,
+      replace: true,
+      transclude: true,
+      compile: function compile(tElement, tAttrs, transclude) {
+        return function postLink(scope, iElement, iAttrs, controller) {
+          var getter = $parse(iAttrs.bsTabs), setter = getter.assign, value = getter(scope);
+          scope.panes = [];
+          var $tabs = iElement.find('ul.nav-tabs');
+          var $panes = iElement.find('div.tab-content');
+          var activeTab = 0, id, title, active;
+          $timeout(function () {
+            $panes.find('[data-title], [data-tab]').each(function (index) {
+              var $this = angular.element(this);
+              id = 'tab-' + scope.$id + '-' + index;
+              title = $this.data('title') || $this.data('tab');
+              active = !active && $this.hasClass('active');
+              $this.attr('id', id).addClass('tab-pane');
+              if (iAttrs.fade)
+                $this.addClass('fade');
+              scope.panes.push({
+                id: id,
+                title: title,
+                content: this.innerHTML,
+                active: active
+              });
+            });
+            if (scope.panes.length && !active) {
+              $panes.find('.tab-pane:first-child').addClass('active' + (iAttrs.fade ? ' in' : ''));
+              scope.panes[0].active = true;
+            }
+          });
+          if (controller) {
+            iElement.on('show', function (ev) {
+              var $target = $(ev.target);
+              scope.$apply(function () {
+                controller.$setViewValue($target.data('index'));
+              });
+            });
+            scope.$watch(iAttrs.ngModel, function (newValue, oldValue) {
+              if (angular.isUndefined(newValue))
+                return;
+              activeTab = newValue;
+              setTimeout(function () {
+                var $next = $($tabs[0].querySelectorAll('li')[newValue * 1]);
+                if (!$next.hasClass('active')) {
+                  $next.children('a').tab('show');
+                }
+              });
+            });
+          }
+        };
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsTimepicker', [
+  '$timeout',
+  '$strapConfig',
+  function ($timeout, $strapConfig) {
+    var TIME_REGEXP = '((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])(?::[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)';
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      link: function postLink(scope, element, attrs, controller) {
+        if (controller) {
+          element.on('changeTime.timepicker', function (ev) {
+            $timeout(function () {
+              controller.$setViewValue(element.val());
+            });
+          });
+          var timeRegExp = new RegExp('^' + TIME_REGEXP + '$', ['i']);
+          controller.$parsers.unshift(function (viewValue) {
+            if (!viewValue || timeRegExp.test(viewValue)) {
+              controller.$setValidity('time', true);
+              return viewValue;
+            } else {
+              controller.$setValidity('time', false);
+              return;
+            }
+          });
+        }
+        element.attr('data-toggle', 'timepicker');
+        element.parent().addClass('bootstrap-timepicker');
+        element.timepicker($strapConfig.timepicker || {});
+        var timepicker = element.data('timepicker');
+        var component = element.siblings('[data-toggle="timepicker"]');
+        if (component.length) {
+          component.on('click', $.proxy(timepicker.showWidget, timepicker));
+        }
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsTooltip', [
+  '$parse',
+  '$compile',
+  function ($parse, $compile) {
+    return {
+      restrict: 'A',
+      scope: true,
+      link: function postLink(scope, element, attrs, ctrl) {
+        var getter = $parse(attrs.bsTooltip), setter = getter.assign, value = getter(scope);
+        scope.$watch(attrs.bsTooltip, function (newValue, oldValue) {
+          if (newValue !== oldValue) {
+            value = newValue;
+          }
+        });
+        if (!!attrs.unique) {
+          element.on('show', function (ev) {
+            $('.tooltip.in').each(function () {
+              var $this = $(this), tooltip = $this.data('tooltip');
+              if (tooltip && !tooltip.$element.is(element)) {
+                $this.tooltip('hide');
+              }
+            });
+          });
+        }
+        element.tooltip({
+          title: function () {
+            return angular.isFunction(value) ? value.apply(null, arguments) : value;
+          },
+          html: true
+        });
+        var tooltip = element.data('tooltip');
+        tooltip.show = function () {
+          var r = $.fn.tooltip.Constructor.prototype.show.apply(this, arguments);
+          this.tip().data('tooltip', this);
+          return r;
+        };
+        scope._tooltip = function (event) {
+          element.tooltip(event);
+        };
+        scope.hide = function () {
+          element.tooltip('hide');
+        };
+        scope.show = function () {
+          element.tooltip('show');
+        };
+        scope.dismiss = scope.hide;
+      }
+    };
+  }
+]);
+'use strict';
+angular.module('$strap.directives').directive('bsTypeahead', [
+  '$parse',
+  function ($parse) {
+    return {
+      restrict: 'A',
+      require: '?ngModel',
+      link: function postLink(scope, element, attrs, controller) {
+        var getter = $parse(attrs.bsTypeahead), setter = getter.assign, value = getter(scope);
+        scope.$watch(attrs.bsTypeahead, function (newValue, oldValue) {
+          if (newValue !== oldValue) {
+            value = newValue;
+          }
+        });
+        element.attr('data-provide', 'typeahead');
+        element.typeahead({
+          source: function (query) {
+            return angular.isFunction(value) ? value.apply(null, arguments) : value;
+          },
+          minLength: attrs.minLength || 1,
+          items: attrs.items,
+          updater: function (value) {
+            if (controller) {
+              scope.$apply(function () {
+                controller.$setViewValue(value);
+              });
+            }
+            scope.$emit('typeahead-updated', value);
+            return value;
+          }
+        });
+        var typeahead = element.data('typeahead');
+        typeahead.lookup = function (ev) {
+          var items;
+          this.query = this.$element.val() || '';
+          if (this.query.length < this.options.minLength) {
+            return this.shown ? this.hide() : this;
+          }
+          items = $.isFunction(this.source) ? this.source(this.query, $.proxy(this.process, this)) : this.source;
+          return items ? this.process(items) : this;
+        };
+        if (!!attrs.matchAll) {
+          typeahead.matcher = function (item) {
+            return true;
+          };
+        }
+        if (attrs.minLength === '0') {
+          setTimeout(function () {
+            element.on('focus', function () {
+              element.val().length === 0 && setTimeout(element.typeahead.bind(element, 'lookup'), 200);
+            });
+          });
+        }
+      }
+    };
+  }
+]);

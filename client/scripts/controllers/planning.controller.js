@@ -4,11 +4,13 @@
  * @param  {[type]} $scope [description]
  * @return {[type]}        [description]
  */
-angular.module('utopia').controller('PlanningController', function($scope, db, $routeParams, Restangular, $timeout){
+angular.module('utopia').controller('PlanningController', function($scope, db, $routeParams, Restangular, $timeout, $modal){
 	$scope.sprints = db.get('sprints');
 	$scope.project_id = $routeParams.project_id;
 	var sprint = Restangular.all('sprint');
+	var selectedSprint = 0;
 
+	
 	/**
 	 * Get workitems for each of the sprint
 	 * @param  {[type]} d [description]
@@ -41,11 +43,35 @@ angular.module('utopia').controller('PlanningController', function($scope, db, $
 		}
 	}
 
+	/**
+	 * Creates a new sprint
+	 * @param  {[type]} newsprint [description]
+	 * @return {[type]}           [description]
+	 */
 	$scope.createSprint = function(newsprint) {
-		sprint.one(project_id).post('', newsprint).then(function(d){
+		sprint.one($scope.project_id).post('', newsprint).then(function(d){
 			$scope.sprints.push(d);
-			//db.set('sprints', $scope.sprints);
 		});
 	}
 
+	/**
+	 * deletes a sprint
+	 * @return {[type]} [description]
+	 */
+	$scope.deleteSprintModal = function(id) {
+		var modal = $modal({
+			template: 'delete-sprint',
+			show: true,
+			backdrop: 'static',
+			scope: $scope,
+			persist : true
+   		});
+		$scope.selectedSprint = _.find($scope.sprints, function(d) { return d.id === id; });
+		$scope.allowedSprints = _.filter($scope.sprints, function(d) { return d.id !== id; });
+	}
+
+	$scope.deleteSprint = function(shiftedSprint){
+		console.log($scope.selectedSprint, shiftedSprint);
+		shiftedSprint = 0;
+	}
 });

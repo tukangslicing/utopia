@@ -525,18 +525,19 @@
     </script>
 
     <script type="text/ng-template" id='planning'>
-    <!-- planning view -->    
-        <div class='row-fluid'>
-            <ul class="nav nav-pills">
-                <li><a href='#/projects/{{project_id}}/dashboard'>Dashboard</a></li>
-                <li><a href='#/projects/{{project_id}}/whiteboard'>Whiteboard</a></li>
-                <li><a href='#/projects/{{project_id}}/timeline'>Timeline</a></li>
-                <li class='active'><a href='#/projects/{{project_id}}/planning'>Planning</a></li>
-            </ul>
-        </div>
-        <div style='padding:5px;margin-top:-20px;'>
-            <button class='btn' type="button" data-title="Create a new sprint" bs-popover="'new-sprint'"><i class='icon-plus'></i>Sprint</button>
-        </div>
+    <!-- planning view -->  
+      <div class='row-fluid'>
+          <ul class="nav nav-pills">
+              <li><a href='#/projects/{{project_id}}/dashboard'>Dashboard</a></li>
+              <li><a href='#/projects/{{project_id}}/whiteboard'>Whiteboard</a></li>
+              <li><a href='#/projects/{{project_id}}/timeline'>Timeline</a></li>
+              <li class='active'><a href='#/projects/{{project_id}}/planning'>Planning</a></li>
+          </ul>
+      </div>
+      <div style='padding:5px;margin-top:-20px;'>
+          <button class='btn' type="button" data-title="Create a new sprint" bs-popover="'new-sprint'"><i class='icon-plus'></i>Sprint</button>
+      </div resize ng-style="style()" id="internal-view">
+      <div style='overflow-x: auto;'>
         <div class='sprint-panel'  
             ng-repeat="sprint in sprints" 
             data-drop="true" 
@@ -548,8 +549,9 @@
                 {{sprint.title}}
                 <i class='icon-plus pull-right hover-hand' 
                 title='New workitem' bs-popover="'new-workitem'"></i>
-                <i class='icon-cog pull-right hover-hand' 
-                title='Edit sprint' bs-popover="'edit-sprint'"></i>
+                <span class="btn-group pull-right">
+                  <i class="icon-cog" bs-dropdown="[{text: 'Edit', click:'editSprintModal(sprint.id)', href:''}, {text: 'Delete', click:'deleteSprintModal(sprint.id)'}]" persist="true"></i>
+                </span>  
             </div>
             <div resize ng-style="style()" id="internal-view">
             <div class='sprint-workitems hover-hand' 
@@ -574,6 +576,7 @@
             </div>
             </div>
         </div>
+      </div>
     </script>
 
     <script type="text/ng-template" id='new-sprint'>
@@ -592,6 +595,24 @@
 
     <script type="text/ng-template" id='edit-sprint'>
     <h1>Here you shall edit the sprint</h1>
+    </script>
+
+    <script type="text/ng-template" id='delete-sprint'>
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+        <h3>Delete sprint: {{selectedSprint.title}}</h3>
+      </div>
+      <div class="modal-body">
+        <p>Move the existing workitems in sprint to</p>
+        <select class='input-medium'
+          chosen ng-model="shiftedSprint"
+          ng-options="sprint.id as sprint.title for sprint in allowedSprints">
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn" ng-click="hide()">Close</button>
+        <button class="btn btn-primary" ng-click="hide();deleteSprint(shiftedSprint);">Save changes</button>
+      </div>
     </script>
 
     <script type="text/javascript" src="dist/utopia.min.js"></script>

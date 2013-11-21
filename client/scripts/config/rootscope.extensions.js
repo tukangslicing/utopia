@@ -23,10 +23,13 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 	 * @param  {[type]} id [description]
 	 * @return {[type]}    [description]
 	 */
-	$rootScope.getState = function(id) {
-		var state = _.find(db.get('states'), function(d) { return d.id == id; });
-		return state ? state.title : '';
-	};
+	$rootScope.getState = (function() {
+		var states = db.get('states');
+		return function(id) {
+			var state = _.find(states, function(d) { return d.id == id; });
+			return state ? state.title : '';
+		}
+	})();
 
 	/**
 	 * Returns Sprint of project based on SprintID 
@@ -49,8 +52,8 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 		if(!date) {
 			return '';
 		}
-		var d = new Date(date);
-		return moment(d).fromNow();
+		//var d = new Date(date);
+		return moment(date).fromNow();
 	};
 
 	/**
