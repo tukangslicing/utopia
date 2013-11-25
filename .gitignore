@@ -1,3 +1,2 @@
-/client/node_modules
-/client/build
-/client/dist
+/node_modules
+/build
