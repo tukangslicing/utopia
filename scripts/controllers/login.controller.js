@@ -8,7 +8,7 @@
 angular.module('utopia').controller('LoginController', function ($scope, $http, $location, db) {
 	$scope.submit = function() {
 		var data = {username : $scope.username, password : $scope.password};
-		$http.post(ut.host + 'key', data).success(function(d) {
+		$http.post(ut.host + '/key', data).success(function(d) {
 			$location.path('/');
 			db.set('api-key', d);
 			$http.defaults.headers.common['utopia-server-version'] = db.get('api-key');

@@ -20,8 +20,8 @@ class ImpedimentFilter extends FilterBase {
 		}
 
 		if(!is_empty($this->query)) {
-			array_push($sql, 'title LIKE ?');
-			array_push($args, '%'.$this->query.'%');
+			array_push($sql, 'MATCH(title, description) AGAINST (? IN BOOLEAN MODE)');
+			array_push($args, $this->query);
 		}
 
 		if(!is_empty($this->is_resolved) && $this->is_resolved != "*") {

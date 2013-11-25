@@ -23,7 +23,9 @@
 			multiple='true'
 			ng-model='filter.selectedUsers'
 			ng-options='t.id as t.display_name for t in users'/>
-			<input type='submit' class="btn" value='Apply'></input>
+			<div class="controls">
+				<input type='submit' class="btn" value='Apply'></input>
+			</div>
 		</form>
 	</div>
 	<div class="span9">
@@ -69,7 +71,6 @@
 			e-form="textBtnForm"
 			markdown="selectedImpediment.description">
 			{{selectedImpediment.description}}
-			
 		</div>
 		<hr />
 		<div ng-repeat='comment in comments' class='hover-parent'>
