@@ -30,13 +30,17 @@
  * Main module
  * @type {[type]}
  */
-var ut = angular.module('utopia', ['restangular', '$strap.directives', 'ngDragDrop']);
+var ut = angular.module('utopia', ['restangular', 
+	'$strap.directives', 
+	'ngDragDrop', 
+	'utopia-templates',
+	'xeditable']);
 
 /**
  * Constants
  * @type {String}
  */
-ut.host = "http://PS7026/utopia/";
+ut.host = "api";
 angular.module('utopia').constant("route", {
 	resolve : function(route) {
 		return {
@@ -67,6 +71,7 @@ angular.module('utopia').config(function($routeProvider, $locationProvider, rout
 	$routeProvider.when('/projects/:project_id/timeline', route.resolve('timeline'));
 	$routeProvider.when('/projects/:project_id/planning', route.resolve('planning'));
 	$routeProvider.when('/projects/:project_id/dashboard', route.resolve('dashboard'));
+	$routeProvider.when('/projects/:project_id/impediments', route.resolve('impediments'));
 	$routeProvider.otherwise({
 		templateUrl : 'under-construction',
 		controller : nothing
@@ -122,7 +127,7 @@ angular.module('utopia').config(function($httpProvider, $routeProvider, Restangu
  * @param  {[type]} $timeout
  * @return {[type]}
  */
-angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout) {
+angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout, editableOptions) {
 	//global authentication
 	$rootScope.$on("$routeChangeStart", function(event, next, current) {
 		NProgress.start();
@@ -144,6 +149,7 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 	});
 	//global header settings
 	$http.defaults.headers.common['utopia-server-version'] = db.get('api-key');
+	editableOptions.theme = 'bs2';
 });
 
 var nothing = function() {}

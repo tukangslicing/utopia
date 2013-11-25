@@ -333,3 +333,8 @@ html, body {
 .no-margin {
 	margin: 0px !important;
 }
+
+.impediment {
+	border: 1px solid #e7e7e7;
+	padding: 5px;
+}

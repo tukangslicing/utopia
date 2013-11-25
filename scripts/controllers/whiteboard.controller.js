@@ -10,8 +10,9 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	/**
 	 * Check if on current project
 	 */
-	if(db.get('current_project') == $scope.project_id) {
-		$scope.getProjectDetails();
+	$scope.project_id = $routeParams.project_id;
+	if(db.get('current_project') !== $scope.project_id) {
+		$scope.getProjectDetails($scope.project_id);
 	}
 	//init restangular URLs!
 	var project = Restangular.all('project');
@@ -21,7 +22,7 @@ angular.module('utopia').controller('WhiteboardController', function ($scope, $r
 	$scope.users = db.get('users');
 	$scope.types = db.get('types');
 	$scope.states = db.get('states');
-	$scope.project_id = $routeParams.project_id;
+	
 	$scope.swkitm = null;
 
 	//do the first pull

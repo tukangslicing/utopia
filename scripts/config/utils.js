@@ -46,6 +46,6 @@ Offline.options = {
   game: false
 };
 
-var timeout = setInterval(function(){
-	Offline.check();
-},2000)
+// var timeout = setInterval(function(){
+// 	Offline.check();
+// },2000)

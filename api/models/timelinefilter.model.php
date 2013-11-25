@@ -1,13 +1,10 @@
 <?php
 
-class TimelineFilter {
+class TimelineFilter extends FilterBase {
 	public $users;
 	public $from;
 	public $to;
 	public $workitem_id;
-
-	public $sql;
-	public $args;
 
 	public function __construct() {
 		$this->users = '';
@@ -44,13 +41,5 @@ class TimelineFilter {
 
 		$this->sql = implode($sql, 'AND');
 		$this->args = $args;
-	}
-
-	public function get_sql() {
-		return $this->sql;
-	}
-
-	public function get_args() {
-		return $this->args;
 	}
 }

@@ -9,10 +9,10 @@ angular.module('utopia').controller('TimelineController', function ($scope, $rou
 	/**
 	 * Check if on current project
 	 */
-	if(db.get('current_project') == $scope.project_id) {
-		$scope.getProjectDetails();
+	$scope.project_id = $routeParams.project_id;
+	if(db.get('current_project') !== $scope.project_id) {
+		$scope.getProjectDetails($scope.project_id);
 	}
-	
 	/**
 	 * Setup basic constants for the controller
 	 * @type {[type]}

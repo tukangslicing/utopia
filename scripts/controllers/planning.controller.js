@@ -9,8 +9,9 @@ angular.module('utopia').controller('PlanningController', function($scope, db, $
 	/**
 	 * Check if on current project
 	 */
-	if(db.get('current_project') == $scope.project_id) {
-		$scope.getProjectDetails();
+	$scope.project_id = $routeParams.project_id;
+	if(db.get('current_project') !== $scope.project_id) {
+		$scope.getProjectDetails($scope.project_id);
 	}
 
 	$scope.sprints = db.get('sprints');

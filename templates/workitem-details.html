@@ -1,0 +1,66 @@
+<!-- workitem details -->
+ <a href='#projects/{{project_id}}/whiteboard/?id={{swkitm.id}}' class='icon-share-alt hover-hand pull-right' title='Open in whiteboard'></a>
+ <table class='table-condensed workitem-details' ng-show='swkitm'>
+    <tr class='hover-hand'>
+        <td><small>ID</small></td>
+        <td><code><span ng-bind="swkitm.id"></span></code></td>
+    </tr>
+    <tr>
+        <td>Title</td>
+        <td><span type='text' ng-bind='swkitm.title'></span></td>
+    </tr>
+    <tr>
+        <td>Description</td>
+        <td><span type='text' ng-bind='swkitm.description'></span></td>
+    </tr>
+    <tr>
+        <td>Importance</td>
+        <td>
+            <span class='badge'>{{swkitm.importance}}</span>
+        </td>
+    </tr>
+    <tr>
+        <td>Points</td>
+        <td>
+            <span class='badge hover-hand'>{{swkitm.story_points}}</span>
+        </td>
+    </tr>
+    <tr>
+        <td>Type</td>
+        <td>
+            {{getType(swkitm.type)}}
+        </td>
+    </tr>
+    <tr>
+        <td>State</td>
+        <td>
+           {{getState(swkitm.state)}}
+        </td>
+    </tr>
+    <tr>
+        <td>Assigned</td>
+        <td>
+           {{getUser(swkitm.assigned_to)}}
+        </td>
+    </tr>
+    <tr>
+        <td>Created</td>
+        <td>
+           {{getUser(swkitm.created_by)}}
+        </td>
+    </tr>
+    <tr>
+        <td>Planned for</td>
+        <td>{{getSprint(swkitm.planned_for)}}</td>
+    </tr>
+    <tr>
+        <td>Created</td>
+        <td><span type='text'>{{swkitm.created_date | date:'medium'}}</span></td>
+    </tr>
+</table>
+<table ng-show='!swkitm'>
+<tr>
+    <td>Just a sec!</td>
+    <td><div class='spinner-icon spinner-inverse'></td>
+</tr>
+</table>

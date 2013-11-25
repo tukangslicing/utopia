@@ -9,7 +9,8 @@
     "grunt-contrib-uglify": "*",
     "grunt-contrib-cssmin": "*",
     "grunt-contrib-copy": "*",
-    "grunt-contrib-clean": "*"
+    "grunt-contrib-clean": "*",
+    "grunt-html2js": "~0.2.0"
   },
   "devDependencies": {},
   "scripts": {
@@ -19,4 +20,3 @@
   "author": "Chinmay Kulkarni",
   "license": "MIT"
 }
-

@@ -26,6 +26,7 @@ class Project extends ActiveRecord\Model {
 	    array('sprints', 'class_name' => 'Sprint'),
 	    array('mappings', 'class_name' => 'ProjectUser'),
 	    array('members', 'class_name' => 'User', 'through' => 'mappings'),
+	    array('impediments', 'class_name' => 'Impediments'),
     );
 
     /**

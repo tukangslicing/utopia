@@ -1,0 +1,52 @@
+<!-- planning view -->  
+<div nav="3"></div>
+<div style='padding:5px;margin-top:-15px;'>
+  <button class='btn' type="button" data-title="Create a new sprint" bs-popover="'new-sprint'"><i class='icon-plus'></i>Sprint</button>
+</div>
+<div style='overflow:scroll'>
+  <table class='sprint-table' resize ng-style="style()" id="internal-view">
+    <tr>
+      <td class='sprint-panel'  
+      ng-repeat="sprint in sprints" 
+      data-drop="true" 
+      ng-model="sprint.workitems" 
+      ng-animate=" 'animate' "
+      jqyoui-droppable="{multiple:true , onDrop: 'setSprintDrop({{sprint.id}})'}"
+      data-jqyoui-options="{index: {{$index}}}" >
+
+      <div class='sprint-panel-header'>
+        {{sprint.title}}
+        <span class="btn-group pull-right">
+         <i class='icon-plus' 
+         title='New workitem' bs-popover="'new-workitem'"></i>
+         <i class="icon-cog" bs-dropdown="[{text: 'Edit', click:'sprintModal(\'edit\',sprint.id)', href:''}, {text: 'Delete', click:'sprintModal(\'delete\',sprint.id)'}]" persist="true"></i>
+       </span>  
+     </div>
+     <div resize ng-style="style()" id='internal-view'>
+      <div class='sprint-workitems hover-hand' 
+      ng-repeat='wk in sprint.workitems' 
+      data-drag="true" 
+      ng-show="wk.id" 
+      ng-model="sprint.workitems" 
+      ng-animate=" 'animate' "
+      data-jqyoui-options="{index: {{$index}}, revert: 'invalid', appendTo: 'body', helper: 'clone' }" 
+      jqyoui-draggable="{index: {{$index}}, animate:true, onDrag: 'setWorkitemDrop({{wk.id}})'}">
+
+      <span class="badge pull-right" 
+      ng-class="{0:'badge-important', 1: 'badge-success', 2: 'badge-warning'}[wk.importance]" 
+      title='Priority'>
+      {{wk.importance}}
+    </span>
+    <button class='btn btn-mini' type="button" data-placement="right" data-title="Workitem details" data-unique="1" bs-popover="'workitem-details'" ng-click="fetchDetails(wk.id)">#{{wk.id}}</button></span>
+    <span><b>{{wk.title}}</b></span>
+    <p>
+      <span class='text-info'>{{getType(wk.type)}}</span>
+      <span class='muted capitalize'>{{getState(wk.state)}}</span>
+      <small class='pull-right'><i>Last updated: {{wk.last_updated | amTimeAgo}}</i></small>
+    </p>
+  </div>
+</div>
+</td>
+</tr>
+</table>
+</div>

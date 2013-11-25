@@ -74,6 +74,12 @@ class ProjectController extends BaseController {
 		return $users;
 	}
 
+	public function impediments_get($project_id) {
+		self::validate_access($project_id);
+		$project = Project::find($project_id);
+		return $project->impediments;
+	}
+
 	/**
 	 * Helper function to validate whether user has rights for the project.
 	 * @param  project_id $id

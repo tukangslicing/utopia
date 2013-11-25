@@ -1,0 +1,16 @@
+<!-- delete sprint -->
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+  <h3>Delete sprint: {{selectedSprint.title}}</h3>
+</div>
+<div class="modal-body">
+  <p>Move the existing workitems from this sprint to</p>
+  <select class='input-medium'
+    chosen ng-model="shiftedSprint"
+    ng-options="sprint.id as sprint.title for sprint in allowedSprints">
+  </select>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn" ng-click="hide()">Close</button>
+  <button class="btn btn-primary" ng-click="hide();deleteSprint(shiftedSprint);">Save changes</button>
+</div>

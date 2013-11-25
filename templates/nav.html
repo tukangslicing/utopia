@@ -1,0 +1,7 @@
+<div class='row-fluid'>
+	<ul class="nav nav-pills">
+		<li ng-repeat='item in items' ng-class="{true : 'active', false : ''}[$index==activeIndex]">
+			<a href='#/projects/{{project_id}}/{{item | lowercase}}'>{{item}}</a>
+		</li>
+	</ul>
+</div>

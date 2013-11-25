@@ -9,6 +9,10 @@ module.exports = function(grunt) {
       directives: {
         src: ['scripts/directives/*.js'],
         dest: 'build/directives.js'
+      },
+      filters : {
+        src: ['scripts/filters/*.js'],
+        dest: 'build/filters.js'
       }
     },
     pkg: grunt.file.readJSON('package.json'),
@@ -24,8 +28,7 @@ module.exports = function(grunt) {
      */
     uglify : {
       options: {
-        mangle: false,
-        beautify : true
+        mangle: false
       },
       dist: {
         src: 'dist/utopia.js',
@@ -59,13 +62,26 @@ module.exports = function(grunt) {
     clean : ["build"],
     watch: {
         scripts: {
-        files: ['scripts/**/*.js', 'css/**/*.css'],
-        tasks: ['ngmin', 'concat', 'cssmin', 'copy', 'clean'],
+        files: ['scripts/**/*.js', 'css/**/*.css', 'templates/**/*.html'],
+        tasks: ['ngmin', 'html2js','concat','cssmin', 'copy', 'clean'],
         options: {
           debounceDelay: 250,
         },
       }
-    }
+    },
+    html2js: {
+      options: {
+        rename : function (name) {
+          return name.replace('.html', '');
+        },
+        base : 'templates',
+        module : 'utopia-templates'
+      },
+      main: {
+        src: ['templates/*.html'],
+        dest: 'build/utopia-templates.js'
+      },
+    },
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -75,7 +91,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-html2js');
 
-  grunt.registerTask('default', ['ngmin', 'concat', 'uglify', 'cssmin', 'copy', 'clean']);
+  grunt.registerTask('default', ['ngmin','html2js','concat', 'uglify', 'cssmin', 'copy', 'clean']);
   
 };

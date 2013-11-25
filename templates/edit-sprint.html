@@ -1,0 +1,25 @@
+<!-- edit a sprint -->
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+    <h3>Edit sprint: {{selectedSprint.title}}</h3>
+</div>
+<div class="modal-body">
+<form class="form-horizontal">
+  <div class="control-group">
+    <label class="control-label" for="title">Title</label>
+    <div class="controls">
+      <input type="text" placeholder="Title" ng-model='selectedSprint.title' required/>
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="inputPassword">Goals</label>
+    <div class="controls">
+      <textarea placeholder="Set some goals" ng-model='selectedSprint.goals' required/>
+    </div>
+  </div>
+</form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn" ng-click="hide()">Close</button>
+    <button class="btn btn-primary" ng-click="hide();editSprint();">Save changes</button>
+</div>

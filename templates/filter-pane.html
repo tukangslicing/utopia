@@ -1,0 +1,38 @@
+<!-- filter pane -->
+<div class="well text-left side-nav affix">
+    <legend>Filter</legend>
+    <strong>By workitem ID</strong>
+    <label>
+        <input type="text" ng-model='workitem_ids'/>
+    </label>
+    <div><strong>By users</strong></div>
+    <select
+        chosen
+        multiple='true'
+        ng-model='selectedUsers'
+        ng-options='t.id as t.display_name for t in users'/>
+    <div>
+        <strong>By date</strong>
+    </div>
+    <label>
+        <div>Start</div>
+        <input type="date" ng-model='from' />
+    </label>
+    <label>
+        <div>End</div>
+        <input type="date" ng-model='to' />
+    </label>
+    <!-- <div><strong>Group by</strong></div>
+    <label class="radio inline">
+      <input type="radio" name="group-radios" value="User" checked>
+      User
+    </label>
+    <label class="radio inline">
+      <input type="radio" name="group-radios" value="Workitem">
+      Workitem
+    </label> -->            
+    <div>
+        <input type='button' class="btn btn-medium" ng-click='applyFilter()' value='Apply' />
+    </div>
+    </form>
+</div>

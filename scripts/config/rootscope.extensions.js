@@ -109,7 +109,6 @@ angular.module('utopia').run(function($rootScope, $location, $http, db, $timeout
 				return $rootScope.getUser(value);
 			},
 			planned_for : function(value) {
-				console.log(value);
 				return $rootScope.getSprint(value);
 			}
 		}

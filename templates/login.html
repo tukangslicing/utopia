@@ -1,0 +1,64 @@
+<!-- Login View -->
+<div class='row-fluid'>
+    <div class='span9'>
+    <!-- Login Carousel -->
+    <div id="myCarousel" class="carousel slide">
+      <ol class="carousel-indicators">
+        <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+        <li data-target="#myCarousel" data-slide-to="1"></li>
+        <li data-target="#myCarousel" data-slide-to="2"></li>
+        <li data-target="#myCarousel" data-slide-to="3"></li>
+        <li data-target="#myCarousel" data-slide-to="4"></li>
+      </ol>
+      <!-- Carousel items -->
+      <div class="carousel-inner">
+        <div class="active item">
+            <h1>Agile project management</h1>
+            <span>Simple yet powerful</span>
+        </div>
+        <div class="item">
+            <h1>Interactive dashboards</h1>
+            <span>Know the current state of your project</span>
+        </div>
+        <div class="item">
+            <h1>Beautiful timeline view</h1>
+            <span>Get to know who's working on what</span>
+        </div>
+        <div class="item">
+            <h1>Emphasis on planning and testing</h1>
+            <span>It's important</span>
+        </div>
+         <div class="item">
+            <h1>Customizable whiteboards</h1>
+            <span>Make Utopia your own!</span>
+        </div>
+      </div>
+      <!-- Carousel nav -->
+      <a class="carousel-control left" href="#myCarousel" data-slide="prev">&lsaquo;</a>
+      <a class="carousel-control right" href="#myCarousel" data-slide="next">&rsaquo;</a>
+    </div>
+    </div>
+    <!-- Login form -->
+    <form class="span3 login-form">
+      <div class="control-group">
+        <label class="control-label" for="inputEmail">Email</label>
+        <div class="controls">
+          <input type="email" id="username" placeholder="Email" ng-model='username' required>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="inputPassword">Password</label>
+        <div class="controls">
+          <input type="password" id="password" placeholder="Password" ng-model='password' required>
+        </div>
+      </div>
+      <div class="control-group">
+        <div class="controls">
+          <label class="checkbox">
+            <input type="checkbox"> Remember me
+          </label>
+          <input type="submit" class="btn" ng-click='submit()'></input>
+        </div>
+      </div>
+    </form>
+</div>

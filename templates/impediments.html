@@ -1,0 +1,92 @@
+<div nav="4">
+</div>
+<div class="row-fluid">
+	<div class="span3 well">
+		<form ng-submit='applyFilter()'>
+			<legend>Filter</legend>
+			<input type="text" placeholder="Search" ng-model="filter.query"/>
+			<label class="radio">
+				<input type="radio" ng-model="filter.is_resolved" value="0"/>
+				Open
+			</label>
+			<label class="radio">
+				<input type="radio" ng-model="filter.is_resolved" value="1"/>
+				Resolved
+			</label>
+			<label class="radio">
+				<input type="radio" ng-model="filter.is_resolved" value="*"/>
+				All
+			</label>
+			<div><strong>Reported by</strong></div>
+			<select
+			chosen
+			multiple='true'
+			ng-model='filter.selectedUsers'
+			ng-options='t.id as t.display_name for t in users'/>
+			<input type='submit' class="btn" value='Apply'></input>
+		</form>
+	</div>
+	<div class="span9">
+		<div class='text-right' style='padding-bottom:5px;' ng-show='!selectedImpediment'>
+			<button class="btn" bs-modal="'new-impediment'"><i class="icon-plus"></i>Create impediment</button>
+		</div>
+		<div ng-repeat='imp in impediments' class='impediment' ng-show='!selectedImpediment'>
+			<a class='workitem-anchor' href='#projects/{{project_id}}/impediments?id={{imp.id}}'>
+				<h4>
+					<span class="badge" ng-class="{true: ' badge-success', false : 'badge-important'}[imp.is_resolved == 1]">i</span>
+					{{imp.title}}
+				</h4>
+			</a>
+			<p><span class="muted">Opened by </span>
+				{{getUser(imp.created_by)}}, {{imp.created_at | amTimeAgo}}
+			</p>
+		</div>
+		<div ng-show='selectedImpediment'>
+			<div class="btn-group">
+				<a class="btn" ng-click='clearSearch()' 
+				href='#projects/{{project_id}}/impediments'>
+				<i class="icon-arrow-left"></i>
+				Back to list
+			</a>
+			<button class='btn' ng-show="!selectedImpediment.is_resolved" ng-click='saveImpediment()'>Mark as resolved</button>
+			<button class="btn" ng-click="textBtnForm.$show()" ng-hide="textBtnForm.$visible">
+				Edit
+			</button>
+			<button class="btn" ng-click="deleteImpediment()">Delete</button>
+		</div>
+		<p class='pull-right'>
+			<span class="muted">Opened by </span>
+			{{getUser(selectedImpediment.created_by)}}, {{selectedImpediment.created_at | amTimeAgo}}
+		</p>
+		<legend>
+			{{selectedImpediment.title}}
+		</legend>
+		<div resize ng-style='style()'>
+			<div onaftersave='saveImpediment(true)'
+			editable-textarea="selectedImpediment.description" 
+			e-rows="7" 
+			e-cols="80"
+			e-form="textBtnForm"
+			markdown="selectedImpediment.description">
+			{{selectedImpediment.description}}
+			
+		</div>
+		<hr />
+		<div ng-repeat='comment in comments' class='hover-parent'>
+			<button class='close pull-right hover-hand hover-child' type='button' ng-click='deleteComment($index)'>x</button>
+			<div markdown="comment.comment_body">{{comment.comment_body}}</div> 
+			<p class='pull-right'>by {{getUser(comment.created_by)}}, 
+				<span title='{{comment.created_at | date: "medium"}}'>
+					{{ago(comment.created_at)}}
+				</span>
+			</p> 
+			<hr />
+		</div>
+		<form ng-submit='addComment()'>
+			<textarea class='input-large' ng-model='comment_body' rows="3" style='width:90%;'></textarea>
+			<input type='submit' class="btn" value='Add'></input>
+		</form>
+	</div>
+</div>
+</div>
+</div>
