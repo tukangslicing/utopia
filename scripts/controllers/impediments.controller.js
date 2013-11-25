@@ -37,7 +37,10 @@ angular.module('utopia').controller('ImpedimentsController', function($scope, $r
 		if(!id) return;
 		$scope.comments = [];
 		$scope.selectedImpediment = _.find($scope.impediments, function(d) { return d.id == id });
+		getComments(id);
+	}
 
+	function getComments(id) {
 		impediments.one(id).getList('comments').then(function(d) {
 			$scope.comments = d;
 		})
@@ -112,7 +115,6 @@ angular.module('utopia').controller('ImpedimentsController', function($scope, $r
 	 * @return {[type]} [description]
 	 */
 	$scope.createImpediment = function(newImpediment) {
-		console.log(newImpediment);
 		impediments.one($scope.project_id).post('', newImpediment).then(function(d){
 			$scope.impediments.push(d);
 		});
@@ -123,5 +125,12 @@ angular.module('utopia').controller('ImpedimentsController', function($scope, $r
 	 * @param  {[type]} d [description]
 	 * @return {[type]}   [description]
 	 */
+	if($location.search().id) {
+		impediments.one($scope.project_id + '/' + $location.search().id).get().then(function(d){
+			console.log(d);
+			$scope.selectedImpediment = d;
+		});
+		getComments($location.search().id);
+	} 
 	$scope.applyFilter();
 })

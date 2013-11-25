@@ -7,7 +7,12 @@ class ImpedimentsController extends BaseController {
 	 * @param  [type] $project_id [description]
 	 * @return [type]             [description]
 	 */
-	public function index_get($project_id) {
+	public function index_get($project_id, $id = NULL) {
+		if($id) {
+			$imp = Impediments::find($id);
+			ProjectController::validate_access($imp->project_id);	
+			return $imp;
+		}
 		ProjectController::validate_access($project_id);
 		$filter = new ImpedimentFilter();
 		$filter = deserialize($this->get_data(), $filter);
