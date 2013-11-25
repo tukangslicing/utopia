@@ -4,7 +4,7 @@ Utopia is an agile software project management tool being designed with flexibil
 
 ##Build instructions
 
-go to ``` client\ ``` do ``` npm install ```
+do ``` npm install ```
 and then ``` grunt ```
 
 ##Love is on the way!
