@@ -3,29 +3,31 @@
 <div class="row-fluid">
 	<div class="span3 well">
 		<form ng-submit='applyFilter()'>
-			<legend>Filter</legend>
-			<input type="text" placeholder="Search" ng-model="filter.query"/>
-			<label class="radio">
-				<input type="radio" ng-model="filter.is_resolved" value="0"/>
-				Open
-			</label>
-			<label class="radio">
-				<input type="radio" ng-model="filter.is_resolved" value="1"/>
-				Resolved
-			</label>
-			<label class="radio">
-				<input type="radio" ng-model="filter.is_resolved" value="*"/>
-				All
-			</label>
-			<div><strong>Reported by</strong></div>
-			<select
-			chosen
-			multiple='true'
-			ng-model='filter.selectedUsers'
-			ng-options='t.id as t.display_name for t in users'/>
-			<div class="controls">
-				<input type='submit' class="btn" value='Apply'></input>
-			</div>
+			<fieldset>
+				<legend>Filter</legend>
+				<input type="text" placeholder="Search" ng-model="filter.query"/>
+				<label class="radio">
+					<input type="radio" ng-model="filter.is_resolved" value="0"/>
+					Open
+				</label>
+				<label class="radio">
+					<input type="radio" ng-model="filter.is_resolved" value="1"/>
+					Resolved
+				</label>
+				<label class="radio">
+					<input type="radio" ng-model="filter.is_resolved" value="*"/>
+					All
+				</label>
+				<div><strong>Reported by</strong></div>
+				<select
+				chosen
+				multiple='true'
+				ng-model='filter.selectedUsers'
+				ng-options='t.id as t.display_name for t in users'/>
+				<div class="controls">
+					<input type='submit' class="btn" value='Apply'></input>
+				</div>
+			</fieldset>
 		</form>
 	</div>
 	<div class="span9">
